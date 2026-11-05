@@ -1,0 +1,20 @@
+# Kempower Self-Operating Charging Network - Project Dependencies
+# Python >= 3.10
+
+# Core Data Processing, Linear Algebra & MILP Optimization
+numpy>=1.24.0
+scipy>=1.10.0
+pandas>=2.0.0
+
+# Interactive Command Center & Visual Analytics
+streamlit>=1.30.0
+altair>=5.0.0
+matplotlib>=3.7.0
+
+# Protocol Serialization, Parsing & Cryptography (OCPP 2.0.1 & ISO 15118 PnC)
+cryptography>=41.0.0
+pydantic>=2.0.0
+python-dateutil>=2.8.2
+
+# Testing & Continuous Deterministic Verification
+pytest>=7.4.0

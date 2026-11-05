@@ -29,8 +29,8 @@ class VehicleSchedule:
     max_charge_kw: float
     penalty_eur: float = 250.0
     dispenser_id: Optional[str] = None
-    optimizer_slack_weight: float = 10000.0
-    deficit_penalty_per_kwh: float = 10.0
+    optimizer_slack_weight: Optional[float] = None
+    deficit_penalty_per_kwh: Optional[float] = None
 
 @dataclass
 class BESSConfig:
@@ -42,6 +42,7 @@ class BESSConfig:
     eta_charge: float = 0.95
     eta_discharge: float = 0.95
     deg_cost_eur_kwh: float = 0.03
+    eta_dc_coupling: float = 0.97  # High-efficiency DC-bus coupling
 
 @dataclass
 class SiteMPCConfig:
@@ -51,10 +52,39 @@ class SiteMPCConfig:
     eta_ch_battery: float = 0.95     # 95.0% vehicle battery charging efficiency
     num_modules: int = 43            # 25 kW modules
     p_mod_kw: float = 25.0
+    num_guns: Optional[int] = 12     # Physical gun capacity constraint (P1-4)
     aux_load_kw: float = 0.0
     peak_fee_eur_kw_mo: float = 6.50 # €/kW/month (full monthly demand tariff, Issue C2)
     use_full_monthly_peak_fee: bool = False
     bess: Optional[BESSConfig] = None
+    max_grid_ramp_kw: Optional[float] = None # Transformer ramp-rate clamping limit
+    pv_capacity_kwp: float = 0.0
+
+    @classmethod
+    def compute_microgrid_capex(
+        cls,
+        bess_kwh: float = 500.0,
+        bess_kw: float = 250.0,
+        pv_kwp: float = 0.0,
+        bess_energy_cost_eur_kwh: float = 320.0,
+        bess_power_cost_eur_kw: float = 110.0,
+        pv_cost_eur_kwp: float = 900.0,
+    ) -> Dict[str, float]:
+        """
+        Calculates standardized microgrid equipment capital costs strictly grounded
+        in equipment_costs.csv (500 kWh / 250 kW BESS = 187,500 €, PV = 900 €/kWp).
+        """
+        bess_energy_capex = bess_kwh * bess_energy_cost_eur_kwh
+        bess_power_capex = bess_kw * bess_power_cost_eur_kw
+        bess_total = bess_energy_capex + bess_power_capex
+        pv_total = pv_kwp * pv_cost_eur_kwp
+        return {
+            "bess_energy_capex_eur": bess_energy_capex,
+            "bess_power_capex_eur": bess_power_capex,
+            "bess_total_capex_eur": bess_total,
+            "pv_total_capex_eur": pv_total,
+            "total_microgrid_capex_eur": bess_total + pv_total,
+        }
 
 @dataclass
 class DispatchPlan:
@@ -124,6 +154,7 @@ class MPCOptimizer:
         transformer_max_kw: Optional[float] = None,
         grid_tariffs_eur_mwh: Optional[List[float]] = None,
         pv_generation_kw: Optional[List[float]] = None,
+        existing_peak_kw: float = 0.0,   # Established peak so far to avoid rolling duplication (P1-5)
         start_step: int = 0
     ) -> DispatchPlan:
         """
@@ -167,8 +198,14 @@ class MPCOptimizer:
                     "batt": max(1.0, v.battery_kwh),
                     "max_kw": max(0.0, v.max_charge_kw),
                     "penalty": v.penalty_eur,
-                    "opt_slack": max(v.penalty_eur, getattr(v, "optimizer_slack_weight", 10000.0)),
-                    "def_pen_kwh": max(1.0, getattr(v, "deficit_penalty_per_kwh", 10.0)),
+                    "opt_slack": (
+                        v.optimizer_slack_weight if v.optimizer_slack_weight is not None
+                        else (max(v.penalty_eur * 10.0, v.penalty_eur + 500.0) if v.penalty_eur > 0 else 0.0)
+                    ),
+                    "def_pen_kwh": (
+                        v.deficit_penalty_per_kwh if v.deficit_penalty_per_kwh is not None
+                        else (max(1.0, (v.penalty_eur / v.battery_kwh) * 5.0) if (v.battery_kwh > 0 and v.penalty_eur > 0) else 0.0)
+                    ),
                 })
 
         # Decision variable indexing
@@ -186,13 +223,14 @@ class MPCOptimizer:
 
         idx_pv_curt = cur; cur += K
 
-        # Vehicle variables: p_v[s], n_mod[s], soc[s], z_v (continuous normalized SoC deficit slack)
+        # Vehicle variables: p_v[s], n_mod[s], a_v[s] (gun), soc[s], z_v (continuous normalized SoC deficit slack)
         v_idx_map = {}
         for v in active_vehicles:
             vid = v["id"]
             n_steps = v["dep"] - v["arr"]
             vd = {"p": cur}; cur += n_steps
             vd["n_mod"] = cur; cur += n_steps
+            vd["a"] = cur; cur += n_steps  # Gun occupancy binary variable (P1-4)
             vd["soc"] = cur; cur += (n_steps + 1)
             vd["z"] = cur; cur += 1
             v_idx_map[vid] = vd
@@ -217,7 +255,7 @@ class MPCOptimizer:
             else (self.config.peak_fee_eur_kw_mo / 30.0)
         )
         c[idx_peak] = peak_rate_eff
-        lb[idx_peak] = 0.0
+        lb[idx_peak] = max(0.0, existing_peak_kw)
 
         # PV curtailment
         for t in range(K):
@@ -262,6 +300,10 @@ class MPCOptimizer:
                 lb[vd["n_mod"] + s] = 0.0
                 ub[vd["n_mod"] + s] = int(np.ceil(v["max_kw"] / self.config.p_mod_kw))
 
+                integrality[vd["a"] + s] = 1
+                lb[vd["a"] + s] = 0.0
+                ub[vd["a"] + s] = 1.0
+
             for s in range(n_steps + 1):
                 lb[vd["soc"] + s] = 0.0
                 ub[vd["soc"] + s] = 1.0
@@ -302,6 +344,21 @@ class MPCOptimizer:
             n_steps = v["dep"] - v["arr"]
             for s in range(n_steps):
                 add_c({vd["p"] + s: 1.0, vd["n_mod"] + s: -self.config.p_mod_kw}, -np.inf, 0.0)
+                # Couple module allocation to gun occupancy: n_mod <= a * M
+                max_mods = int(np.ceil(v["max_kw"] / self.config.p_mod_kw))
+                add_c({vd["n_mod"] + s: 1.0, vd["a"] + s: -float(max_mods)}, -np.inf, 0.0)
+
+        # Physical gun limit: sum a[v,t] <= num_guns (P1-4)
+        if self.config.num_guns is not None and self.config.num_guns > 0:
+            for t in range(K):
+                row_gun = {}
+                for v in active_vehicles:
+                    if v["arr"] <= t < v["dep"]:
+                        s = t - v["arr"]
+                        vd = v_idx_map[v["id"]]
+                        row_gun[vd["a"] + s] = 1.0
+                if row_gun:
+                    add_c(row_gun, -np.inf, float(self.config.num_guns))
 
         # 4. Total active modules <= station cabinet capacity
         for t in range(K):
@@ -351,6 +408,15 @@ class MPCOptimizer:
 
             # Terminal constraint: soc[end] + z_v >= req_soc (z_v is continuous deficit in [0, 1])
             add_c({vd["soc"] + n_steps: 1.0, vd["z"]: 1.0}, v["req_soc"], np.inf)
+
+        # 7. Grid Ramp-Rate Clamping Constraint (if configured)
+        if self.config.max_grid_ramp_kw is not None and self.config.max_grid_ramp_kw > 0.0:
+            for t in range(1, K):
+                add_c(
+                    {idx_grid + t: 1.0, idx_grid + t - 1: -1.0},
+                    -self.config.max_grid_ramp_kw,
+                    self.config.max_grid_ramp_kw,
+                )
 
         # Build sparse constraint matrix
         num_constraints = len(rows)
@@ -432,7 +498,7 @@ class MPCOptimizer:
 
         # Cost breakdown (contractual accounting cost vs internal priority weight)
         energy_cost = float(np.sum(1e-3 * (np.array(spot_prices_eur_mwh) + np.array(tariffs)) * grid_sol * self.dt))
-        peak_cost = float(peak_rate_eff * peak_sol)
+        peak_cost = float(peak_rate_eff * max(0.0, peak_sol - existing_peak_kw))
         accounting_total_cost = energy_cost + peak_cost + penalties_total
 
         return DispatchPlan(
