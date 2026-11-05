@@ -150,22 +150,59 @@ class ROIAnalyzer:
     @classmethod
     def analyze_monthly_peak_demand_vs_energy(cls) -> Dict[str, Any]:
         """
-        Compares S1-S5 monthly peak demand fees against 14-day energy costs
-        from finance_daily.csv and tariffs.csv (Issue C2).
+        Compares S1-S5 monthly peak demand fees against official 14-day energy costs
+        computed directly from tariffs.csv, network_site_power.csv, and baseline_kpis.csv.
+        Eliminates non-existent finance_daily.csv reference (Fixes F02 / App Launch Crash).
         """
-        fin_path = resolve_csv_path("finance_daily.csv")
-        energy_cost_14d = 0.0
-        revenue_14d = 0.0
-        with open(fin_path, mode="r", encoding="utf-8") as f:
+        # 1. Load peak power fee per kW-month from tariffs.csv
+        tariffs_path = resolve_csv_path("tariffs.csv")
+        tariffs: Dict[str, float] = {}
+        with open(tariffs_path, mode="r", encoding="utf-8") as f:
             for row in csv.DictReader(f):
-                energy_cost_14d += float(row["energy_cost_eur"])
-                revenue_14d += float(row["revenue_eur"])
+                tariffs[row["tariff_id"].strip()] = float(row["peak_power_fee_eur_kw_month"])
 
-        # Peak demand charges across S1-S5 from dataset summary (31,788.35 €/month)
-        monthly_peak_demand_fee_s1_s5_eur = 31788.35
+        site_tariffs = {
+            "S1": tariffs.get("T_DEPOT", 6.50),
+            "S2": tariffs.get("T_DEPOT", 6.50),
+            "S3": tariffs.get("T_PUBLIC", 7.50),
+            "S4": tariffs.get("T_PUBLIC", 7.50),
+            "S5": tariffs.get("T_DEPOT", 6.50),
+        }
+
+        # 2. Compute peak grid demand per site directly from network_site_power.csv
+        pwr_path = resolve_csv_path("network_site_power.csv")
+        site_peaks: Dict[str, float] = {s: 0.0 for s in site_tariffs}
+        with open(pwr_path, mode="r", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                sid = row["site_id"].strip()
+                if sid in site_peaks:
+                    g_kw = float(row["grid_kw"])
+                    if g_kw > site_peaks[sid]:
+                        site_peaks[sid] = g_kw
+
+        monthly_peak_demand_fee_s1_s5_eur = sum(
+            site_peaks[s] * site_tariffs[s] for s in site_tariffs
+        )
+
+        # 3. Read official 14-day energy cost from baseline_kpis.csv
+        kpis_path = resolve_csv_path("baseline_kpis.csv")
+        energy_cost_14d = 0.0
+        with open(kpis_path, mode="r", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if row["period"].strip() == "all_14_days" and row["site_id"].strip() in site_tariffs:
+                    energy_cost_14d += float(row["energy_cost_eur"])
+
+        # 4. Read official public charging revenue from sessions_baseline.csv (S3 & S4 @ 0.45 €/kWh)
+        sess_path = resolve_csv_path("sessions_baseline.csv")
+        revenue_14d = 0.0
+        with open(sess_path, mode="r", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if row["site_id"].strip() in ("S3", "S4"):
+                    revenue_14d += float(row["energy_kwh"]) * 0.45
+
         return {
             "s1_s5_energy_cost_14d_eur": round(energy_cost_14d, 2),
             "s1_s5_revenue_14d_eur": round(revenue_14d, 2),
-            "s1_s5_monthly_peak_demand_fee_eur": monthly_peak_demand_fee_eur if False else monthly_peak_demand_fee_s1_s5_eur,
+            "s1_s5_monthly_peak_demand_fee_eur": round(monthly_peak_demand_fee_s1_s5_eur, 2),
             "peak_demand_exceeds_14d_energy_cost": (monthly_peak_demand_fee_s1_s5_eur > energy_cost_14d),
         }

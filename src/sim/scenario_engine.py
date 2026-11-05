@@ -20,6 +20,7 @@ from src.core.self_healing import (
     InverterEfficiencyGuard,
 )
 from src.sim.data_loader import KempowerDataLoader
+from src.sim.discrete_sim import simulate_closed_loop_minute_by_minute
 
 
 class ScenarioEngine:
@@ -58,6 +59,8 @@ class ScenarioEngine:
         thermal_audit = PredictiveThermalEngine.detect_s1_historical_anomaly("D1-9")
         n1_audit = PredictiveThermalEngine.evaluate_s1_n1_post_fault_dispatch()
 
+        sim_s1 = simulate_closed_loop_minute_by_minute(site_id="S1", date="2026-11-12", strategy="urgency", cross_tie=True)
+
         return {
             "site_id": "S1",
             "baseline_missed_departures": 4,
@@ -68,8 +71,9 @@ class ScenarioEngine:
             "n1_post_fault_audit": n1_audit,
             "strategy_a_0capex": strategy_a,
             "strategy_b_hardware": strategy_b,
-            "optimized_missed_departures": 0,
-            "optimized_deficit_kwh": 0.0,
+            "discrete_sim": sim_s1,
+            "optimized_missed_departures": sim_s1["missed_departures"],
+            "optimized_deficit_kwh": sim_s1["deficit_kwh"],
         }
 
     def run_s2_scenario(self) -> Dict[str, Any]:
@@ -112,6 +116,8 @@ class ScenarioEngine:
             priorities={"D2-5": 1.0, "D2-6": 1.0},
         )
 
+        sim_s2 = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="urgency", cross_tie=True)
+
         return {
             "site_id": "S2",
             "baseline_missed_departures": 4,
@@ -123,8 +129,9 @@ class ScenarioEngine:
             "c2_1_continuous_alloc_kw": c2_1_alloc,
             "c2_2_continuous_alloc_kw": c2_2_alloc,
             "all_8_trucks_on_time_after": True,
-            "optimized_missed_departures": 0,
-            "optimized_deficit_kwh": 0.0,
+            "discrete_sim": sim_s2,
+            "optimized_missed_departures": sim_s2["missed_departures"],
+            "optimized_deficit_kwh": sim_s2["deficit_kwh"],
         }
 
     def run_s3_scenario(self) -> Dict[str, Any]:
@@ -214,13 +221,15 @@ class ScenarioEngine:
           03:30-06:00, eliminating the 508.95 kWh deficit across all 5 missed buses (B27, B28, B33, B34, B35).
         """
         reconcile = CommissioningAutoCalibrator.reconcile_s5_three_way()
+        sim_s5 = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="urgency", cross_tie=True)
         return {
             "site_id": "S5",
             "baseline_missed_departures": 5,
             "baseline_deficit_kwh": reconcile["s5_total_deficit_kwh"],  # 508.95 kWh
             "three_way_reconciliation": reconcile,
-            "optimized_missed_departures": reconcile["missed_departures_after"],  # 0
-            "optimized_deficit_kwh": 0.0,
+            "discrete_sim": sim_s5,
+            "optimized_missed_departures": sim_s5["missed_departures"],
+            "optimized_deficit_kwh": sim_s5["deficit_kwh"],
         }
 
     def run_all_scenarios(self) -> Dict[str, Any]:
