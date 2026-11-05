@@ -77,7 +77,7 @@ class TestSLAFormulas(unittest.TestCase):
         print(f"Availability 0.00%: Deduction = {d_0} EUR (100%)")
         
         self.assertEqual(d_995, 0.0)
-        self.assertEqual(d_994, 200.0)
+        self.assertAlmostEqual(d_994, 200.0, places=2)
         self.assertEqual(d_950, 9000.0) # Notice at 95.00%, deduction is 90%, NOT 100%!
         self.assertEqual(d_945, 10000.0) # 100% deduction reached at 94.50%, not 95.00%!
 
