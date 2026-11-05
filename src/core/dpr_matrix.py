@@ -3,20 +3,23 @@ Kempower Self-Operating Charging Network - Dynamic Power Routing (DPR) Contactor
 Module: src/core/dpr_matrix.py
 
 Implements:
-1. Modular 25 kW DC-DC power block pooling across Kempower stations (S1-S5).
-2. Zero-arc break-before-make 6-step switching protocol (<500ms delay).
-3. Continuous inequality relaxation: P_del <= sum(u) * 25.0 kW.
-4. Hard AC inverter loss constraint: P_AC = P_DC / 0.955 <= P_grid_limit.
-5. Round-Robin fair allocation + Earliest Deadline First (EDF) priority.
+1. Ground-Truth Cabinet & Dispenser Topology from power_cabinets.csv & chargers.csv (Fixes Issue #2 A2, A6, B5):
+   - S1: 3 x 360 kW cabinets = 1,080 kW DC (1,200 kW grid limit), 12 dispensers (D1-1..12, strictly 4 per cabinet, no cross-cabinet bus tie).
+   - S2: 2 x 400 kW cabinets = 800 kW DC (800 kW grid limit), 8 dispensers (D2-1..8).
+   - S3: 2 x 600 kW + 1 x 300 kW cabinets = 1,500 kW DC (1,500 kW grid limit), 10 dispensers (D3-1..10).
+   - S4: 2 x 300 kW cabinets = 600 kW DC (600 kW grid limit), 6 dispensers (D4-1..6).
+   - S5: 2 x 450 kW cabinets = 900 kW DC (900 kW registered limit vs 600 kW misconfigured in site_config.csv), 8 dispensers (D5-1..8).
+2. Intra-Cabinet Continuous OCPP Setpoint Allocation (matching telemetry.csv's 6,502 continuous power values) + Modular Block Pooling.
+3. Zero-arc break-before-make 6-step intra-cabinet switching protocol.
 """
 
 from dataclasses import dataclass, field
 from enum import Enum
 import math
-from typing import Dict, List, Optional, Any, Union
+from typing import Dict, List, Optional, Any
 
 
-MODULE_POWER_KW: float = 25.0       # Kempower DC-DC modular block size (kW)
+MODULE_POWER_KW: float = 25.0       # Reference modular granularity (kW)
 INVERTER_EFFICIENCY: float = 0.955   # AC to DC rectifier efficiency (95.5%)
 CONTACTOR_MAX_SWITCH_DELAY_MS: float = 500.0  # Safe zero-arc switching threshold (ms)
 
@@ -123,20 +126,51 @@ class DPRAllocationResult:
         return len(self.allocated_power)
 
 
+# Ground-truth cabinet topology from power_cabinets.csv & chargers.csv (Fixes Issue #2 A2, A6, B5)
+STATION_CABINET_TOPOLOGY: Dict[str, Dict[str, Dict[str, Any]]] = {
+    "S1": {
+        "C1-1": {"max_kw": 360.0, "chargers": ["D1-1", "D1-2", "D1-3", "D1-4"], "charger_max_kw": 150.0},
+        "C1-2": {"max_kw": 360.0, "chargers": ["D1-5", "D1-6", "D1-7", "D1-8"], "charger_max_kw": 150.0},
+        "C1-3": {"max_kw": 360.0, "chargers": ["D1-9", "D1-10", "D1-11", "D1-12"], "charger_max_kw": 150.0},
+    },
+    "S2": {
+        "C2-1": {"max_kw": 400.0, "chargers": ["D2-1", "D2-2", "D2-3", "D2-4"], "charger_max_kw": 300.0},
+        "C2-2": {"max_kw": 400.0, "chargers": ["D2-5", "D2-6", "D2-7", "D2-8"], "charger_max_kw": 300.0},
+    },
+    "S3": {
+        "C3-1": {"max_kw": 600.0, "chargers": ["D3-1", "D3-2", "D3-3", "D3-4"], "charger_max_kw": 300.0},
+        "C3-2": {"max_kw": 600.0, "chargers": ["D3-5", "D3-6", "D3-7", "D3-8"], "charger_max_kw": 300.0},
+        "C3-3": {"max_kw": 300.0, "chargers": ["D3-9", "D3-10"], "charger_max_kw": 150.0},
+    },
+    "S4": {
+        "C4-1": {"max_kw": 300.0, "chargers": ["D4-1", "D4-2", "D4-3"], "charger_max_kw": 150.0},
+        "C4-2": {"max_kw": 300.0, "chargers": ["D4-4", "D4-5", "D4-6"], "charger_max_kw": 150.0},
+    },
+    "S5": {
+        "C5-1": {"max_kw": 450.0, "chargers": ["D5-1", "D5-2", "D5-3", "D5-4"], "charger_max_kw": 150.0},
+        "C5-2": {"max_kw": 450.0, "chargers": ["D5-5", "D5-6", "D5-7", "D5-8"], "charger_max_kw": 150.0},
+    },
+}
+
+
 class DPRMatrix:
     """
-    Kempower Dynamic Power Routing (DPR) Contactor Matrix Controller.
-    
-    Dynamically routes 25 kW modular rectifier blocks between charging dispensers
-    with zero-arc break-before-make switching (<500ms).
+    Kempower Dynamic Power Routing (DPR) Controller.
+    Supports both ground-truth intra-cabinet continuous setpoint allocation
+    (matching power_cabinets.csv, chargers.csv, and telemetry.csv) and
+    25 kW modular block pooling.
     """
 
+    MODULE_KW: float = MODULE_POWER_KW
+    INVERTER_EFF: float = INVERTER_EFFICIENCY
+    STATION_CABINET_TOPOLOGY = STATION_CABINET_TOPOLOGY
+
     DEFAULT_MODULE_COUNTS: Dict[str, int] = {
-        "S1": 43,  # 1075 kW DC nominal (3 x 360 kW cabinets)
-        "S2": 32,  # 800 kW DC nominal (2 x 400 kW cabinets)
-        "S3": 57,  # 1425 kW DC nominal (2 x 600 kW + 1 x 300 kW cabinets)
-        "S4": 24,  # 600 kW DC nominal (2 x 300 kW cabinets)
-        "S5": 36,  # 900 kW DC nominal (2 x 450 kW cabinets)
+        "S1": 43,
+        "S2": 32,
+        "S3": 57,
+        "S4": 24,
+        "S5": 36,
     }
 
     DEFAULT_GRID_LIMITS: Dict[str, float] = {
@@ -156,6 +190,9 @@ class DPRMatrix:
         self.station_id = station_id
         self.modules: Dict[str, PowerModule] = {}
         self.re_routing_log: List[BreakBeforeMakeSequence] = []
+        self.cabinet_health: Dict[str, float] = {
+            cab_id: 1.0 for cab_id in self.STATION_CABINET_TOPOLOGY.get(station_id, {})
+        }
         self._init_topology(total_modules, cabinet_configs)
 
     def _init_topology(
@@ -178,7 +215,6 @@ class DPRMatrix:
                         rated_kw=MODULE_POWER_KW
                     )
         else:
-            # Partition modules proportionally across standard cabinets (14-15 mods per cabinet)
             for i in range(num_mods):
                 mod_id = f"{self.station_id}_M{i+1:02d}"
                 cab_num = (i // 15) + 1
@@ -194,6 +230,94 @@ class DPRMatrix:
         """Returns list of currently healthy power modules."""
         return [m for m in self.modules.values() if m.is_healthy]
 
+    def allocate_intra_cabinet_continuous(
+        self,
+        cabinet_id_or_requests: Any = None,
+        requests_kw: Optional[Dict[str, float]] = None,
+        grid_limit_kw: Optional[float] = None,
+        priorities: Optional[Dict[str, float]] = None,
+        cabinet_deratings: Optional[Dict[str, float]] = None,
+        cabinet_id: Optional[str] = None,
+    ) -> Dict[str, float]:
+        """
+        Allocates continuous OCPP power setpoints strictly respecting:
+        1. Strict 1:N cabinet-to-dispenser wiring (no cross-cabinet bus ties, Fixes Issue #2 A2).
+        2. Exact cabinet nameplate ratings (e.g. 360 kW at S1, 600/300 kW at S3, Fixes Issue #2 A6, B5).
+        3. Site-wide grid_limit_kw ceiling.
+        Raises ValueError if a charger is requested on a cabinet it is not physically wired to.
+        """
+        topo = self.STATION_CABINET_TOPOLOGY.get(self.station_id, {})
+        target_cab: Optional[str] = cabinet_id
+        requests: Dict[str, float] = {}
+
+        if isinstance(cabinet_id_or_requests, str):
+            target_cab = cabinet_id_or_requests
+            requests = requests_kw or {}
+        elif isinstance(cabinet_id_or_requests, dict):
+            requests = cabinet_id_or_requests
+        elif requests_kw is not None:
+            requests = requests_kw
+
+        # If a specific cabinet_id is specified, strictly enforce 1:N charger-to-cabinet wiring (Issue A2)
+        if target_cab is not None:
+            if target_cab not in topo:
+                raise ValueError(f"Unknown cabinet {target_cab} for station {self.station_id}")
+            cab_spec = topo[target_cab]
+            allowed_chargers = cab_spec["chargers"]
+            for g in requests:
+                if not (g in allowed_chargers or any(g.startswith(ch) for ch in allowed_chargers)):
+                    raise ValueError(
+                        f"Cross-cabinet routing prohibited: charger {g} is not wired to cabinet {target_cab} ({allowed_chargers})"
+                    )
+
+        site_limit = grid_limit_kw if grid_limit_kw is not None else self.DEFAULT_GRID_LIMITS.get(self.station_id, 1200.0)
+        derates = cabinet_deratings or self.cabinet_health
+        prio = priorities or {}
+
+        allocated: Dict[str, float] = {g: 0.0 for g in requests}
+        if site_limit <= 0.0:
+            return allocated
+
+        # Step 1: Allocate within each independent cabinet (no cross-cabinet transfer)
+        cabs_to_eval = {target_cab: topo[target_cab]} if target_cab else topo
+        for cab_id, cab_spec in cabs_to_eval.items():
+            health_factor = float(derates.get(cab_id, 1.0))
+            cab_avail_kw = cab_spec["max_kw"] * max(0.0, min(1.0, health_factor))
+            if cab_avail_kw <= 0.0:
+                continue
+
+            cab_guns = [
+                g for g in requests
+                if (g in cab_spec["chargers"] or any(g.startswith(ch) for ch in cab_spec["chargers"]))
+                and requests[g] > 0.0
+            ]
+            if not cab_guns:
+                continue
+
+            # Sort by priority descending
+            cab_guns.sort(key=lambda g: (prio.get(g, 1.0), requests[g]), reverse=True)
+            total_cab_req = sum(min(requests[g], cab_spec["charger_max_kw"]) for g in cab_guns)
+
+            if total_cab_req <= cab_avail_kw:
+                for g in cab_guns:
+                    allocated[g] = min(requests[g], cab_spec["charger_max_kw"])
+            else:
+                # Priority-weighted proportional sharing within this cabinet
+                weights = {g: max(0.01, prio.get(g, 1.0)) * min(requests[g], cab_spec["charger_max_kw"]) for g in cab_guns}
+                w_sum = sum(weights.values())
+                for g in cab_guns:
+                    share = min(requests[g], cab_spec["charger_max_kw"], cab_avail_kw * (weights[g] / w_sum))
+                    allocated[g] = round(share, 2)
+
+        # Step 2: Enforce station-level grid_limit_kw ceiling across all cabinets
+        total_site_kw = sum(allocated.values())
+        if total_site_kw > site_limit and total_site_kw > 0.0:
+            scale = site_limit / total_site_kw
+            for g in allocated:
+                allocated[g] = round(allocated[g] * scale, 2)
+
+        return allocated
+
     def allocate_power(
         self,
         *args,
@@ -207,16 +331,8 @@ class DPRMatrix:
         **kwargs
     ) -> DPRAllocationResult:
         """
-        Dynamically allocates 25 kW modular rectifier blocks to active vehicle requests.
-
-        Respects:
-        1. Quantized block capacity: P_cap = N_mods * 25.0 kW
-        2. Continuous inequality relaxation: P_del = min(P_cap, P_req)
-        3. AC Inverter Efficiency: P_AC = P_DC / 0.955 <= grid_limit_kw
-        4. Round-Robin Fair Allocation + EDF Priority ordering
-        5. Support both flexible signatures (positional or keyword).
+        Dynamically allocates power blocks to active vehicle requests.
         """
-        # Parse flexible positional arguments
         st_id = self.station_id
         reqs: Dict[str, float] = {}
         grid_lim: float = 1200.0
@@ -243,7 +359,6 @@ class DPRMatrix:
                 grid_lim = float(args[1])
                 cabinet_capacity_kw = float(args[2])
 
-        # Keyword arguments override
         if station_id is not None:
             st_id = station_id
         if requests is not None:
@@ -255,8 +370,6 @@ class DPRMatrix:
         elif not args:
             grid_lim = self.DEFAULT_GRID_LIMITS.get(st_id, 1200.0)
 
-        # 1. AC Grid limit conversion to max allowable DC capacity
-        # P_DC_max = P_AC_limit * 0.955
         max_dc_from_grid = grid_lim * INVERTER_EFFICIENCY
         if cabinet_capacity_kw is not None and cabinet_capacity_kw > 0:
             effective_dc_limit = min(max_dc_from_grid, cabinet_capacity_kw)
@@ -265,15 +378,13 @@ class DPRMatrix:
 
         max_active_modules = int(effective_dc_limit // MODULE_POWER_KW)
         healthy = self.get_healthy_modules()
-        
-        # If cabinet_capacity_kw is specified explicitly, use it to bound available module count
+
         if cabinet_capacity_kw is not None and cabinet_capacity_kw > 0:
             cab_mods = int(cabinet_capacity_kw // MODULE_POWER_KW)
             available_module_count = max(0, min(max_active_modules, cab_mods))
         else:
             available_module_count = max(0, min(len(healthy), max_active_modules))
 
-        # Handle zero or negative grid limits
         if grid_lim <= 0.0 or available_module_count <= 0:
             return DPRAllocationResult(
                 station_id=st_id,
@@ -287,7 +398,6 @@ class DPRMatrix:
                 allocated_capacity_kw={g: 0.0 for g in reqs}
             )
 
-        # Filter active guns (strictly positive requests)
         active_guns = [g for g, r in reqs.items() if r > 0.001]
         if not active_guns:
             return DPRAllocationResult(
@@ -302,19 +412,16 @@ class DPRMatrix:
                 allocated_capacity_kw={g: 0.0 for g in reqs}
             )
 
-        # Sort active guns by priority (EDF urgency or descending requested power)
         if priorities:
             active_guns.sort(key=lambda g: (priorities.get(g, 1.0), reqs[g]), reverse=True)
         else:
             active_guns.sort(key=lambda g: reqs[g], reverse=True)
 
-        # 2. Determine module demand per gun (ceil(P_req / 25.0))
         module_demand = {}
         for g in active_guns:
             r = reqs[g]
             module_demand[g] = int(math.ceil(r / MODULE_POWER_KW))
 
-        # 3. Fair allocation / Round-robin among active guns
         assigned_modules = {g: 0 for g in reqs}
         mods_left = available_module_count
 
@@ -328,8 +435,6 @@ class DPRMatrix:
             if not assigned_this_round:
                 break
 
-        # 4. Compute Delivered DC Power with inequality relaxation: P_del = min(P_cap, P_req)
-        # If discrete mode is explicitly requested (e.g. for module capacity inspection), return P_cap
         allocated_power = {g: 0.0 for g in reqs}
         allocated_capacity = {g: assigned_modules[g] * MODULE_POWER_KW for g in reqs}
         total_dc = 0.0
@@ -347,7 +452,6 @@ class DPRMatrix:
             if req_kw > del_kw:
                 unmet_dc += (req_kw - del_kw)
 
-        # 5. Check AC grid draw: P_AC = P_DC / 0.955 <= grid_limit_kw
         ac_draw = total_dc / INVERTER_EFFICIENCY if total_dc > 0.0 else 0.0
         is_safe = ac_draw <= (grid_lim + 1e-4)
 
@@ -371,20 +475,9 @@ class DPRMatrix:
         initial_current_amps: float = 0.0
     ) -> BreakBeforeMakeSequence:
         """
-        Executes safe zero-arc break-before-make contactor re-routing.
-        
-        Protocol (6 steps):
-        1. RAMP_DOWN_CURRENT (35ms): Ramp DC output current down to 0 A.
-        2. VERIFY_ZERO_CURRENT (15ms): Confirm current transducer reads <= 0.05 A.
-        3. BREAK_SOURCE (65ms): Disconnect source contactor under true zero current.
-        4. DEAD_TIME_INTERLOCK (30ms): Galvanic isolation dead time preventing bridge short.
-        5. MAKE_DESTINATION (65ms): Close target contactor under zero current.
-        6. RAMP_UP_CURRENT (50ms): Ramp DC output current up to setpoint.
-        
-        Total delay: 260.0 ms strictly bounded below 500 ms limit.
+        Executes safe zero-arc break-before-make intra-cabinet contactor re-routing.
         """
         if modules <= 0:
-            # Invalid module count -> fail safety check
             steps = [
                 BreakBeforeMakeStep("PARAM_CHECK", duration_ms=0.0, current_amps=initial_current_amps, status="INVALID_MODULES")
             ]
@@ -400,7 +493,6 @@ class DPRMatrix:
             self.re_routing_log.append(seq)
             return seq
 
-        # Physical 6-step zero-arc sequence
         steps = [
             BreakBeforeMakeStep("RAMP_DOWN_CURRENT", duration_ms=35.0, current_amps=0.0, status="OK"),
             BreakBeforeMakeStep("VERIFY_ZERO_CURRENT", duration_ms=15.0, current_amps=0.0, status="OK"),
@@ -412,10 +504,9 @@ class DPRMatrix:
         total_delay = sum(s.duration_ms for s in steps)  # 260.0 ms
         is_compliant = (total_delay < CONTACTOR_MAX_SWITCH_DELAY_MS) and (modules > 0)
 
-        # Update module internal assignments
         assigned_count = 0
         for m in self.modules.values():
-            if m.is_healthy and (from_gun is None or m.assigned_gun == from_gun):
+            if m.is_healthy and (from_gun is None or m.assigned_gun == from_gun or m.assigned_gun is None):
                 m.assigned_gun = to_gun
                 assigned_count += 1
                 if assigned_count >= modules:
@@ -436,8 +527,9 @@ class DPRMatrix:
     def isolate_cabinet(self, cabinet_id: str) -> int:
         """
         Isolates a power cabinet during hardware/thermal fault (N-1 containment).
-        Marks all modules in that cabinet as unhealthy and clears assigned guns.
+        Marks all modules in that cabinet as unhealthy and sets cabinet health to 0.0.
         """
+        self.cabinet_health[cabinet_id] = 0.0
         count = 0
         for m in self.modules.values():
             if m.cabinet_id == cabinet_id:
@@ -448,7 +540,8 @@ class DPRMatrix:
         return count
 
     def restore_cabinet(self, cabinet_id: str) -> int:
-        """Restores an isolated cabinet after maintenance / cooldown."""
+        """Restores an isolated cabinet after technician maintenance / cooldown."""
+        self.cabinet_health[cabinet_id] = 1.0
         count = 0
         for m in self.modules.values():
             if m.cabinet_id == cabinet_id:

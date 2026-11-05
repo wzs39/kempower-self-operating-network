@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-data_dir = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 print("--- 1. S1 Cabinets and Chargers ---")
 chargers = pd.read_csv(os.path.join(data_dir, "chargers.csv"))

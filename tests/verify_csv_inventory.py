@@ -2,7 +2,7 @@ import os
 import glob
 import pandas as pd
 
-DATA_DIR = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 # Claims in Section 6.1 of Kempower_Self_Operating_Network_Comprehensive_Survey.md
 claimed_stats = {

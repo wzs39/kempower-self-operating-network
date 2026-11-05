@@ -19,100 +19,68 @@ import numpy as np
 import pandas as pd
 import pytest
 
-# Workspace & Dataset Paths
-WORKSPACE = r"C:\Users\qwe\Desktop\hackson"
-DATA_DIR = os.path.join(WORKSPACE, "kempower-challenge", "kempower-challenge-data")
+from src.utils.paths import get_repo_root, get_data_dir
+from src.core.dpr_matrix import DPRMatrix
+from src.core.mpc_optimizer import MPCOptimizer
+from src.core.self_healing import EdgeFSM
+from src.core.virtual_replug import VirtualReplugManager
+from src.commercial.sla_calculator import SLACalculator
+
+# Workspace & Dataset Paths (cross-platform dynamic resolution)
+WORKSPACE = str(get_repo_root())
+DATA_DIR = str(get_data_dir())
 PROJECT_PATH = os.path.join(WORKSPACE, "PROJECT.md")
 SLA_PATH = os.path.join(WORKSPACE, "One_Page_SLA_Specification.md")
 
 
 # ==============================================================================
-# Domain Physics & Contract Reference Models (Progressive Testability Oracles)
+# Domain Physics & Production Engine Adapters (Wired directly to src/core & src/commercial)
 # ==============================================================================
 
 class ContractDPRMatrix:
-    """Authoritative reference oracle for F01: 25 kW Dynamic Power Routing."""
-    MODULE_KW = 25.0
-    INVERTER_EFF = 0.955
+    """Production adapter for F01: 25 kW Dynamic Power Routing (src.core.dpr_matrix.DPRMatrix)."""
+    MODULE_KW = DPRMatrix.MODULE_KW
+    INVERTER_EFF = DPRMatrix.INVERTER_EFF
 
     @classmethod
     def allocate_power(cls, requests: dict[str, float], grid_limit_ac: float, cabinet_capacity_kw: float) -> dict[str, float]:
-        """
-        Allocates power in discrete 25 kW modular blocks.
-        Respects:
-        1. Max DC power clamp: P_DC <= grid_limit_ac * 0.955
-        2. Cabinet physical capacity clamp
-        3. Module quantization: P_alloc = k * 25.0 kW
-        """
-        max_dc_grid = grid_limit_ac * cls.INVERTER_EFF
-        effective_dc_limit = min(max_dc_grid, cabinet_capacity_kw)
-        max_modules = int(effective_dc_limit // cls.MODULE_KW)
-        
-        # Sort requests by magnitude (or priority)
-        allocations = {k: 0.0 for k in requests}
-        allocated_modules = 0
-        
-        for gun_id, req_kw in sorted(requests.items(), key=lambda x: -x[1]):
-            if req_kw <= 0:
-                continue
-            needed_modules = int(math.ceil(req_kw / cls.MODULE_KW))
-            grant_modules = min(needed_modules, max_modules - allocated_modules)
-            allocations[gun_id] = grant_modules * cls.MODULE_KW
-            allocated_modules += grant_modules
-            
-        return allocations
+        dpr = DPRMatrix(station_id="S1", total_modules=int(max(43, cabinet_capacity_kw // cls.MODULE_KW)))
+        res = dpr.allocate_power(
+            requests=requests,
+            grid_limit_ac=grid_limit_ac,
+            cabinet_capacity_kw=cabinet_capacity_kw,
+            discrete=True,
+        )
+        return res.allocated_capacity_kw
 
     @classmethod
     def re_route_contactor(cls, from_gun: str, to_gun: str, modules: int, initial_current_amps: float) -> dict:
-        """
-        Executes zero-arc break-before-make contactor re-routing.
-        Requires current to be 0A before contactor open.
-        Switching delay must be strictly < 500ms.
-        """
-        if initial_current_amps > 0.0:
-            # Must first ramp current to zero to avoid arcing
-            zero_current_achieved = True
-            arc_detected = False
-        else:
-            zero_current_achieved = True
-            arc_detected = False
-            
-        switching_delay_ms = 48.5  # Typical solid-state/mechanical contactor cycle (<500ms)
-        success = (modules > 0) and zero_current_achieved and not arc_detected and (switching_delay_ms < 500.0)
+        dpr = DPRMatrix(station_id="S1")
+        seq = dpr.re_route_contactor(from_gun, to_gun, modules=modules, initial_current_amps=initial_current_amps)
         return {
-            "success": success,
-            "arc_prevented": not arc_detected,
-            "switching_delay_ms": switching_delay_ms,
-            "transferred_modules": modules if success else 0
+            "success": seq["success"],
+            "arc_prevented": seq["arc_prevented"],
+            "switching_delay_ms": seq["switching_delay_ms"],
+            "transferred_modules": seq["transferred_modules"],
         }
 
 
 class ContractMPCSolver:
-    """Authoritative reference oracle for F02: 15-min Macro MPC/MILP."""
-    INVERTER_EFF = 0.955
-    SCALE_FACTOR = 1e-3  # EUR/MWh -> EUR/kWh scaling
+    """Production adapter for F02: 15-min Macro MPC/MILP (src.core.mpc_optimizer.MPCOptimizer)."""
+    INVERTER_EFF = MPCOptimizer.INVERTER_EFF
+    SCALE_FACTOR = MPCOptimizer.SCALE_FACTOR
 
     @classmethod
     def compute_objective_cost(cls, spot_price_mwh: float, tariff_mwh: float, power_kw: float, dt_hours: float, penalty_eur: float, abandoned: bool) -> float:
-        """Computes true EUR cost with 1e-3 scaling factor."""
-        if abandoned:
-            return penalty_eur
-        energy_kwh = power_kw * dt_hours
-        rate_eur_kwh = (spot_price_mwh + tariff_mwh) * cls.SCALE_FACTOR
-        return energy_kwh * rate_eur_kwh
+        return MPCOptimizer.compute_objective_cost(spot_price_mwh, tariff_mwh, power_kw, dt_hours, penalty_eur, abandoned)
 
     @classmethod
     def evaluate_cv_taper(cls, rated_kw: float, soc: float) -> float:
-        """Evaluates battery absorption limit with CC/CV taper above 80% SoC."""
-        if soc <= 0.80:
-            return rated_kw
-        # Taper exponential decay curve from dataset specification
-        taper_factor = max(0.05, 1.0 - 0.9 * ((soc - 0.80) / 0.20) ** 1.2)
-        return rated_kw * taper_factor
+        return MPCOptimizer.evaluate_cv_taper(rated_kw, soc)
 
 
 class ContractEdgeFSM:
-    """Authoritative reference oracle for F03: Edge Micro FSM."""
+    """Production adapter for F03: Edge Micro FSM (src.core.self_healing.EdgeFSM)."""
     NORMAL = "NORMAL"
     THERMAL_WARNING = "THERMAL_WARNING"
     LOAD_MIGRATION = "LOAD_MIGRATION"
@@ -122,101 +90,37 @@ class ContractEdgeFSM:
 
     @classmethod
     def tick(cls, telemetry: dict) -> dict:
-        fan_rpm = telemetry.get("fan_rpm", 1800.0)
-        baseline_rpm = telemetry.get("baseline_fan_rpm", 1800.0)
-        internal_temp_c = telemetry.get("internal_temp_c", 45.0)
-        wan_connected = telemetry.get("wan_connected", True)
-        config_mismatch = telemetry.get("config_mismatch", False)
-
-        rpm_drop_pct = (baseline_rpm - fan_rpm) / baseline_rpm if baseline_rpm > 0 else 0.0
-
-        if internal_temp_c >= 75.0:
-            return {"state": cls.HARDWARE_TRIP, "action": "TRIP_MAIN_BREAKER", "safe": True}
-        
-        # Thermal protection takes precedence even in offline islanding mode
-        if internal_temp_c >= 65.0 or rpm_drop_pct >= 0.20:
-            action = "SHIFT_LOAD_TO_PARALLEL_CABINETS" if rpm_drop_pct >= 0.20 else "DERATE_50_PCT"
-            state = cls.LOAD_MIGRATION if action == "SHIFT_LOAD_TO_PARALLEL_CABINETS" else cls.THERMAL_WARNING
-            return {"state": state, "action": action, "safe": True, "rpm_drop_pct": rpm_drop_pct}
-
-        if config_mismatch:
-            return {"state": cls.AUTO_CALIBRATED, "action": "APPLY_CONFIG_OVERRIDE", "safe": True}
-
-        if not wan_connected:
-            return {"state": cls.OFFLINE_ISLANDING, "action": "ENGAGE_LOCAL_DLM_FULL_POWER", "fallback_kw": None}
-
-        return {"state": cls.NORMAL, "action": "NONE", "safe": True}
-
-
-class ContractVirtualReplug:
-    """Authoritative reference oracle for F04: Dual-Gun Satellite Multiplexing."""
-    @classmethod
-    def schedule_depot_night(cls, buses_a: list[str], buses_b: list[str], current_time_hour: float) -> dict:
-        """
-        Group A: 22:00 to 02:00 (22.0 to 26.0/2.0)
-        Group B: 02:00 to 05:30 (2.0 to 5.5)
-        Top-Off: 05:30 to 06:00 (5.5 to 6.0)
-        """
-        if current_time_hour >= 22.0 or current_time_hour < 2.0:
-            phase = "PHASE_A_FAST_CHARGE"
-            active_guns = [f"{b}_GunA" for b in buses_a]
-            idle_guns = [f"{b}_GunB" for b in buses_b]
-        elif 2.0 <= current_time_hour < 5.5:
-            phase = "PHASE_B_FAST_CHARGE"
-            active_guns = [f"{b}_GunB" for b in buses_b]
-            idle_guns = [f"{b}_GunA" for b in buses_a]
-        else:
-            phase = "PHASE_BALANCED_TOP_OFF"
-            active_guns = [f"{b}_GunA" for b in buses_a] + [f"{b}_GunB" for b in buses_b]
-            idle_guns = []
-
+        fsm = EdgeFSM(site_id=str(telemetry.get("site_id", "S1")))
+        res = fsm.tick(telemetry)
         return {
-            "phase": phase,
-            "active_guns_count": len(active_guns),
-            "idle_guns_count": len(idle_guns),
-            "replug_actions_needed": 0  # 100% physical connectivity means 0 replugs!
+            "state": res["state"],
+            "action": res["action"],
+            "safe": res["safe"],
+            "rpm_drop_pct": res["rpm_drop_pct"],
+            "fallback_kw": res["fallback_kw"],
         }
 
 
+class ContractVirtualReplug:
+    """Production adapter for F04: Dual-Gun Satellite Multiplexing (src.core.virtual_replug.VirtualReplugManager)."""
+    @classmethod
+    def schedule_depot_night(cls, buses_a: list[str], buses_b: list[str], current_time_hour: float) -> dict:
+        return VirtualReplugManager.schedule_depot_night(buses_a, buses_b, current_time_hour)
+
+
 class ContractSLAEngine:
-    """Authoritative reference oracle for F11: One-Page SLA & MRDT."""
+    """Production adapter for F11: One-Page SLA & MRDT (src.commercial.sla_calculator.SLACalculator)."""
     @classmethod
     def compute_mrdt(cls, soc_req: float, soc_arrive: float, batt_kwh: float, p_charger_max: float, p_veh_max: float, eta: float = 0.95, t_buffer: float = 15.0) -> float:
-        delta_soc = max(0.0, soc_req - soc_arrive) / 100.0
-        needed_energy = delta_soc * batt_kwh
-        eff_power = min(p_charger_max, p_veh_max) * eta
-        if eff_power <= 0:
-            return float('inf')
-        return (needed_energy / eff_power) * 60.0 + t_buffer
+        return SLACalculator.compute_mrdt(soc_req, soc_arrive, batt_kwh, p_charger_max, p_veh_max, eta=eta, t_buffer=t_buffer)
 
     @classmethod
     def compute_fleet_penalty(cls, delayed_records: list[dict], undercharged_records: list[dict], p_base: float = 250.0, c_min: float = 5.0, c_energy: float = 1.50) -> float:
-        total = 0.0
-        for r in delayed_records:
-            if not r.get("mrdt_satisfied", True):
-                continue
-            delay_min = r.get("delay_min", 0.0)
-            if delay_min > 0:
-                total += p_base + max(0.0, delay_min - 15.0) * c_min
-        for r in undercharged_records:
-            if not r.get("mrdt_satisfied", True):
-                continue
-            delta_soc = max(0.0, r["soc_req"] - r["soc_dep"]) / 100.0
-            total += delta_soc * r["cap_kwh"] * c_energy
-        return total
+        return SLACalculator.compute_fleet_penalty(delayed_records, undercharged_records, p_base=p_base, c_min=c_min, c_energy=c_energy)
 
     @classmethod
     def compute_availability_deduction(cls, monthly_base_fee: float, avail_pct: float) -> float:
-        avail = round(avail_pct, 4)
-        if avail >= 99.50:
-            return 0.0
-        elif avail >= 95.00:
-            shortfall = round(99.50 - avail, 4)
-            steps = int(math.ceil(shortfall / 0.10))
-            pct = min(90.0, steps * 2.0)
-            return monthly_base_fee * (pct / 100.0)
-        else:
-            return monthly_base_fee * 1.0
+        return SLACalculator.compute_availability_deduction(monthly_base_fee, avail_pct)
 
 
 # ==============================================================================
@@ -770,14 +674,14 @@ class TestTier3CrossFeatureCombinations(unittest.TestCase):
         self.assertEqual(alloc["D5-7"], 150.0)
 
     def test_c06_s2_dso_curtailment_and_lookahead_precharging(self):
-        """S2 DSO 400 kW curtailment combined with 14:20-16:00 precharging."""
-        # 4 trucks need 1250.10 kWh. In 16:00-18:15 (2.25h), 400 kW grid provides 900 kWh.
-        # Deficit is 350.10 kWh. Precharge in 14:20-16:00 (1.67h) delivers up to 1102.10 kWh.
-        total_needed = 1250.10
-        curtailment_supply = 400.0 * 2.25
-        deficit = total_needed - curtailment_supply
-        precharge_available = 800.0 * (100.0 / 60.0)  # 1h 40min at 800 kW
-        self.assertGreater(precharge_available, deficit)
+        """S2 DSO 400 kW curtailment combined with T05-T08 priority preemption (Issues A5, A8, B5)."""
+        # 4 afternoon trucks (T01-T04) have 283.50 kWh deficit in departures_baseline.csv.
+        # Overnight trucks T05-T08 consumed 1,857.06 kWh during 14:20-23:00; reallocating 283.50 kWh solves T01-T04.
+        from src.sim.scenario_engine import ScenarioEngine
+        s2_res = ScenarioEngine().run_s2_scenario()
+        self.assertEqual(s2_res["baseline_deficit_kwh"], 283.50)
+        self.assertGreater(s2_res["overnight_trucks_t05_t08_afternoon_kwh"], s2_res["baseline_deficit_kwh"])
+        self.assertEqual(s2_res["optimized_missed_departures"], 0)
 
     def test_c07_thermal_n1_shedding_and_dual_gun_rerouting(self):
         """C1-3 failure at S1 triggers fast 180 kW shed followed by zero-arc contactor rerouting."""
@@ -893,23 +797,23 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         self.assertEqual(failed_buses, {"B28", "B35", "B33", "B34", "B27"})
 
     def test_commercial_21_fte_elimination_and_roi(self):
-        """Commercial AEaaS: Eliminating 21 FTE (€1.365M/yr) gives 1.89-month Dual-Gun ROI."""
-        ops_path = os.path.join(DATA_DIR, "operations_log.csv")
-        df_ops = pd.read_csv(ops_path)
-        total_actions = df_ops["count"].sum()
-        total_mins = df_ops["staff_minutes"].sum()
-        self.assertEqual(total_actions, 8852)
-        self.assertEqual(total_mins, 93412)
-
-        # 21 FTE * 65000 EUR = 1,365,000 EUR/yr
-        fte_cost_yearly = 21 * 65000.0
-        self.assertEqual(fte_cost_yearly, 1365000.0)
-
-        # 12 Dual-gun dispensers @ 18,000 EUR = 216,000 EUR
-        dual_gun_capex = 12 * 18000.0
-        payback_months = (dual_gun_capex / fte_cost_yearly) * 12.0
-        self.assertAlmostEqual(payback_months, 1.8989, places=2)
-        self.assertLess(payback_months, 2.0)
+        """Commercial AEaaS: Honest 100-site labor (45 €/h = 87,750 €/FTE) and 27,000 €/gun CAPEX audit (Issues A7, B1, B2, B6, B9)."""
+        from src.commercial.roi_analyzer import ROIAnalyzer
+        labor = ROIAnalyzer.analyze_network_operations_labor()
+        eq = ROIAnalyzer.analyze_equipment_and_payback()
+        self.assertEqual(labor["total_ops_biweekly"], 8852)
+        self.assertEqual(labor["total_minutes_biweekly"], 93412.0)
+        self.assertEqual(labor["staff_hourly_rate_eur"], 45.0)
+        self.assertEqual(labor["annual_cost_per_fte_eur"], 87750.0)
+        self.assertEqual(labor["total_network_fte"], 20.76)
+        self.assertEqual(labor["replug_network_fte"], 9.95)
+        self.assertEqual(labor["replug_share_by_duration_pct"], 47.93)
+        self.assertEqual(labor["total_network_annual_labor_eur"], 1821534.0)
+        self.assertEqual(labor["replug_network_annual_labor_eur"], 872976.0)
+        self.assertEqual(eq["installed_cost_per_gun_eur"], 27000.0)
+        self.assertEqual(eq["s1_12_guns_total_capex_with_civil_eur"], 324000.0)
+        self.assertEqual(eq["s1_payback_years_with_civil"], 13.31)
+        self.assertEqual(eq["strategy_a_0capex_capex_eur"], 0.0)
 
 
 # ==============================================================================
@@ -939,11 +843,17 @@ class TestRequirementsCoverage(unittest.TestCase):
         self.assertGreater(reduction_pct, 98.0)
 
     def test_r4_one_page_sla_and_mrdt_anti_fraud(self):
-        """R4: One-page SLA with MRDT gate and piecewise availability deduction."""
-        with open(SLA_PATH, "r", encoding="utf-8") as f:
-            sla_text = f.read()
-        self.assertIn("MRDT", sla_text)
-        self.assertIn("150.0%", sla_text)
+        """R4: One-page SLA with MRDT gate, piecewise availability deduction, and 150% cap."""
+        mrdt = SLACalculator.compute_mrdt(80.0, 20.0, 300.0, 150.0, 150.0)
+        self.assertGreater(mrdt, 75.0)
+        inv = SLACalculator.settle_monthly_invoice(
+            monthly_base_fee=10000.0,
+            avail_pct=94.0,
+            delayed_records=[{"delay_min": 45.0, "mrdt_satisfied": True}] * 25,
+            undercharged_records=[],
+        )
+        self.assertEqual(inv["max_liability_cap_eur"], 15000.0)
+        self.assertEqual(inv["capped_payout_eur"], 15000.0)
 
     def test_r5_hardware_physics_and_thermal_safety(self):
         """R5: 95.5% AC inverter loss and 75°C hard safety trip."""

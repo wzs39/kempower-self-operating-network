@@ -1,11 +1,9 @@
-# Engineering Decisions & Trade-off Log · Project Sentinel - Self-Operating Charging Network
+# Engineering Decisions & Trade-off Log · Kempower Self-Operating Charging Network
 
-| Decision | Chosen Path | Rejected Alternative | Why |
+| Decision Area | Chosen Engineering Path | Rejected Alternative | Empirical Justification (from 45 CSVs) |
 |---|---|---|---|
-| Frontend UI | Streamlit / Rapid React | Custom Webpack/Tailwind setup | Saves 6 hours of boilerplate styling |
-| Data Layer | In-memory + Local JSON Fixture | PostgreSQL + Prisma migrations | Zero DB connection latency/auth issues during demo |
-| Error Handling | Graceful mock fallback toast | Complex retry/backoff queue | Judges don't wait 30 seconds for retries |
-
-### Next 3 Actions
-1. Verify mock fallback fires within 1 second if backend returns 500.
-2. Keep commit history clean and tagged (`v0.1-walking-skeleton`, `v1.0-demo-ready`).
+| **S1 12-Charger vs 24-Bus Bottleneck (`A1`, `B2`, `B6`)** | Dual-path comparison: **Strategy A** (`0 €` CAPEX software wave scheduling + single `01:30` swap) as immediate primary fix; **Strategy B** (`27,000 €/gun` = `324,000 €` for 12 guns) as long-term hardware option | Claiming 1.5-month hardware payback at S1 by attributing all 100-site labor (`21 FTE`) to S1 | S1 accounts for only `156` biweekly replugs (`2.79%` of network, `24,336 €/yr` at `45 €/h`), so S1 hardware payback is `13.31 yr` (`8.88 yr` hw-only), whereas Strategy A costs `0 €` CAPEX and eliminates all 4 missed departures immediately |
+| **Cabinet Power Routing (`A2`, `A6`, `B5`)** | Strict 1:N cabinet-to-dispenser wiring (`STATION_CABINET_TOPOLOGY`) + 1 kW continuous OCPP setpoints within each cabinet | Cross-cabinet contactor rerouting or mandatory 25 kW quantization inside 400 kW cabinets | `chargers.csv` wires each charger to exactly 1 cabinet (`C1-3 -> D1-9..12`), and `telemetry.csv` contains 6,502 continuous power values; continuous setpoints avoid `25 kW` quantization waste on `C2-1/C2-2` (`400 kW`) |
+| **S2 Afternoon Deficit (`A5`, `A8`)** | Priority preemption of overnight trucks `T05–T08` (`1,857.06 kWh` afternoon consumption) during `14:20–18:15` to supply `283.50 kWh` to `T01–T04` | Claiming `1,102.10 kWh` of free grid headroom in `14:20–16:00` or `350.10 kWh` deficit | `site_power_baseline.csv` shows S2 is already at `800/800 kW` in `14:20–16:00` (`33.3 kWh` headroom), and `departures_baseline.csv` shows `T01–T04` deficit is `44.82+111.24+49.14+78.30 = 283.50 kWh` |
+| **S5 Missed Departures (`C6`)** | 3-Way Digital Twin reconciliation restoring `site_config.csv` `grid_limit_kw: 600 -> 900 kW` (+ `D5-7: 150 kW`, `D5-8: sim_active=True`) | Attributing S5's 5 missed buses (`D5-1..D5-5`) solely to unused chargers `D5-7/D5-8` | `B27, B28, B33, B34, B35` were all plugged into `D5-1..D5-5` from `03:30` to `06:00`; restoring `600 -> 900 kW` unlocks `+300 kW × 2.5h = +750 kWh > 508.95 kWh` deficit |
+| **MILP Objective & Peak Demand (`C1`, `C2`)** | High internal priority weight (`10,000 €`) on continuous SoC deficit + full monthly peak demand rate (`6.50 / 7.50 €/kW·month`) | Using raw `250 €` contractual penalty in MILP or dividing monthly peak demand fee by 30 | At `799.30 €/MWh` + `24 €/MWh`, charging `328 kWh` costs `~297.6 € > 250 €`; separating internal priority weight prevents vehicle abandonment during price spikes |
