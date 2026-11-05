@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-data_dir = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 print("==================================================")
 print("PART 1: S1 C1-3 THERMAL FAILURE (F015 / F016)")

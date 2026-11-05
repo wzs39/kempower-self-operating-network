@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 
-data_dir = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 # Load fleet schedule and vehicles
 sched = pd.read_csv(os.path.join(data_dir, "fleet_schedule.csv"))

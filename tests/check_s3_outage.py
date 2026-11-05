@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-data_dir = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 arrivals = pd.read_csv(os.path.join(data_dir, "public_arrivals.csv"))
 s3_arr = arrivals[(arrivals['site_id'] == 'S3') & (arrivals['ts'].str.startswith('2026-11-13'))]

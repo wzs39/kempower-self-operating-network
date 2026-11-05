@@ -29,6 +29,8 @@ class VehicleSchedule:
     max_charge_kw: float
     penalty_eur: float = 250.0
     dispenser_id: Optional[str] = None
+    optimizer_slack_weight: float = 10000.0
+    deficit_penalty_per_kwh: float = 10.0
 
 @dataclass
 class BESSConfig:
@@ -50,7 +52,8 @@ class SiteMPCConfig:
     num_modules: int = 43            # 25 kW modules
     p_mod_kw: float = 25.0
     aux_load_kw: float = 0.0
-    peak_fee_eur_kw_mo: float = 6.50 # €/kW/month
+    peak_fee_eur_kw_mo: float = 6.50 # €/kW/month (full monthly demand tariff, Issue C2)
+    use_full_monthly_peak_fee: bool = False
     bess: Optional[BESSConfig] = None
 
 @dataclass
@@ -72,6 +75,7 @@ class DispatchPlan:
     solver_status: str
     solve_time_ms: float
     is_optimal: bool
+    vehicle_deficit_kwh: Dict[str, float] = field(default_factory=dict)
 
 class MPCOptimizer:
     """
@@ -162,7 +166,9 @@ class MPCOptimizer:
                     "req_soc": max(0.0, min(1.0, v.required_soc)),
                     "batt": max(1.0, v.battery_kwh),
                     "max_kw": max(0.0, v.max_charge_kw),
-                    "penalty": v.penalty_eur
+                    "penalty": v.penalty_eur,
+                    "opt_slack": max(v.penalty_eur, getattr(v, "optimizer_slack_weight", 10000.0)),
+                    "def_pen_kwh": max(1.0, getattr(v, "deficit_penalty_per_kwh", 10.0)),
                 })
 
         # Decision variable indexing
@@ -180,7 +186,7 @@ class MPCOptimizer:
 
         idx_pv_curt = cur; cur += K
 
-        # Vehicle variables: p_v[s], n_mod[s], soc[s], z_v
+        # Vehicle variables: p_v[s], n_mod[s], soc[s], z_v (continuous normalized SoC deficit slack)
         v_idx_map = {}
         for v in active_vehicles:
             vid = v["id"]
@@ -204,8 +210,13 @@ class MPCOptimizer:
             lb[idx_grid + t] = 0.0
             ub[idx_grid + t] = tx_max
 
-        # Peak demand fee (daily prorated)
-        c[idx_peak] = self.config.peak_fee_eur_kw_mo / 30.0
+        # Peak demand fee: full monthly peak rate when use_full_monthly_peak_fee or full-day horizon K >= 96 (Issue C2)
+        peak_rate_eff = (
+            self.config.peak_fee_eur_kw_mo
+            if (self.config.use_full_monthly_peak_fee or K >= 96)
+            else (self.config.peak_fee_eur_kw_mo / 30.0)
+        )
+        c[idx_peak] = peak_rate_eff
         lb[idx_peak] = 0.0
 
         # PV curtailment
@@ -232,14 +243,14 @@ class MPCOptimizer:
                 lb[idx_b_soc + t] = bess_cfg.min_soc
                 ub[idx_b_soc + t] = bess_cfg.max_soc
 
-        # Vehicle variables
+        # Vehicle variables (Fixes Issue C1 & Wave 1 D5: continuous SoC deficit slack with high priority weight)
         for v in active_vehicles:
             vid = v["id"]
             vd = v_idx_map[vid]
             n_steps = v["dep"] - v["arr"]
 
-            c[vd["z"]] = v["penalty"]
-            integrality[vd["z"]] = 1
+            c[vd["z"]] = max(v["opt_slack"], v["batt"] * v["def_pen_kwh"])
+            integrality[vd["z"]] = 0
             lb[vd["z"]] = 0.0
             ub[vd["z"]] = 1.0
 
@@ -320,7 +331,7 @@ class MPCOptimizer:
             rhs_balance = self.config.aux_load_kw - pv_gen[t]
             add_c(row, rhs_balance, rhs_balance)
 
-        # 6. Normalized SoC dynamics & Terminal SLA with Big-M = 1.0
+        # 6. Normalized SoC dynamics & Terminal SLA with continuous deficit slack d_v and Big-M = 1.0
         for v in active_vehicles:
             vid = v["id"]
             vd = v_idx_map[vid]
@@ -338,7 +349,7 @@ class MPCOptimizer:
                     vd["p"] + s: -(self.config.eta_ch_battery * self.dt) / e_batt
                 }, 0.0, 0.0)
 
-            # Terminal constraint: soc[end] + 1.0 * z >= req_soc
+            # Terminal constraint: soc[end] + z_v >= req_soc (z_v is continuous deficit in [0, 1])
             add_c({vd["soc"] + n_steps: 1.0, vd["z"]: 1.0}, v["req_soc"], np.inf)
 
         # Build sparse constraint matrix
@@ -361,7 +372,7 @@ class MPCOptimizer:
             integrality=integrality,
             bounds=opt_bounds,
             constraints=constraints,
-            options={"time_limit": 5.0, "disp": False}
+            options={"time_limit": 5.0, "mip_rel_gap": 1e-2, "disp": False}
         )
         solve_time = (time.time() - t0) * 1000.0
 
@@ -384,6 +395,7 @@ class MPCOptimizer:
 
         v_dc_pow = {}
         v_soc_traj = {}
+        v_def_kwh = {}
         unmet = []
         penalties_total = 0.0
 
@@ -404,8 +416,11 @@ class MPCOptimizer:
             soc_full[dep + 1:] = soc_full[dep]
             v_soc_traj[vid] = soc_full
 
-            z_val = sol[vd["z"]]
-            if z_val > 0.5:
+            z_val = max(0.0, float(sol[vd["z"]]))
+            def_kwh = round(z_val * v["batt"], 3)
+            v_def_kwh[vid] = def_kwh
+
+            if z_val > 1e-3:
                 unmet.append(vid)
                 penalties_total += v["penalty"]
 
@@ -415,9 +430,10 @@ class MPCOptimizer:
             total_dc += p
         ac_load = total_dc * self.inv_factor
 
-        # Cost breakdown
+        # Cost breakdown (contractual accounting cost vs internal priority weight)
         energy_cost = float(np.sum(1e-3 * (np.array(spot_prices_eur_mwh) + np.array(tariffs)) * grid_sol * self.dt))
-        peak_cost = float(self.config.peak_fee_eur_kw_mo / 30.0 * peak_sol)
+        peak_cost = float(peak_rate_eff * peak_sol)
+        accounting_total_cost = energy_cost + peak_cost + penalties_total
 
         return DispatchPlan(
             horizon_steps=K,
@@ -429,14 +445,15 @@ class MPCOptimizer:
             bess_power_kw=bess_pow,
             bess_soc=bess_soc_traj,
             unmet_vehicles=unmet,
-            total_cost_eur=float(res.fun),
+            total_cost_eur=accounting_total_cost,
             energy_cost_eur=energy_cost,
             peak_cost_eur=peak_cost,
             penalty_cost_eur=penalties_total,
             peak_power_kw=peak_sol,
             solver_status="OPTIMAL" if res.status == 0 else f"STATUS_{res.status}",
             solve_time_ms=solve_time,
-            is_optimal=res.success
+            is_optimal=res.success,
+            vehicle_deficit_kwh=v_def_kwh,
         )
 
     def _fallback_dispatch(

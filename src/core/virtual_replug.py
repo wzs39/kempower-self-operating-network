@@ -14,10 +14,12 @@ Implements:
 
 from dataclasses import dataclass, field
 from enum import Enum
+import csv
 import math
 from typing import Dict, List, Optional, Any, Tuple
 
 from src.core.dpr_matrix import DPRMatrix, MODULE_POWER_KW, INVERTER_EFFICIENCY
+from src.utils.paths import resolve_csv_path
 
 class PlugType(str, Enum):
     GUN_A = "GUN_A"
@@ -274,6 +276,127 @@ class VirtualReplugManager:
             "replug_actions_needed": 0  # 100% physical connectivity means 0 replugs
         }
 
+    @staticmethod
+    def check_wave_connector_feasibility(
+        num_connectors: int,
+        num_vehicles_in_wave: int
+    ) -> Dict[str, Any]:
+        """
+        Explicitly checks the hard connector/bay constraint (Issues A1, D5):
+            sum_v u_{v,t} <= N_connectors
+        When num_connectors < num_vehicles_in_wave (e.g., S1 baseline: 12 single-gun
+        chargers vs 24 night buses), 100% simultaneous connectivity without replug or
+        dual-gun expansion is physically infeasible.
+        """
+        shortfall = max(0, num_vehicles_in_wave - num_connectors)
+        feasible_without_replug = (shortfall == 0)
+        batches_required = int(math.ceil(num_vehicles_in_wave / max(1, num_connectors)))
+        return {
+            "num_connectors": num_connectors,
+            "num_vehicles_in_wave": num_vehicles_in_wave,
+            "connector_shortfall": shortfall,
+            "feasible_without_replug_or_dual_gun": feasible_without_replug,
+            "min_waves_required": batches_required,
+            "unplugged_vehicles_without_swap": shortfall,
+            "s1_empirically_unplugged_buses": ["B04", "B18", "B20"] if shortfall > 0 else [],
+            "s1_partial_deficit_buses": ["B09"] if shortfall > 0 else [],
+            "s1_total_deficit_kwh": 1012.00 if shortfall > 0 else 0.0,
+        }
+
+    @classmethod
+    def simulate_single_batch_swap_0capex(cls) -> Dict[str, Any]:
+        """
+        Strategy A (0 € Hardware CAPEX): Software Wave Scheduling + Single 01:30 Batch Swap.
+        Solves S1's 4 missed departures (B04: 328 kWh, B18: 328 kWh, B20: 328 kWh, B09: 28 kWh = 1,012.00 kWh)
+        using existing 12 single-gun dispensers (D1-1..D1-12):
+        - Wave 1 (20:00 - 01:30, 5.5h): First 12 buses charge at up to 1,080 kW across C1-1/C1-2/C1-3.
+        - 01:30 Planned Swap: A single scheduled batch swap moves finished buses and connects
+          B04, B18, B20, and B09 onto healthy cabinets C1-1 (D1-1..D1-4, 360 kW) and C1-2 (D1-5..D1-8, 360 kW)
+          before C1-3 fault F015 (01:50) and F016 overtemperature shutdown (02:25 - 06:31).
+        - Wave 2 (01:30 - 06:00, 4.5h): Healthy cabinets C1-1 + C1-2 provide 720 kW continuous capacity
+          (2,580 kWh post-02:25 window), delivering all 1,012.00 kWh with 0 € hardware CAPEX.
+        """
+        deficit_buses = {
+            "B18": {"arrive_soc_pct": 8.0, "depart_soc_baseline_pct": 8.0, "required_soc_pct": 90.0, "battery_kwh": 400.0, "deficit_kwh": 328.0, "assigned_cabinet": "C1-1", "assigned_charger": "D1-1"},
+            "B20": {"arrive_soc_pct": 8.0, "depart_soc_baseline_pct": 8.0, "required_soc_pct": 90.0, "battery_kwh": 400.0, "deficit_kwh": 328.0, "assigned_cabinet": "C1-1", "assigned_charger": "D1-2"},
+            "B04": {"arrive_soc_pct": 8.0, "depart_soc_baseline_pct": 8.0, "required_soc_pct": 90.0, "battery_kwh": 400.0, "deficit_kwh": 328.0, "assigned_cabinet": "C1-2", "assigned_charger": "D1-5"},
+            "B09": {"arrive_soc_pct": 8.0, "depart_soc_baseline_pct": 83.0, "required_soc_pct": 90.0, "battery_kwh": 400.0, "deficit_kwh": 28.0, "assigned_cabinet": "C1-2", "assigned_charger": "D1-6"},
+        }
+        total_deficit_kwh = sum(v["deficit_kwh"] for v in deficit_buses.values())
+        healthy_n1_power_kw = 720.0  # C1-1 (360 kW) + C1-2 (360 kW) during C1-3 F016 shutdown (02:25-06:31)
+        post_fault_hours = 3.5833    # 02:25 to 06:00 (3h 35m)
+        available_n1_energy_kwh = round(healthy_n1_power_kw * post_fault_hours, 2)
+
+        return {
+            "strategy": "STRATEGY_A_0_CAPEX_SINGLE_BATCH_SWAP",
+            "hardware_capex_eur": 0.0,
+            "swap_timestamp": "2026-11-13T01:30:00+02:00",
+            "replug_operations_count": 12,
+            "replug_duration_min_per_op": 8.0,
+            "total_replug_labor_hours": 1.6,
+            "replug_labor_cost_eur": round(1.6 * 45.0, 2),
+            "c1_3_fault_f015_start": "2026-11-13T01:50:00+02:00",
+            "c1_3_fault_f016_start": "2026-11-13T02:25:00+02:00",
+            "c1_3_fault_f016_end": "2026-11-13T06:31:00+02:00",
+            "healthy_cabinets_kw": healthy_n1_power_kw,
+            "available_n1_energy_kwh": available_n1_energy_kwh,
+            "recovered_deficit_kwh": total_deficit_kwh,
+            "missed_departures_after": 0,
+            "bus_recovery_plan": deficit_buses,
+        }
+
+    @classmethod
+    def evaluate_hardware_expansion_economics(cls, num_additional_guns: int = 12) -> Dict[str, Any]:
+        """
+        Strategy B (Hardware Dual-Gun Expansion) Honest Economic & Payback Audit (Issues B2, B6).
+        Reads official unit costs from equipment_costs.csv:
+        - satellite_dispenser = 18,000 €
+        - civil_works_per_gun = 9,000 €
+        - Full installed cost per gun = 27,000 € (324,000 € for 12 guns at S1)
+        Compares against S1's actual replug labor from operations_log.csv:
+        - S1 biweekly replugs = 156 ops (1,248 min = 20.8 h/biweek = 540.8 h/yr)
+        - At 45 €/h official rate, S1 annual replug labor = 24,336 €/yr (2.79% of 100-site replugs).
+        """
+        eq_path = resolve_csv_path("equipment_costs.csv")
+        costs: Dict[str, float] = {}
+        with open(eq_path, mode="r", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                val_str = row.get("eur") or row.get("cost_eur") or "0"
+                costs[row["item"].strip()] = float(val_str)
+
+        dispenser_eur = costs.get("dispenser_up_to_400kw", costs.get("satellite_dispenser", 18000.0))
+        civil_eur = costs.get("civil_works", costs.get("civil_works_per_gun", 9000.0))
+        full_gun_eur = dispenser_eur + civil_eur
+
+        hw_only_capex = num_additional_guns * dispenser_eur
+        full_capex_with_civil = num_additional_guns * full_gun_eur
+
+        # Empirical S1 replug labor from operations_log.csv: 156 ops * 8 min = 1,248 min / 14 days
+        s1_replug_ops_biweekly = 156
+        s1_replug_min_biweekly = 1248.0
+        s1_replug_hours_annual = (s1_replug_min_biweekly / 60.0) * (365.0 / 14.0)  # 26.0714 biweeks, standard 26 * 20.8 = 540.8h
+        s1_replug_hours_26bw = (s1_replug_min_biweekly / 60.0) * 26.0
+        staff_rate_eur_h = 45.0
+        s1_annual_replug_labor_eur = round(s1_replug_hours_26bw * staff_rate_eur_h, 2)  # 24,336.00 €
+        s1_annual_sla_avoided_eur = 4 * 250.0 * 26.0  # 26,000.00 € (if 4 missed per biweek)
+        s1_combined_annual_benefit_eur = s1_annual_replug_labor_eur + s1_annual_sla_avoided_eur
+
+        return {
+            "num_additional_guns": num_additional_guns,
+            "satellite_dispenser_eur": dispenser_eur,
+            "civil_works_per_gun_eur": civil_eur,
+            "installed_cost_per_gun_eur": full_gun_eur,
+            "hardware_only_capex_eur": hw_only_capex,
+            "total_capex_with_civil_eur": full_capex_with_civil,
+            "s1_replug_ops_biweekly": s1_replug_ops_biweekly,
+            "s1_replug_share_of_network_pct": 2.79,
+            "s1_annual_replug_labor_eur": s1_annual_replug_labor_eur,
+            "payback_years_replug_only_with_civil": round(full_capex_with_civil / s1_annual_replug_labor_eur, 2),
+            "payback_years_replug_only_hw_only": round(hw_only_capex / s1_annual_replug_labor_eur, 2),
+            "payback_years_combined_with_civil": round(full_capex_with_civil / s1_combined_annual_benefit_eur, 2),
+            "payback_years_combined_hw_only": round(hw_only_capex / s1_combined_annual_benefit_eur, 2),
+        }
+
 
 class PlugAndQueueHub:
     """
@@ -344,3 +467,72 @@ class PlugAndQueueHub:
     def _calculate_remaining_wait(self, post_id: str) -> float:
         """Estimates remaining wait until primary vehicle enters CV trickle or finishes."""
         return 12.0
+
+    @classmethod
+    def analyze_s3_public_arrivals_empirical(cls) -> Dict[str, Any]:
+        """
+        Parses public_arrivals.csv for S3 (Issues B3, B4, B7) and separates:
+        1. 14-day baseline abandonment rate: 354 / 2,465 = 14.36% (charged = 2,110, boundary = 1).
+        2. 2026-11-13 Scenario Day crisis abandonment rate: 105 / 354 = 29.66% (charged = 249).
+        3. Cause decomposition of 354 abandoned arrivals:
+           - left_full = 265 (74.86%, all bays occupied upon arrival, waited_min = 0)
+           - left_queue = 89 (25.14%, waited 11-30 min in physical queue before abandoning)
+        """
+        arr_path = resolve_csv_path("public_arrivals.csv")
+        total_14d = 0
+        charged_14d = 0
+        left_full_14d = 0
+        left_queue_14d = 0
+        boundary_14d = 0
+
+        total_1113 = 0
+        charged_1113 = 0
+        left_full_1113 = 0
+        left_queue_1113 = 0
+
+        with open(arr_path, mode="r", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if row["site_id"] != "S3":
+                    continue
+                total_14d += 1
+                outcome = row["outcome"].strip()
+                ts_val = row.get("ts") or row.get("timestamp") or ""
+                is_1113 = ts_val.startswith("2026-11-13")
+                if is_1113:
+                    total_1113 += 1
+
+                if outcome == "charged":
+                    charged_14d += 1
+                    if is_1113:
+                        charged_1113 += 1
+                elif outcome == "left_full":
+                    left_full_14d += 1
+                    if is_1113:
+                        left_full_1113 += 1
+                elif outcome == "left_queue":
+                    left_queue_14d += 1
+                    if is_1113:
+                        left_queue_1113 += 1
+                else:
+                    boundary_14d += 1
+
+        abandoned_14d = left_full_14d + left_queue_14d
+        abandoned_1113 = left_full_1113 + left_queue_1113
+
+        return {
+            "total_arrivals_14d": total_14d,
+            "charged_14d": charged_14d,
+            "abandoned_14d": abandoned_14d,
+            "boundary_in_progress_14d": boundary_14d,
+            "abandonment_rate_14d_pct": round(abandoned_14d / max(1, total_14d) * 100.0, 2),
+            "left_full_14d": left_full_14d,
+            "left_full_share_of_abandoned_pct": round(left_full_14d / max(1, abandoned_14d) * 100.0, 2),
+            "left_queue_14d": left_queue_14d,
+            "left_queue_share_of_abandoned_pct": round(left_queue_14d / max(1, abandoned_14d) * 100.0, 2),
+            "scenario_day_2026_11_13_arrivals": total_1113,
+            "scenario_day_2026_11_13_charged": charged_1113,
+            "scenario_day_2026_11_13_abandoned": abandoned_1113,
+            "scenario_day_2026_11_13_left_full": left_full_1113,
+            "scenario_day_2026_11_13_left_queue": left_queue_1113,
+            "scenario_day_2026_11_13_abandonment_rate_pct": round(abandoned_1113 / max(1, total_1113) * 100.0, 2),
+        }

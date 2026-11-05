@@ -3,7 +3,7 @@ import glob
 import pandas as pd
 import numpy as np
 
-DATA_DIR = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 
 def test_total_csv_rows():
     print("=" * 60)

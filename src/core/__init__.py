@@ -19,6 +19,7 @@ from src.core.dpr_matrix import (
     MODULE_POWER_KW,
     INVERTER_EFFICIENCY,
     CONTACTOR_MAX_SWITCH_DELAY_MS,
+    STATION_CABINET_TOPOLOGY,
 )
 
 from src.core.virtual_replug import (

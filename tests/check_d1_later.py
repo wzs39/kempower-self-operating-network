@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-data_dir = r"C:\Users\qwe\Desktop\hackson\kempower-challenge\kempower-challenge-data"
+data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "kempower-challenge", "kempower-challenge-data")
 df = pd.read_csv(os.path.join(data_dir, "telemetry_1min.csv"))
 s1_later = df[(df['charger_id'].str.startswith('D1-')) & (df['ts'] >= '2026-11-13T02:20:00') & (df['ts'] <= '2026-11-13T04:00:00')]
 print(s1_later[s1_later['power_kw'] > 0][['ts', 'charger_id', 'power_kw', 'cabinet_temp_c', 'error_events']].head(30).to_string())

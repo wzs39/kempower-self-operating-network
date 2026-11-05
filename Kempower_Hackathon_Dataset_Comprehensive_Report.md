@@ -16,16 +16,16 @@
 在传统充电网络运营中，高度依赖人类解决系统冲突：人工监控桩群状态、人工调度夜间重插拔车（Move and Replug）、人工在电网限电时手动下调功率、人工响应设备故障并派遣技师抢修、手动调整零售电价。Kempower 赛题要求参赛团队设计出一套**摆脱持续人工介入的自治智能控制核心**，并在官方提供的两周（2026-11-02 至 2026-11-15）真实业务仿真数据上进行完整验证。
 
 ### 1.2 文件夹全景资产统计
-当前文件夹（`C:\Users\qwe\Desktop\hackson`）共包含 **57 个文件**，分为根目录参赛辅导材料与 `kempower-challenge` 核心数据集两大板块：
+当前文件夹（`<REPO_ROOT>`）共包含 **57 个文件**，分为根目录参赛辅导材料与 `kempower-challenge` 核心数据集两大板块：
 - **根目录核心指导与辅助文件（9 个）**：
-  - 赛题任务书与官方说明（1 个 PDF 原件）：[`Kempower-challenge-brief.pdf`](file:///C:/Users/qwe/Desktop/hackson/Kempower-challenge-brief.pdf)
-  - 导师辅导与工位预约排班表（1 个 Excel 工作簿）：[`Energy_Hackathon_2026_mentoring.xlsx`](file:///C:/Users/qwe/Desktop/hackson/Energy_Hackathon_2026_mentoring.xlsx)
+  - 赛题任务书与官方说明（1 个 PDF 原件）：[`Kempower-challenge-brief.pdf`](./Kempower-challenge-brief.pdf)
+  - 导师辅导与工位预约排班表（1 个 Excel 工作簿）：[`Energy_Hackathon_2026_mentoring.xlsx`](./Energy_Hackathon_2026_mentoring.xlsx)
   - 赛题现场手机实拍图纸（4 个 JPG 高清照片）：包含了任务书纸质版第 1、2、3 页及备份
-  - 官方发布压缩包（1 个 ZIP 归档）：[`kempower-challenge.zip`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge.zip)
-  - 子目录任务书备份（1 个 PDF）：[`kempower-challenge/Kempower-challenge-brief.pdf`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/Kempower-challenge-brief.pdf)
-  - **官方开营演讲演示文稿（1 个 PPTX，42 MB）**：[`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](file:///C:/Users/qwe/Desktop/hackson/Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx)
+  - 官方发布压缩包（1 个 ZIP 归档）：[`kempower-challenge.zip`](./kempower-challenge.zip)
+  - 子目录任务书备份（1 个 PDF）：[`kempower-challenge/Kempower-challenge-brief.pdf`](./kempower-challenge/Kempower-challenge-brief.pdf)
+  - **官方开营演讲演示文稿（1 个 PPTX，42 MB）**：[`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](./Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx)
 - **核心数据目录 `kempower-challenge-data`（48 个文件）**：
-  - 核心 Markdown 文档（3 份）：[`README.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/README.md)、[`DATA_DICTIONARY.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md)、[`PUBLIC_SOURCES.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md)
+  - 核心 Markdown 文档（3 份）：[`README.md`](./kempower-challenge/kempower-challenge-data/README.md)、[`DATA_DICTIONARY.md`](./kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md)、[`PUBLIC_SOURCES.md`](./kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md)
   - 业务数据 CSV 文件（45 个）：总计记录行数达 **240,635 行**，全面覆盖欧洲 5 国（芬兰、瑞典、挪威、丹麦、德国）100 个充电站的宏观电网数据，以及芬兰本土 5 个微观典型场站（S1~S5）毫秒/分钟级高频监控、车辆调度、工单运维与商业合同。
 
 ```mermaid
@@ -53,7 +53,7 @@ graph TD
 
 ## 2. 根目录关键赛题与支撑材料深度解读
 
-### 2.1 赛题任务书：[`Kempower-challenge-brief.pdf`](file:///C:/Users/qwe/Desktop/hackson/Kempower-challenge-brief.pdf)
+### 2.1 赛题任务书：[`Kempower-challenge-brief.pdf`](./Kempower-challenge-brief.pdf)
 该 PDF 文件共 3 页，是 Kempower 与 LahtiES 联合发布的官方赛题指南，明确了参赛团队的战略方向、评判维度和交付合同：
 1. **三大核心研发任务**：
    - **第一部分：能源与控制核心（The energy and control core）**：当电网限额（Grid limits）、分时动态电价（15分钟级波动）和车队严苛发车时刻表产生冲突时，系统如何在机柜、枪头、场站间动态分配功率？当系统出现故障时如何无感自愈？系统智能应部署在何处（充电桩 MCU、场站边缘控制器 Edge、云端 Cloud 还是外部聚合器）？发生断网时如何保证业务不崩溃？
@@ -70,7 +70,7 @@ graph TD
    - **商业可行性（Commercial viability - 20%）**：商业模式是否能让客户自愿买单？权责与赔付机制是否清晰明了；
    - **表达清晰度（Clarity - 15%）**：2029 年故事是否通俗易懂，非专业评委能否直观感知价值。
 
-### 2.2 导师排班与支持机制：[`Energy_Hackathon_2026_mentoring.xlsx`](file:///C:/Users/qwe/Desktop/hackson/Energy_Hackathon_2026_mentoring.xlsx)
+### 2.2 导师排班与支持机制：[`Energy_Hackathon_2026_mentoring.xlsx`](./Energy_Hackathon_2026_mentoring.xlsx)
 该文件为黑客松现场导师辅导预约工作表，共 996 行。
 - **导师阵容与机制**：
   - **Mats Mattsson**：Kempower 核心高管，周四负责开营动员与 Kickoff Q&A，周六作为评委出席终局评审；
@@ -81,15 +81,15 @@ graph TD
 
 ### 2.3 现场打印件实拍图片（4 张 JPG）
 经图像特征分析与 MD5 哈希校验：
-- [`bcc26c76ab238a9932feb12d814d3b1f.jpg`](file:///C:/Users/qwe/Desktop/hackson/bcc26c76ab238a9932feb12d814d3b1f.jpg)（MD5: `3833a1128b5a...`，179 KB）：参赛队员在黑客松桌面拍摄的赛题任务书第 1 页纸质版照片（含 Kempower 简介、背景、Whose network is it 与核心挑战三大模块）；
-- [`823c0d67d56415d307e4e42792ad3b00.jpg`](file:///C:/Users/qwe/Desktop/hackson/823c0d67d56415d307e4e42792ad3b00.jpg)（MD5: `971a32efb9e6...`，222 KB）：拍摄的任务书第 2 页纸质版照片（包含第二部分 Demo 要求、第三部分商业协议要求、交付清单以及评分标准前四项表格）；
-- [`b80b867a15b6cad8875c2b9dfbd4dd6e.jpg`](file:///C:/Users/qwe/Desktop/hackson/b80b867a15b6cad8875c2b9dfbd4dd6e.jpg)（MD5: `971a32efb9e6...`，222 KB）：经比对，其二进制哈希与 `823c0d67...jpg` 完全一致，属于同一张第 2 页照片的重复备份；
-- [`c69a216eb73e13a6f70b130c04e274a1.jpg`](file:///C:/Users/qwe/Desktop/hackson/c69a216eb73e13a6f70b130c04e274a1.jpg)（MD5: `3f354871f365...`，151 KB）：拍摄的任务书第 3 页纸质版照片（包含评分标准最后一项 Clarity、Baseline KPIs 引用指引、比赛规则及数据集免责声明）。
+- [`bcc26c76ab238a9932feb12d814d3b1f.jpg`](./bcc26c76ab238a9932feb12d814d3b1f.jpg)（MD5: `3833a1128b5a...`，179 KB）：参赛队员在黑客松桌面拍摄的赛题任务书第 1 页纸质版照片（含 Kempower 简介、背景、Whose network is it 与核心挑战三大模块）；
+- [`823c0d67d56415d307e4e42792ad3b00.jpg`](./823c0d67d56415d307e4e42792ad3b00.jpg)（MD5: `971a32efb9e6...`，222 KB）：拍摄的任务书第 2 页纸质版照片（包含第二部分 Demo 要求、第三部分商业协议要求、交付清单以及评分标准前四项表格）；
+- [`b80b867a15b6cad8875c2b9dfbd4dd6e.jpg`](./b80b867a15b6cad8875c2b9dfbd4dd6e.jpg)（MD5: `971a32efb9e6...`，222 KB）：经比对，其二进制哈希与 `823c0d67...jpg` 完全一致，属于同一张第 2 页照片的重复备份；
+- [`c69a216eb73e13a6f70b130c04e274a1.jpg`](./c69a216eb73e13a6f70b130c04e274a1.jpg)（MD5: `3f354871f365...`，151 KB）：拍摄的任务书第 3 页纸质版照片（包含评分标准最后一项 Clarity、Baseline KPIs 引用指引、比赛规则及数据集免责声明）。
 
-### 2.4 数据包原始归档：[`kempower-challenge.zip`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge.zip)
+### 2.4 数据包原始归档：[`kempower-challenge.zip`](./kempower-challenge.zip)
 大小为 1,820,908 字节，解压后即为当前目录下的 `kempower-challenge` 文件夹，内含 49 个原始文件（1 份 PDF + 48 份数据与文档），数据结构完好无损。
 
-### 2.5 官方开营演讲文稿：[`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](file:///C:/Users/qwe/Desktop/hackson/Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx) (23 页全量解构与现场原声)
+### 2.5 官方开营演讲文稿：[`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](./Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx) (23 页全量解构与现场原声)
 该文件大小为 **42.02 MB**，是 Kempower 云软件负责人 **Mats Mattsson** 于 2026 年 11 月 5 日（周四）上午 10:00 在拉赫蒂 LUT 大学 CrazyTown 开营仪式上发表的官方 Kickoff Keynote 完整演示文稿（含 23 页高清幻灯片、现场演讲动画视频节点与全部演讲者演说词备注 Notes）。该文稿为整个赛题提供了第一手权威技术揭秘与规则红线：
 
 1. **震撼人工作业数据官方实锤**：
@@ -110,7 +110,7 @@ graph TD
    - 幻灯片第 17 页给出了极其关键的参赛底线：
      - **"Never change the data we gave"**：绝对严禁篡改官方提供的 45 个 CSV 数据集（基线和场景日数据对所有团队必须完全一致）；
      - **"Missing something? Add it, and say so."**：允许自行补充外部数据（如利用 `PUBLIC_SOURCES.md` 中的 Fingrid、Nord Pool 实测数据或合成数据），但周六必须提交一份**包含所有新增数据与假设的清单（One list of all you added and every assumption）**；
-     - **"Count the cost"**：如果方案中新增了储能电池（BESS）或新充电桩，必须严格按照 [`equipment_costs.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/equipment_costs.csv) 核算投资与建设成本。
+     - **"Count the cost"**：如果方案中新增了储能电池（BESS）或新充电桩，必须严格按照 [`equipment_costs.csv`](./kempower-challenge/kempower-challenge-data/equipment_costs.csv) 核算投资与建设成本。
 5. **导师团队全量 6 人阵容**：
    - 幻灯片第 19 页正式公布了 Kempower 6 位专家导师：Mats Mattsson, Panu Vartiainen, Iiro Kinnunen, Thet Zin, Chuong Pham, Paul Carlson，并提供了 Mukkulankatu 19 (Isku 门 3 楼) 的 63 个一对一辅导 Slot 预约机制。
 
@@ -120,7 +120,7 @@ graph TD
 
 数据集解压于 `kempower-challenge/kempower-challenge-data`，包含 3 份基础文档：
 
-### 3.1 架构主文档：[`README.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/README.md)
+### 3.1 架构主文档：[`README.md`](./kempower-challenge/kempower-challenge-data/README.md)
 系统设计了由面及点、微观与宏观相结合的**双层观测体系（Two Levels of Detail）**：
 1. **全网宏观级（Network Level - 100 个站点）**：
    - 跨越北欧与西欧 5 个国家（芬兰 25 站、瑞典 25 站、挪威 20 站、德国 20 站、丹麦 10 站）；
@@ -134,13 +134,13 @@ graph TD
      - **S4（City hub - 市区公共快充枢纽）**：服务出租车、网约车与普通市民，配置 2 台 300 kW 机柜，8 根枪，屋顶配有 50 kWp 分布式光伏。
      - **S5（Bus depot South - 南部新建公交场站）**：2026-11-06 刚刚验收交付的新站，自 11-09 起投入运营，配 2 台 450 kW 机柜（共 900 kW 设备容量），但电网入户功率上限仅 600 kW，存在初始工程配置缺陷。
 
-### 3.2 字段字典规范：[`DATA_DICTIONARY.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md)
+### 3.2 字段字典规范：[`DATA_DICTIONARY.md`](./kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md)
 严格定义了数据规范：
 - **时间与分辨率**：所有时间戳均为 ISO 8601 格式，统一采用芬兰赫尔辛基时区（UTC+2），时间序列主要为 15 分钟（`ts` 表示该 15 分钟区间的起始点）。
 - **物理量与单位**：功率为千瓦（`kW`）、能量为千瓦时（`kWh`）或兆瓦时（`MWh`，1 MWh = 1,000 kWh）、车辆电池荷电状态为百分比（`SoC %`）、电价为欧元/兆瓦时（`EUR/MWh`）或欧元/千瓦时（`EUR/kWh`）。
 - **数据结构层级**：明确了全网宏观表与 S1~S5 微观特写表的关联主键（`site_id`、`cabinet_id`、`charger_id`、`vehicle_id`、`fault_id`、`ticket_id`）。
 
-### 3.3 行业权威基准数据源：[`PUBLIC_SOURCES.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md)
+### 3.3 行业权威基准数据源：[`PUBLIC_SOURCES.md`](./kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md)
 指引参赛选手在设计算法时参考欧洲真实的工业界标准与实时接口：
 - **芬兰国家电网 Fingrid Open Data**：电网负荷、风电出力、电网频率及辅助服务市场规范；
 - **Nord Pool 与 ENTSO-E**：自 2025 年起欧洲日前现货市场采用的 15 分钟级撮合交易价格；
@@ -158,73 +158,73 @@ graph TD
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/prices.csv) | 1,344 | 4 | `ts`, `spot_eur_mwh`, `grid_tariff_depot_eur_mwh`, `grid_tariff_public_eur_mwh` | S1~S5 场站所在地的 15 分钟级日前现货电价及分时过网费。总购电成本 = (现货价 + 过网费) × 消耗电量。两周共 1,344 个时刻。 |
-| [`zone_prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/zone_prices.csv) | 1,344 | 14 | `ts`, `FI`, `SE1~SE4`, `NO1~NO5`, `DK1~DK2`, `DE-LU` | 全网 100 站覆盖的 14 个欧洲电力现货竞价区 15 分钟电价矩阵。展示跨国充电网络所面临的巨大电价差异。 |
-| [`tariffs.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/tariffs.csv) | 2 | 6 | `tariff_id`, `day_eur_mwh`, `night_eur_mwh`, `day_from`, `day_to`, `peak_power_fee_eur_kw_month` | 电网基本输配电资费表。关键字段 `peak_power_fee`（需量电费，每月每 kW 最高负荷收取 24~28 欧元），是惩罚充电网络瞬时冲顶的关键经济杠杆。 |
-| [`reserve_market_prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/reserve_market_prices.csv) | 2,016 | 4 | `ts`, `country`, `market`, `capacity_price_eur_mw_h` | 北欧调频备用辅助服务市场（FCR-D 快速下调、FCR-N 正常调频、FFR 快速频率响应）小时级容量补偿报价。展示智能场站向电网反向提供灵活性服务的创收潜力。 |
-| [`co2_intensity.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/co2_intensity.csv) | 4,368 | 3 | `ts`, `zone`, `g_co2_per_kwh` | 14 个电价区的小时级电网碳排放强度（g CO₂/kWh）。算法可借此设计兼顾“经济最低”与“绿电碳排放最优”的低碳充电策略。 |
-| [`pv_production.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/pv_production.csv) | 1,344 | 3 | `ts`, `site_id`, `pv_kw` | S4 场站屋顶 50 kWp 光伏在 11 月份的 15 分钟实际发电功率。北欧初冬光照极低，体现了冬季新能源出力的脆弱性。 |
-| [`grid_capacity.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/grid_capacity.csv) | 95 | 8 | `site_id`, `current_limit_kw`, `max_upgrade_kw`, `upgrade_cost_eur_per_kw`, `upgrade_lead_time_months`, `flexible_extra_kw` | 全网 95 个站点的电网增容升级评估表：给出增容投资成本（€/kW）、施工周期（月）以及电网公司提供的柔性额外容量与年限电承诺小时数。 |
-| [`grid_events.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/grid_events.csv) / [`network_grid_events.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_grid_events.csv) | 2 / 26 | 8 | `event_id`, `site_id`, `notified_ts`, `start_ts`, `end_ts`, `type`, `limit_kw`, `note` | 电网调度中心下达的紧急事件表。包含两类：`limit_cap`（动态限制总进线功率削峰）与 `outage`（电网检修完全断电）。直接考验系统的负荷自适应削减能力。 |
+| [`prices.csv`](./kempower-challenge/kempower-challenge-data/prices.csv) | 1,344 | 4 | `ts`, `spot_eur_mwh`, `grid_tariff_depot_eur_mwh`, `grid_tariff_public_eur_mwh` | S1~S5 场站所在地的 15 分钟级日前现货电价及分时过网费。总购电成本 = (现货价 + 过网费) × 消耗电量。两周共 1,344 个时刻。 |
+| [`zone_prices.csv`](./kempower-challenge/kempower-challenge-data/zone_prices.csv) | 1,344 | 14 | `ts`, `FI`, `SE1~SE4`, `NO1~NO5`, `DK1~DK2`, `DE-LU` | 全网 100 站覆盖的 14 个欧洲电力现货竞价区 15 分钟电价矩阵。展示跨国充电网络所面临的巨大电价差异。 |
+| [`tariffs.csv`](./kempower-challenge/kempower-challenge-data/tariffs.csv) | 2 | 6 | `tariff_id`, `day_eur_mwh`, `night_eur_mwh`, `day_from`, `day_to`, `peak_power_fee_eur_kw_month` | 电网基本输配电资费表。关键字段 `peak_power_fee`（需量电费，每月每 kW 最高负荷收取 24~28 欧元），是惩罚充电网络瞬时冲顶的关键经济杠杆。 |
+| [`reserve_market_prices.csv`](./kempower-challenge/kempower-challenge-data/reserve_market_prices.csv) | 2,016 | 4 | `ts`, `country`, `market`, `capacity_price_eur_mw_h` | 北欧调频备用辅助服务市场（FCR-D 快速下调、FCR-N 正常调频、FFR 快速频率响应）小时级容量补偿报价。展示智能场站向电网反向提供灵活性服务的创收潜力。 |
+| [`co2_intensity.csv`](./kempower-challenge/kempower-challenge-data/co2_intensity.csv) | 4,368 | 3 | `ts`, `zone`, `g_co2_per_kwh` | 14 个电价区的小时级电网碳排放强度（g CO₂/kWh）。算法可借此设计兼顾“经济最低”与“绿电碳排放最优”的低碳充电策略。 |
+| [`pv_production.csv`](./kempower-challenge/kempower-challenge-data/pv_production.csv) | 1,344 | 3 | `ts`, `site_id`, `pv_kw` | S4 场站屋顶 50 kWp 光伏在 11 月份的 15 分钟实际发电功率。北欧初冬光照极低，体现了冬季新能源出力的脆弱性。 |
+| [`grid_capacity.csv`](./kempower-challenge/kempower-challenge-data/grid_capacity.csv) | 95 | 8 | `site_id`, `current_limit_kw`, `max_upgrade_kw`, `upgrade_cost_eur_per_kw`, `upgrade_lead_time_months`, `flexible_extra_kw` | 全网 95 个站点的电网增容升级评估表：给出增容投资成本（€/kW）、施工周期（月）以及电网公司提供的柔性额外容量与年限电承诺小时数。 |
+| [`grid_events.csv`](./kempower-challenge/kempower-challenge-data/grid_events.csv) / [`network_grid_events.csv`](./kempower-challenge/kempower-challenge-data/network_grid_events.csv) | 2 / 26 | 8 | `event_id`, `site_id`, `notified_ts`, `start_ts`, `end_ts`, `type`, `limit_kw`, `note` | 电网调度中心下达的紧急事件表。包含两类：`limit_cap`（动态限制总进线功率削峰）与 `outage`（电网检修完全断电）。直接考验系统的负荷自适应削减能力。 |
 
 ### 4.2 领域二：车队管理、车辆调度与干线走廊（6 个文件）
 面向 B 端车队运营的约束数据，决定了充电调度的硬性边界。
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`vehicles.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/vehicles.csv) | 50 | 8 | `vehicle_id`, `fleet_id`, `home_site_id`, `vehicle_type`, `battery_kwh`, `max_charge_kw`, `consumption_kwh_per_km` | 50 辆特写车队车辆档案（B01~B36 公交车，T01~T14 重卡）。明确了动力电池容量（重卡达 400~600 kWh）、最大接受充电功率与常规百公里能耗。 |
-| [`fleet_schedule.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/fleet_schedule.csv) | 656 | 7 | `vehicle_id`, `site_id`, `arrive_ts`, `arrive_soc_pct`, `depart_ts`, `required_soc_pct`, `next_route_km` | 车队进出站计划表（656 次停靠）。给出了车辆到达时的剩余 SoC、计划出车时间、出车最低要求 SoC（通常为 80%~90%）及下一班次运营里程。 |
-| [`departures_baseline.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/departures_baseline.csv) | 606 | 6 | `vehicle_id`, `site_id`, `depart_ts`, `depart_soc_pct`, `required_soc_pct`, `below_required` | 现有人工运营下 606 次出车记录。标记了 `below_required=1` 的严重失职事件（车辆带着过低电量出站，面临半路抛锚风险），是算法方案必须消除的痛点。 |
-| [`corridors.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/corridors.csv) | 12 | 8 | `route_id`, `from`, `to`, `countries`, `km`, `electric_trucks_per_day_2026`, `electric_trucks_per_day_2029_forecast`, `own_sites_on_route` | 12 条连接欧洲主要枢纽的跨国货运走廊（如赫尔辛基至拉赫蒂、奥斯陆至哥德堡）。包含 2026 当前与 2029 预测的电动重卡日流量，指导网络扩容规划。 |
-| [`traffic_points.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/traffic_points.csv) / [`traffic_counts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/traffic_counts.csv) | 2 / 2,688 | 3 / 5 | `point_id`, `nearest_site_id`, `ts`, `cars`, `vans`, `trucks` | S3 高速站与 S4 市区站旁公路断面的 15 分钟车流量观测（按轿车、货车、重卡分类）。为公桩到达预测提供先导流量指标。 |
-| [`weather.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/weather.csv) | 8,736 | 4 | `ts`, `location`, `country`, `temp_c` | 26 个地理坐标的小时级环境气温。北欧初冬气温骤降至 -10℃ 以下，车辆冬季能耗增加 20%~40%，对电池加热与充放电效率构成严酷挑战。 |
+| [`vehicles.csv`](./kempower-challenge/kempower-challenge-data/vehicles.csv) | 50 | 8 | `vehicle_id`, `fleet_id`, `home_site_id`, `vehicle_type`, `battery_kwh`, `max_charge_kw`, `consumption_kwh_per_km` | 50 辆特写车队车辆档案（B01~B36 公交车，T01~T14 重卡）。明确了动力电池容量（重卡达 400~600 kWh）、最大接受充电功率与常规百公里能耗。 |
+| [`fleet_schedule.csv`](./kempower-challenge/kempower-challenge-data/fleet_schedule.csv) | 656 | 7 | `vehicle_id`, `site_id`, `arrive_ts`, `arrive_soc_pct`, `depart_ts`, `required_soc_pct`, `next_route_km` | 车队进出站计划表（656 次停靠）。给出了车辆到达时的剩余 SoC、计划出车时间、出车最低要求 SoC（通常为 80%~90%）及下一班次运营里程。 |
+| [`departures_baseline.csv`](./kempower-challenge/kempower-challenge-data/departures_baseline.csv) | 606 | 6 | `vehicle_id`, `site_id`, `depart_ts`, `depart_soc_pct`, `required_soc_pct`, `below_required` | 现有人工运营下 606 次出车记录。标记了 `below_required=1` 的严重失职事件（车辆带着过低电量出站，面临半路抛锚风险），是算法方案必须消除的痛点。 |
+| [`corridors.csv`](./kempower-challenge/kempower-challenge-data/corridors.csv) | 12 | 8 | `route_id`, `from`, `to`, `countries`, `km`, `electric_trucks_per_day_2026`, `electric_trucks_per_day_2029_forecast`, `own_sites_on_route` | 12 条连接欧洲主要枢纽的跨国货运走廊（如赫尔辛基至拉赫蒂、奥斯陆至哥德堡）。包含 2026 当前与 2029 预测的电动重卡日流量，指导网络扩容规划。 |
+| [`traffic_points.csv`](./kempower-challenge/kempower-challenge-data/traffic_points.csv) / [`traffic_counts.csv`](./kempower-challenge/kempower-challenge-data/traffic_counts.csv) | 2 / 2,688 | 3 / 5 | `point_id`, `nearest_site_id`, `ts`, `cars`, `vans`, `trucks` | S3 高速站与 S4 市区站旁公路断面的 15 分钟车流量观测（按轿车、货车、重卡分类）。为公桩到达预测提供先导流量指标。 |
+| [`weather.csv`](./kempower-challenge/kempower-challenge-data/weather.csv) | 8,736 | 4 | `ts`, `location`, `country`, `temp_c` | 26 个地理坐标的小时级环境气温。北欧初冬气温骤降至 -10℃ 以下，车辆冬季能耗增加 20%~40%，对电池加热与充放电效率构成严酷挑战。 |
 
 ### 4.3 领域三：硬件资产、多维遥测与自主维护（10 个文件）
 反映硬件物理状态、故障演化规律与现有高昂的人工作业成本。
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`sites.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/sites.csv) / [`network_sites.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_sites.csv) | 5 / 100 | 10 / 19 | `site_id`, `name`, `type`, `dispensers`, `dispenser_kw`, `grid_limit_kw`, `bess_kwh`, `bess_kw`, `pv_kwp`, `connectivity_quality` | 场站基础资产台账。定义了机柜功率、枪数、电网进线容量、储能电池参数与网络通信质量质量标识（`good`/`weak`）。 |
-| [`power_cabinets.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/power_cabinets.csv) | 12 | 4 | `cabinet_id`, `site_id`, `max_kw`, `commissioned_date` | S1~S5 场站的 12 台 Kempower 大功率整流机柜（300~600 kW）。Kempower 机柜内置多个 50 kW 功率模块，负责动态路由到各枪头。 |
-| [`chargers.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/chargers.csv) | 46 | 6 | `charger_id`, `cabinet_id`, `site_id`, `max_kw`, `connector_type`, `commissioned_date` | S1~S5 场站的 46 个外接充电终端（桩/枪），均为 CCS2 接口，单枪标称最大承受功率为 150~300 kW。 |
-| [`telemetry.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/telemetry.csv) | 56,448 | 8 | `ts`, `charger_id`, `site_id`, `status`, `power_kw`, `cabinet_temp_c`, `error_count`, `connectivity` | 全量特写枪头的 15 分钟级常规遥测大表。包含状态（`available`, `charging`, `faulted`, `offline`）、输出功率、机柜内部温度、错误包计数及联网标记。 |
-| [`telemetry_1min.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/telemetry_1min.csv) | 9,000 | 6 | `ts`, `charger_id`, `power_kw`, `cabinet_temp_c`, `error_events`, `fan_rpm` | **核心诊断资产**：选取关键故障枪头（如 D1-9~D1-12、D3-3、D4-2）故障发生前 24 小时的 1 分钟级高频黑匣子数据。包含散热风扇转速（`fan_rpm`）与微观错误率，是构建预测性维护算法（PdM）的金矿。 |
-| [`faults.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/faults.csv) | 19 | 10 | `fault_id`, `site_id`, `cabinet_id`, `charger_id`, `start_ts`, `fault_category`, `severity`, `symptom`, `cleared_ts`, `cleared_by` | S1~S5 发生的 19 次真实硬件/电气故障。涵盖通信中断、支付故障、电缆损坏、过温保护、功率模块击穿、接地故障等，记录了消除方式（`self`, `remote_reset`, `technician`）。 |
-| [`network_faults_daily.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_faults_daily.csv) | 173 | 5 | `date`, `site_id`, `fault_category`, `faults`, `downtime_min` | 全网 100 站两周内的按天故障频次与停机分钟数统计，展示硬件损耗与可用率现状。 |
-| [`service_tickets.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/service_tickets.csv) | 14 | 11 | `ticket_id`, `fault_id`, `opened_ts`, `remote_reset_tried`, `technician_id`, `dispatched_ts`, `arrived_ts`, `part_id`, `closed_ts`, `cost_eur` | 现有人工售后工单。记录了每次报修、远程重置尝试、派工路程耗时、备件更换及最终产生的高昂维护成本（两周内 14 单累计耗费 **12,185.80 欧元**）。 |
-| [`technicians.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/technicians.csv) / [`travel_times.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/travel_times.csv) / [`spare_parts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/spare_parts.csv) | 3 / 15 / 6 | 5 / 3 / 6 | 各表主键对应字段 | 运维资源约束表：3 名现场技师的时薪（70~95 €/h）与值班班次；基地至各场站的单程行驶时间（15~55 分钟）；关键备件（电源模块、电缆、接触器等）的在库数量、补货周期与采购单价。 |
-| [`firmware.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/firmware.csv) | 100 | 3 | `site_id`, `firmware_version`, `installed_date` | 100 个站点的固件版本分布（如 R24.4, R25.2, R26.1）。揭示网络中存在的版本碎片化与未及时升级引发的兼容性故障。 |
+| [`sites.csv`](./kempower-challenge/kempower-challenge-data/sites.csv) / [`network_sites.csv`](./kempower-challenge/kempower-challenge-data/network_sites.csv) | 5 / 100 | 10 / 19 | `site_id`, `name`, `type`, `dispensers`, `dispenser_kw`, `grid_limit_kw`, `bess_kwh`, `bess_kw`, `pv_kwp`, `connectivity_quality` | 场站基础资产台账。定义了机柜功率、枪数、电网进线容量、储能电池参数与网络通信质量质量标识（`good`/`weak`）。 |
+| [`power_cabinets.csv`](./kempower-challenge/kempower-challenge-data/power_cabinets.csv) | 12 | 4 | `cabinet_id`, `site_id`, `max_kw`, `commissioned_date` | S1~S5 场站的 12 台 Kempower 大功率整流机柜（300~600 kW）。Kempower 机柜内置多个 50 kW 功率模块，负责动态路由到各枪头。 |
+| [`chargers.csv`](./kempower-challenge/kempower-challenge-data/chargers.csv) | 46 | 6 | `charger_id`, `cabinet_id`, `site_id`, `max_kw`, `connector_type`, `commissioned_date` | S1~S5 场站的 46 个外接充电终端（桩/枪），均为 CCS2 接口，单枪标称最大承受功率为 150~300 kW。 |
+| [`telemetry.csv`](./kempower-challenge/kempower-challenge-data/telemetry.csv) | 56,448 | 8 | `ts`, `charger_id`, `site_id`, `status`, `power_kw`, `cabinet_temp_c`, `error_count`, `connectivity` | 全量特写枪头的 15 分钟级常规遥测大表。包含状态（`available`, `charging`, `faulted`, `offline`）、输出功率、机柜内部温度、错误包计数及联网标记。 |
+| [`telemetry_1min.csv`](./kempower-challenge/kempower-challenge-data/telemetry_1min.csv) | 9,000 | 6 | `ts`, `charger_id`, `power_kw`, `cabinet_temp_c`, `error_events`, `fan_rpm` | **核心诊断资产**：选取关键故障枪头（如 D1-9~D1-12、D3-3、D4-2）故障发生前 24 小时的 1 分钟级高频黑匣子数据。包含散热风扇转速（`fan_rpm`）与微观错误率，是构建预测性维护算法（PdM）的金矿。 |
+| [`faults.csv`](./kempower-challenge/kempower-challenge-data/faults.csv) | 19 | 10 | `fault_id`, `site_id`, `cabinet_id`, `charger_id`, `start_ts`, `fault_category`, `severity`, `symptom`, `cleared_ts`, `cleared_by` | S1~S5 发生的 19 次真实硬件/电气故障。涵盖通信中断、支付故障、电缆损坏、过温保护、功率模块击穿、接地故障等，记录了消除方式（`self`, `remote_reset`, `technician`）。 |
+| [`network_faults_daily.csv`](./kempower-challenge/kempower-challenge-data/network_faults_daily.csv) | 173 | 5 | `date`, `site_id`, `fault_category`, `faults`, `downtime_min` | 全网 100 站两周内的按天故障频次与停机分钟数统计，展示硬件损耗与可用率现状。 |
+| [`service_tickets.csv`](./kempower-challenge/kempower-challenge-data/service_tickets.csv) | 14 | 11 | `ticket_id`, `fault_id`, `opened_ts`, `remote_reset_tried`, `technician_id`, `dispatched_ts`, `arrived_ts`, `part_id`, `closed_ts`, `cost_eur` | 现有人工售后工单。记录了每次报修、远程重置尝试、派工路程耗时、备件更换及最终产生的高昂维护成本（两周内 14 单累计耗费 **12,185.80 欧元**）。 |
+| [`technicians.csv`](./kempower-challenge/kempower-challenge-data/technicians.csv) / [`travel_times.csv`](./kempower-challenge/kempower-challenge-data/travel_times.csv) / [`spare_parts.csv`](./kempower-challenge/kempower-challenge-data/spare_parts.csv) | 3 / 15 / 6 | 5 / 3 / 6 | 各表主键对应字段 | 运维资源约束表：3 名现场技师的时薪（70~95 €/h）与值班班次；基地至各场站的单程行驶时间（15~55 分钟）；关键备件（电源模块、电缆、接触器等）的在库数量、补货周期与采购单价。 |
+| [`firmware.csv`](./kempower-challenge/kempower-challenge-data/firmware.csv) | 100 | 3 | `site_id`, `firmware_version`, `installed_date` | 100 个站点的固件版本分布（如 R24.4, R25.2, R26.1）。揭示网络中存在的版本碎片化与未及时升级引发的兼容性故障。 |
 
 ### 4.4 领域四：智能建站、交付验收与现场配置（5 个文件）
 直击传统充电场站工程交付周期长、人工调试失误频发的顽疾。
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`commissioning_steps.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/commissioning_steps.csv) | 9 | 12 | `step_id`, `site_id`, `step`, `owner_role`, `planned_start`, `actual_start`, `waited_days`, `status`, `blocker`, `note` | S5 新公交场站从现场勘测到交付的 9 个标准工序全生命周期记录。详细记录了等待电网审批（延期 14 天）、恶劣天气、后台配置地址错误等卡点。 |
-| [`commissioning_history.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/commissioning_history.csv) | 108 | 8 | `site_ref`, `step`, `owner_role`, `planned_days`, `actual_days`, `waited_days`, `rework`, `blocker_category` | 过去 12 座历史场站的工程交付经验库。统计了各工序的延误天数与返工率（`rework`），为自动化建站工作流设计提供了量化依据。 |
-| [`site_config.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/site_config.csv) | 199 | 4 | `site_id`, `charger_id`, `parameter`, `configured_value` | S1~S5 各站及枪头的微观运行参数配置（如 `grid_limit_kw`, `offline_fallback_kw_per_dispenser`, `sim_active`, `phase_rotation`）。**其中埋藏了导致 S5 故障的人工配置低级失误（D5-7 错设为 50 kW，D5-8 未激活 SIM 卡）**。 |
-| [`candidate_locations.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/candidate_locations.csv) | 20 | 13 | `candidate_id`, `country`, `zone`, `aadt_cars`, `aadt_trucks`, `grid_available_kw`, `connection_lead_time_months`, `land_cost_eur_per_month` | 20 个拟新建场站的选址评估表。提供道路交通断面流量、周边可用电网容量、接网等待月数、月租地价与邻近本方站点距离，支持自主智能选址与 ROI 测算。 |
-| [`equipment_costs.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/equipment_costs.csv) | 10 | 3 | `item`, `unit`, `eur` | 核心硬件公开基准报价（如 600 kW 整流柜 110,000 欧元、MCS 兆瓦重卡终端 45,000 欧元、储能电池 350 €/kWh 等），用于扩容与改造成本测算。 |
+| [`commissioning_steps.csv`](./kempower-challenge/kempower-challenge-data/commissioning_steps.csv) | 9 | 12 | `step_id`, `site_id`, `step`, `owner_role`, `planned_start`, `actual_start`, `waited_days`, `status`, `blocker`, `note` | S5 新公交场站从现场勘测到交付的 9 个标准工序全生命周期记录。详细记录了等待电网审批（延期 14 天）、恶劣天气、后台配置地址错误等卡点。 |
+| [`commissioning_history.csv`](./kempower-challenge/kempower-challenge-data/commissioning_history.csv) | 108 | 8 | `site_ref`, `step`, `owner_role`, `planned_days`, `actual_days`, `waited_days`, `rework`, `blocker_category` | 过去 12 座历史场站的工程交付经验库。统计了各工序的延误天数与返工率（`rework`），为自动化建站工作流设计提供了量化依据。 |
+| [`site_config.csv`](./kempower-challenge/kempower-challenge-data/site_config.csv) | 199 | 4 | `site_id`, `charger_id`, `parameter`, `configured_value` | S1~S5 各站及枪头的微观运行参数配置（如 `grid_limit_kw`, `offline_fallback_kw_per_dispenser`, `sim_active`, `phase_rotation`）。**其中埋藏了导致 S5 故障的人工配置低级失误（D5-7 错设为 50 kW，D5-8 未激活 SIM 卡）**。 |
+| [`candidate_locations.csv`](./kempower-challenge/kempower-challenge-data/candidate_locations.csv) | 20 | 13 | `candidate_id`, `country`, `zone`, `aadt_cars`, `aadt_trucks`, `grid_available_kw`, `connection_lead_time_months`, `land_cost_eur_per_month` | 20 个拟新建场站的选址评估表。提供道路交通断面流量、周边可用电网容量、接网等待月数、月租地价与邻近本方站点距离，支持自主智能选址与 ROI 测算。 |
+| [`equipment_costs.csv`](./kempower-challenge/kempower-challenge-data/equipment_costs.csv) | 10 | 3 | `item`, `unit`, `eur` | 核心硬件公开基准报价（如 600 kW 整流柜 110,000 欧元、MCS 兆瓦重卡终端 45,000 欧元、储能电池 350 €/kWh 等），用于扩容与改造成本测算。 |
 
 ### 4.5 领域五：公众用户服务、交通流量与全网实时功率流（3 个文件）
 面向 C 端公共充电网络的用户行为模式与全网宏观功率平衡。
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`public_arrivals.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/public_arrivals.csv) | 3,939 | 9 | `arrival_id`, `site_id`, `ts`, `vehicle_class`, `arrive_soc_pct`, `energy_wanted_kwh`, `max_wait_min`, `outcome`, `energy_delivered_kwh` | S3 高速站与 S4 市区站的 3,939 位公共车主充电记录。给出车主进站电量、期望充入电量、排队耐受极限时长（`max_wait_min`），以及最终结局（充完走人 `charged`、排队超时放弃 `left_queue`、因站满直接驶离 `left_full`）。 |
-| [`price_changes.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/price_changes.csv) | 8 | 4 | `site_id`, `from_ts`, `old_price_eur_kwh`, `new_price_eur_kwh` | 人工在某些场站临时调整对外零售服务费的记录。反映传统人工调价的滞后性，对比基于供需与电网状态的算法动态定价空间。 |
-| [`network_site_power.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_site_power.csv) | 134,400 | 13 | `ts`, `site_id`, `demand_kw`, `delivered_kw`, `grid_kw`, `grid_limit_kw`, `pv_kw`, `bess_kw`, `bess_soc_pct`, `queue_len`, `arrivals`, `abandoned`, `dispensers_available` | **全数据集最大主力表（9.54 MB）**：全网 100 站、连续 14 天、15 分钟级的全景能量天平。完整呈现了每个时刻车辆需求功率、实际分配功率、电网取电、光伏输出、储能充放功率与当前 SoC、排队车数与弃流人数。 |
+| [`public_arrivals.csv`](./kempower-challenge/kempower-challenge-data/public_arrivals.csv) | 3,939 | 9 | `arrival_id`, `site_id`, `ts`, `vehicle_class`, `arrive_soc_pct`, `energy_wanted_kwh`, `max_wait_min`, `outcome`, `energy_delivered_kwh` | S3 高速站与 S4 市区站的 3,939 位公共车主充电记录。给出车主进站电量、期望充入电量、排队耐受极限时长（`max_wait_min`），以及最终结局（充完走人 `charged`、排队超时放弃 `left_queue`、因站满直接驶离 `left_full`）。 |
+| [`price_changes.csv`](./kempower-challenge/kempower-challenge-data/price_changes.csv) | 8 | 4 | `site_id`, `from_ts`, `old_price_eur_kwh`, `new_price_eur_kwh` | 人工在某些场站临时调整对外零售服务费的记录。反映传统人工调价的滞后性，对比基于供需与电网状态的算法动态定价空间。 |
+| [`network_site_power.csv`](./kempower-challenge/kempower-challenge-data/network_site_power.csv) | 134,400 | 13 | `ts`, `site_id`, `demand_kw`, `delivered_kw`, `grid_kw`, `grid_limit_kw`, `pv_kw`, `bess_kw`, `bess_soc_pct`, `queue_len`, `arrivals`, `abandoned`, `dispensers_available` | **全数据集最大主力表（9.54 MB）**：全网 100 站、连续 14 天、15 分钟级的全景能量天平。完整呈现了每个时刻车辆需求功率、实际分配功率、电网取电、光伏输出、储能充放功率与当前 SoC、排队车数与弃流人数。 |
 
 ### 4.6 领域六：商业契约、成长预测与基准指标（4 个文件）
 用于评估商业价值、SLA 履约能力以及官方基准对标线。
 
 | 文件名 | 行数 | 列数 | 核心主键与字段 | 业务内涵与核心价值 |
 |---|---|---|---|---|
-| [`contracts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/contracts.csv) | 29 | 8 | `customer_id`, `customer`, `sites`, `contract_type`, `uptime_sla_pct`, `response_time_h`, `penalty_eur_per_late_departure`, `annual_fee_eur` | 29 家商业大客户的服务合同。约定了可用率承诺（95%~98% SLA）、故障响应时限（2~4小时）、车队延误出发罚金（如每延误一次赔付 500~1,000 欧元）以及年服务费。 |
-| [`growth_forecast.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/growth_forecast.csv) | 60 | 4 | `segment`, `country`, `year`, `index_2026_100` | 2026 至 2035 年乘用车、轻型客车、重卡等各细分车型在五国的渗透率增长指数（以 2026 年为基数 100），用于长期战略规划。 |
-| [`baseline_kpis.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/baseline_kpis.csv) | 10 | 11 | `period`, `site_id`, `departures`, `departures_below_required_soc`, `public_arrivals`, `public_abandoned`, `public_abandon_pct`, `energy_mwh`, `energy_cost_eur`, `peak_kw`, `charger_availability_pct` | **核心对标基准线（S1~S5）**：官方给出的 14 天全周期与 11.13 场景日现场人工运营的真实 KPI 成绩单。参赛算法的仿真结果必须以此为底线进行超越比拼。 |
-| [`network_kpis.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_kpis.csv) | 95 | 13 | `site_id`, `country`, `type`, `energy_mwh`, `arrivals`, `abandoned`, `departures_below_required`, `peak_grid_kw`, `hours_demand_above_grid_limit`, `dispenser_availability_pct` | 全网其余 95 站的 14 天基准表现，包含各站功率超限小时数、欠电发车频次与服务可用度。 |
-| [`connectivity_outages.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/connectivity_outages.csv) | 13 | 3 | `site_id`, `start_ts`, `end_ts` | 场站与云端后台断网事件表。S3 发生高达 12 次断网，特别是场景日连续 2 小时完全失联，是检验边缘离线自治能力的试金石。 |
+| [`contracts.csv`](./kempower-challenge/kempower-challenge-data/contracts.csv) | 29 | 8 | `customer_id`, `customer`, `sites`, `contract_type`, `uptime_sla_pct`, `response_time_h`, `penalty_eur_per_late_departure`, `annual_fee_eur` | 29 家商业大客户的服务合同。约定了可用率承诺（95%~98% SLA）、故障响应时限（2~4小时）、车队延误出发罚金（如每延误一次赔付 500~1,000 欧元）以及年服务费。 |
+| [`growth_forecast.csv`](./kempower-challenge/kempower-challenge-data/growth_forecast.csv) | 60 | 4 | `segment`, `country`, `year`, `index_2026_100` | 2026 至 2035 年乘用车、轻型客车、重卡等各细分车型在五国的渗透率增长指数（以 2026 年为基数 100），用于长期战略规划。 |
+| [`baseline_kpis.csv`](./kempower-challenge/kempower-challenge-data/baseline_kpis.csv) | 10 | 11 | `period`, `site_id`, `departures`, `departures_below_required_soc`, `public_arrivals`, `public_abandoned`, `public_abandon_pct`, `energy_mwh`, `energy_cost_eur`, `peak_kw`, `charger_availability_pct` | **核心对标基准线（S1~S5）**：官方给出的 14 天全周期与 11.13 场景日现场人工运营的真实 KPI 成绩单。参赛算法的仿真结果必须以此为底线进行超越比拼。 |
+| [`network_kpis.csv`](./kempower-challenge/kempower-challenge-data/network_kpis.csv) | 95 | 13 | `site_id`, `country`, `type`, `energy_mwh`, `arrivals`, `abandoned`, `departures_below_required`, `peak_grid_kw`, `hours_demand_above_grid_limit`, `dispenser_availability_pct` | 全网其余 95 站的 14 天基准表现，包含各站功率超限小时数、欠电发车频次与服务可用度。 |
+| [`connectivity_outages.csv`](./kempower-challenge/kempower-challenge-data/connectivity_outages.csv) | 13 | 3 | `site_id`, `start_ts`, `end_ts` | 场站与云端后台断网事件表。S3 发生高达 12 次断网，特别是场景日连续 2 小时完全失联，是检验边缘离线自治能力的试金石。 |
 
 ---
 
@@ -264,20 +264,20 @@ graph TD
 
 ## 6. 现状人工运营成本与效率瓶颈量化分析
 
-通过全面穿透汇总分析两周内的操作日志 [`operations_log.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/operations_log.csv) 与工单记录，我们可以精确量化传统“人工在环（Human-in-the-loop）”运营的沉重代价：
+通过全面穿透汇总分析两周内的操作日志 [`operations_log.csv`](./kempower-challenge/kempower-challenge-data/operations_log.csv) 与工单记录，我们可以精确量化传统“人工在环（Human-in-the-loop）”运营的沉重代价：
 
-### 6.1 全网两周人工工时消耗统计
-两周内，全网 100 站累计发生各类人工运维与调度事件共 **10,380 次**，消耗工时累计高达 **93,412 分钟（约合 1,556.87 个工时）**：
+### 6.1 全网两周人工工时消耗统计 (`B1`)
+两周内，全网 100 站累计发生各类人工运维与调度事件共 **8,852 次**，消耗工时累计高达 **93,412 分钟（折合 1,556.87 个工时）**。按芬兰法定双周工时（`75 小时/人`，每周 `37.5 小时`，年均 `1,950 小时`）与 [`equipment_costs.csv`](./kempower-challenge/kempower-challenge-data/equipment_costs.csv) 规定的 `operations_staff = 45 €/h`（`87,750 €/FTE/年`）、`technician_labour = 80 €/h` 核算：
 
 | 人工运维动作类型 (`action`) | 累计发生频次 (`count`) | 消耗人工总耗时 (`staff_minutes`) | 折合小时数 (`Hours`) | 动作具体内容与痛点剖析 |
 |---|---|---|---|---|
-| **`move_and_replug_vehicle`** | **5,596 次** | **44,768 分钟** | **746.1 小时** | **全网最大的体力与时间浪费**！由于桩枪少于车辆数，车队专门雇佣夜班地勤人员，在深夜冒着严寒将充满电的公交/卡车倒车移开，再将下一辆车挪过来插枪。占到全网人工作业总时间的 **47.9%**。 |
-| **`technician_visit`** | **73 次** | **22,906 分钟** | **381.8 小时** | 技师带备件驱车前往现场排故。因路途遥远与交通延误，平均每次出勤耗时超过 5 小时。仅特写站 14 次出勤就产生了 **12,185.80 欧元**的直接开支。 |
-| **`customer_contact`** | **2,418 次** | **14,508 分钟** | **241.8 小时** | 接听车主与车队的故障报修、排队投诉与咨询热线。平均每天处理近 200 通投诉。 |
-| **`manual_load_adjustment`** | **684 次** | **10,260 分钟** | **171.0 小时** | 监控人员在电网限电或负荷超标时，人工登录后台手动调节各机柜/桩的功率限额。响应滞后极易导致越限罚款。 |
-| **`remote_reset`** | **73 次** | **730 分钟** | **12.2 小时** | 监控中心人员在后台手动点击重启软死机或报通讯错的充电桩。 |
-| **`manual_price_change`** | **8 次** | **240 分钟** | **4.0 小时** | 运营人员手动调整公桩零售价格，严重脱节于 15 分钟一变的电力市场现货价。 |
-| **全网合计** | **10,380 次** | **93,412 分钟** | **1,556.9 小时** | **相当于全网常年需要维持近 10 名专职全职人力（FTE）疲于奔命处理手动杂务！** |
+| **`move_and_replug_vehicle`** | **5,596 次 (63.22%)** | **44,768 分钟 (47.93%)** | **746.13 小时** | **全网最大的体力与时间浪费**！由于桩枪少于车辆数，车队专门雇佣夜班地勤人员，在深夜冒着严寒将充满电的公交/卡车倒车移开，再将下一辆车挪过来插枪。占全网人工频次的 **63.22%**、工时的 **47.93%**（折合 **9.95 FTE**，全网年化人工 **872,976 €/年**；S1 单站两周 `1,248 min` 年化 **24,336 €/年**）。 |
+| **`technician_visit`** | **73 次** | **22,906 分钟** | **381.77 小时** | 技师带备件驱车前往现场排故（折合 **5.09 FTE**）。因路途遥远与交通延误，平均每次出勤耗时超过 5 小时。仅特写站 14 次出勤就产生了 **12,185.80 欧元**的直接开支。 |
+| **`customer_contact`** | **2,418 次** | **14,508 分钟** | **241.80 小时** | 接听车主与车队的故障报修、排队投诉与咨询热线（折合 **3.22 FTE**）。平均每天处理近 200 通投诉。 |
+| **`manual_load_adjustment`** | **684 次** | **10,260 分钟** | **171.00 小时** | 监控人员在电网限电或负荷超标时，人工登录后台手动调节各机柜/桩的功率限额（折合 **2.28 FTE**）。 |
+| **`remote_reset`** | **73 次** | **730 分钟** | **12.17 小时** | 监控中心人员在后台手动点击重启软死机或报通讯错的充电桩（折合 **0.16 FTE**）。 |
+| **`manual_price_change`** | **8 次** | **240 分钟** | **4.00 小时** | 运营人员手动调整公桩零售价格，严重脱节于 15 分钟一变的电力市场现货价（折合 **0.05 FTE**）。 |
+| **全网合计** | **8,852 次 (100%)** | **93,412 分钟 (100%)** | **1,556.87 小时** | **精确折合 20.76 FTE (≈ 21 FTE)，全网按 45 €/h 年化人工高达 1,821,534 €/年（技师按 80 €/h 核算达 1,982,229 €/年）！** |
 
 ---
 
@@ -344,63 +344,80 @@ graph TB
 
 | 序号 | 文件相对路径 | 文件大小 | 行数 / 规模 | 核心属性与技术用途 |
 |---|---|---|---|---|
-| 0 | [`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](file:///C:/Users/qwe/Desktop/hackson/Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx) | 42.02 MB | 23 页幻灯片+演说词 | 官方开营演讲 Keynote（Mats Mattsson 披露 21 FTE 人工成本、25kW动态步长硬件原理、4大系统张力与规则红线） |
-| 1 | [`Kempower-challenge-brief.pdf`](file:///C:/Users/qwe/Desktop/hackson/Kempower-challenge-brief.pdf) | 87.8 KB | 3 页 | 官方赛题任务书（任务目标、交付物清单、评分准则） |
-| 2 | [`Energy_Hackathon_2026_mentoring.xlsx`](file:///C:/Users/qwe/Desktop/hackson/Energy_Hackathon_2026_mentoring.xlsx) | 40.8 KB | 996 行 | 黑客松现场导师排班预约表（Kempower 总部与线上支持机制） |
-| 3 | [`bcc26c76ab238a9932feb12d814d3b1f.jpg`](file:///C:/Users/qwe/Desktop/hackson/bcc26c76ab238a9932feb12d814d3b1f.jpg) | 179.1 KB | 1280×1707 | 现场手机实拍图纸：任务书第 1 页（赛题背景与命题） |
-| 4 | [`823c0d67d56415d307e4e42792ad3b00.jpg`](file:///C:/Users/qwe/Desktop/hackson/823c0d67d56415d307e4e42792ad3b00.jpg) | 222.8 KB | 1280×1707 | 现场手机实拍图纸：任务书第 2 页（原型演示要求与评分细则） |
-| 5 | [`b80b867a15b6cad8875c2b9dfbd4dd6e.jpg`](file:///C:/Users/qwe/Desktop/hackson/b80b867a15b6cad8875c2b9dfbd4dd6e.jpg) | 222.8 KB | 1280×1707 | 现场手机实拍图纸：任务书第 2 页重复备份（哈希一致） |
-| 6 | [`c69a216eb73e13a6f70b130c04e274a1.jpg`](file:///C:/Users/qwe/Desktop/hackson/c69a216eb73e13a6f70b130c04e274a1.jpg) | 151.6 KB | 1280×1707 | 现场手机实拍图纸：任务书第 3 页（评委评分要求与免责声明） |
-| 7 | [`kempower-challenge.zip`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge.zip) | 1.82 MB | 49 个文件 | 官方数据集原始发布压缩归档包 |
-| 8 | [`kempower-challenge/Kempower-challenge-brief.pdf`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/Kempower-challenge-brief.pdf) | 87.8 KB | 3 页 | 任务书副本，与根目录 PDF 二进制一致 |
-| 9 | [`.../kempower-challenge-data/README.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/README.md) | 6.8 KB | 99 行 | 数据集宏观导读、拓扑架构与实体关系 Mermaid 图 |
-| 10 | [`.../kempower-challenge-data/DATA_DICTIONARY.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md) | 11.6 KB | 232 行 | 完整数据字典、字段含义定义、数据单位标准对照表 |
-| 11 | [`.../kempower-challenge-data/PUBLIC_SOURCES.md`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md) | 1.5 KB | 22 行 | 真实工业界开源数据源索引（Fingrid, Nord Pool, Fintraffic） |
-| 12 | [`.../baseline_kpis.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/baseline_kpis.csv) | 704 B | 10 行 | 特写站点 S1~S5 现有人工运营 KPI 基准（全周期与场景日） |
-| 13 | [`.../candidate_locations.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/candidate_locations.csv) | 1.5 KB | 20 行 | 20 个拟建新站点候选地参数（车流量、电网容量、地价等） |
-| 14 | [`.../chargers.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/chargers.csv) | 1.6 KB | 46 行 | S1~S5 场站的 46 个外接充电终端（枪）台账 |
-| 15 | [`.../co2_intensity.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/co2_intensity.csv) | 149.3 KB | 4,368 行 | 14 个电力竞价区的小时级电网碳排放强度（g CO₂/kWh） |
-| 16 | [`.../commissioning_history.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/commissioning_history.csv) | 5.3 KB | 108 行 | 过去 12 座场站的工程交付经验库与卡点分析 |
-| 17 | [`.../commissioning_steps.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/commissioning_steps.csv) | 1.2 KB | 9 行 | S5 新公交场站建设交付工序明细与延误记录 |
-| 18 | [`.../connectivity_outages.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/connectivity_outages.csv) | 753 B | 13 行 | 场站移动网络中断断连事件表（主要集中于 S3 高速站） |
-| 19 | [`.../contracts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/contracts.csv) | 2.3 KB | 29 行 | 29 家商业大客户 SLA 服务合同参数（年费、罚则与可用率要求） |
-| 20 | [`.../corridors.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/corridors.csv) | 821 B | 12 行 | 12 条欧洲跨国电动重卡货运走廊交通量与增长预测 |
-| 21 | [`.../departures_baseline.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/departures_baseline.csv) | 27.2 KB | 606 行 | S1, S2, S5 车队实际出发 SoC 与欠电失误记录 |
-| 22 | [`.../equipment_costs.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/equipment_costs.csv) | 353 B | 10 行 | 充电站核心设备公开采购参考单价表 |
-| 23 | [`.../faults.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/faults.csv) | 2.6 KB | 19 行 | S1~S5 发生的 19 起真实硬件故障明细与解除方式 |
-| 24 | [`.../firmware.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/firmware.csv) | 2.4 KB | 100 行 | 全网 100 个站点的当前固件版本分布与升级记录 |
-| 25 | [`.../fleet_schedule.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/fleet_schedule.csv) | 47.3 KB | 656 行 | S1, S2, S5 车队到站、离站计划与目标 SoC 约束 |
-| 26 | [`.../grid_capacity.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/grid_capacity.csv) | 3.5 KB | 95 行 | 全网 95 个站点的电网升级上限、成本、周期与柔性限电承诺 |
-| 27 | [`.../grid_events.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/grid_events.csv) | 334 B | 2 行 | 特写站点遭遇的电网调度事件（S2 限电 400 kW 与 S4 停电） |
-| 28 | [`.../growth_forecast.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/growth_forecast.csv) | 1.3 KB | 60 行 | 2026~2035 年各类电动车型在欧洲五国的长期增长指数 |
-| 29 | [`.../network_faults_daily.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_faults_daily.csv) | 6.0 KB | 173 行 | 全网 100 站按天汇总的故障频次与停机分钟数 |
-| 30 | [`.../network_grid_events.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_grid_events.csv) | 3.7 KB | 26 行 | 全网 10 个柔性接网站点的电网削峰调度指令历史 |
-| 31 | [`.../network_kpis.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_kpis.csv) | 6.2 KB | 95 行 | 全网其余 95 站的 14 天人工运营基准绩效考核汇总 |
-| 32 | [`.../network_site_power.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_site_power.csv) | 9.54 MB | 134,400 行 | 全网 100 站 15 分钟全景功率、储能充放、排队与弃流大矩阵 |
-| 33 | [`.../network_sites.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/network_sites.csv) | 11.2 KB | 100 行 | 全网 100 个站点的全属性台账（含储能、光伏、大功率终端等） |
-| 34 | [`.../operations_log.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/operations_log.csv) | 68.6 KB | 1,601 行 | 全网两周内各项人工运维操作频次与耗时日志（累计 9.3 万分钟） |
-| 35 | [`.../power_cabinets.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/power_cabinets.csv) | 333 B | 12 行 | S1~S5 场站的 12 台 Kempower 大功率整流机柜配置 |
-| 36 | [`.../price_changes.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/price_changes.csv) | 396 B | 8 行 | 公共充电站人工调整零售电价的历史操作记录 |
-| 37 | [`.../prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/prices.csv) | 57.8 KB | 1,344 行 | 特写站所在地 15 分钟级日前现货电价与分时输配电价 |
-| 38 | [`.../public_arrivals.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/public_arrivals.csv) | 267.5 KB | 3,939 行 | S3, S4 公共场站 3,939 位车主进站充电、排队与弃流明细 |
-| 39 | [`.../pv_production.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/pv_production.csv) | 46.1 KB | 1,344 行 | S4 市区站屋顶 50 kWp 分布式光伏 15 分钟实际发电记录 |
-| 40 | [`.../reserve_market_prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/reserve_market_prices.csv) | 83.4 KB | 2,016 行 | 北欧电网调频备用辅助服务市场（FCR-D, FCR-N, FFR）小时报价 |
-| 41 | [`.../service_tickets.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/service_tickets.csv) | 2.0 KB | 14 行 | 现有人工售后工单处理明细（技师出勤耗时、备件消耗与成本） |
-| 42 | [`.../sessions_baseline.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/sessions_baseline.csv) | 422.6 KB | 4,182 行 | S1~S5 两周内 4,182 次充电会话明细（插拔枪时间、充电量等） |
-| 43 | [`.../site_config.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/site_config.csv) | 5.7 KB | 199 行 | S1~S5 场站与枪头的微观运行参数配置（含 S5 错误配置彩蛋） |
-| 44 | [`.../site_power_baseline.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/site_power_baseline.csv) | 236.0 KB | 6,720 行 | S1~S5 场站 14 天两周内 15 分钟级电网进线负荷基线数据 |
-| 45 | [`.../sites.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/sites.csv) | 438 B | 5 行 | S1~S5 5 个特写场站基础定义（名称、类型、电网限额、光伏等） |
-| 46 | [`.../spare_parts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/spare_parts.csv) | 436 B | 6 行 | 核心电气备件库存储备、进货周期与采购单价 |
-| 47 | [`.../tariffs.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/tariffs.csv) | 152 B | 2 行 | 输配电网峰谷电价与每月最高负荷需量电费费率 |
-| 48 | [`.../technicians.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/technicians.csv) | 296 B | 3 行 | 3 名专职现场维修技师的时薪、班次与技能清单 |
-| 49 | [`.../telemetry.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/telemetry.csv) | 3.29 MB | 56,448 行 | S1~S5 枪头 15 分钟常规运行遥测大表（温度、错误、功率等） |
-| 50 | [`.../telemetry_1min.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/telemetry_1min.csv) | 429.4 KB | 9,000 行 | 关键故障前 24 小时 1 分钟高频黑匣子遥测（含风扇转速，核心金矿） |
-| 51 | [`.../traffic_counts.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/traffic_counts.csv) | 102.6 KB | 2,688 行 | S3, S4 场站临近公路断面的 15 分钟车流计数器数据 |
-| 52 | [`.../traffic_points.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/traffic_points.csv) | 117 B | 2 行 | 交通流量监测断面与对应场站映射关系 |
-| 53 | [`.../travel_times.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/travel_times.csv) | 199 B | 15 行 | 技师驻地至各特写站点的单程驾驶耗时矩阵 |
-| 54 | [`.../vehicles.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/vehicles.csv) | 2.1 KB | 50 行 | 50 辆特写车队车辆档案（电池电量、最大功率、百公里能耗等） |
-| 55 | [`.../weather.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/weather.csv) | 374.1 KB | 8,736 行 | 欧洲 26 个重点枢纽城市两周小时级室外气温监测数据 |
-| 56 | [`.../zone_prices.csv`](file:///C:/Users/qwe/Desktop/hackson/kempower-challenge/kempower-challenge-data/zone_prices.csv) | 138.4 KB | 1,344 行 | 欧洲 14 个电力竞价区 15 分钟日前电力现货价格矩阵 |
+| 0 | [`Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx`](./Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx) | 42.02 MB | 23 页幻灯片+演说词 | 官方开营演讲 Keynote（Mats Mattsson 披露 21 FTE 人工成本、25kW动态步长硬件原理、4大系统张力与规则红线） |
+| 1 | [`Kempower-challenge-brief.pdf`](./Kempower-challenge-brief.pdf) | 87.8 KB | 3 页 | 官方赛题任务书（任务目标、交付物清单、评分准则） |
+| 2 | [`Energy_Hackathon_2026_mentoring.xlsx`](./Energy_Hackathon_2026_mentoring.xlsx) | 40.8 KB | 996 行 | 黑客松现场导师排班预约表（Kempower 总部与线上支持机制） |
+| 3 | [`bcc26c76ab238a9932feb12d814d3b1f.jpg`](./bcc26c76ab238a9932feb12d814d3b1f.jpg) | 179.1 KB | 1280×1707 | 现场手机实拍图纸：任务书第 1 页（赛题背景与命题） |
+| 4 | [`823c0d67d56415d307e4e42792ad3b00.jpg`](./823c0d67d56415d307e4e42792ad3b00.jpg) | 222.8 KB | 1280×1707 | 现场手机实拍图纸：任务书第 2 页（原型演示要求与评分细则） |
+| 5 | [`b80b867a15b6cad8875c2b9dfbd4dd6e.jpg`](./b80b867a15b6cad8875c2b9dfbd4dd6e.jpg) | 222.8 KB | 1280×1707 | 现场手机实拍图纸：任务书第 2 页重复备份（哈希一致） |
+| 6 | [`c69a216eb73e13a6f70b130c04e274a1.jpg`](./c69a216eb73e13a6f70b130c04e274a1.jpg) | 151.6 KB | 1280×1707 | 现场手机实拍图纸：任务书第 3 页（评委评分要求与免责声明） |
+| 7 | [`kempower-challenge.zip`](./kempower-challenge.zip) | 1.82 MB | 49 个文件 | 官方数据集原始发布压缩归档包 |
+| 8 | [`kempower-challenge/Kempower-challenge-brief.pdf`](./kempower-challenge/Kempower-challenge-brief.pdf) | 87.8 KB | 3 页 | 任务书副本，与根目录 PDF 二进制一致 |
+| 9 | [`.../kempower-challenge-data/README.md`](./kempower-challenge/kempower-challenge-data/README.md) | 6.8 KB | 99 行 | 数据集宏观导读、拓扑架构与实体关系 Mermaid 图 |
+| 10 | [`.../kempower-challenge-data/DATA_DICTIONARY.md`](./kempower-challenge/kempower-challenge-data/DATA_DICTIONARY.md) | 11.6 KB | 232 行 | 完整数据字典、字段含义定义、数据单位标准对照表 |
+| 11 | [`.../kempower-challenge-data/PUBLIC_SOURCES.md`](./kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md) | 1.5 KB | 22 行 | 真实工业界开源数据源索引（Fingrid, Nord Pool, Fintraffic） |
+| 12 | [`.../baseline_kpis.csv`](./kempower-challenge/kempower-challenge-data/baseline_kpis.csv) | 704 B | 10 行 | 特写站点 S1~S5 现有人工运营 KPI 基准（全周期与场景日） |
+| 13 | [`.../candidate_locations.csv`](./kempower-challenge/kempower-challenge-data/candidate_locations.csv) | 1.5 KB | 20 行 | 20 个拟建新站点候选地参数（车流量、电网容量、地价等） |
+| 14 | [`.../chargers.csv`](./kempower-challenge/kempower-challenge-data/chargers.csv) | 1.6 KB | 46 行 | S1~S5 场站的 46 个外接充电终端（枪）台账 |
+| 15 | [`.../co2_intensity.csv`](./kempower-challenge/kempower-challenge-data/co2_intensity.csv) | 149.3 KB | 4,368 行 | 14 个电力竞价区的小时级电网碳排放强度（g CO₂/kWh） |
+| 16 | [`.../commissioning_history.csv`](./kempower-challenge/kempower-challenge-data/commissioning_history.csv) | 5.3 KB | 108 行 | 过去 12 座场站的工程交付经验库与卡点分析 |
+| 17 | [`.../commissioning_steps.csv`](./kempower-challenge/kempower-challenge-data/commissioning_steps.csv) | 1.2 KB | 9 行 | S5 新公交场站建设交付工序明细与延误记录 |
+| 18 | [`.../connectivity_outages.csv`](./kempower-challenge/kempower-challenge-data/connectivity_outages.csv) | 753 B | 13 行 | 场站移动网络中断断连事件表（主要集中于 S3 高速站） |
+| 19 | [`.../contracts.csv`](./kempower-challenge/kempower-challenge-data/contracts.csv) | 2.3 KB | 29 行 | 29 家商业大客户 SLA 服务合同参数（年费、罚则与可用率要求） |
+| 20 | [`.../corridors.csv`](./kempower-challenge/kempower-challenge-data/corridors.csv) | 821 B | 12 行 | 12 条欧洲跨国电动重卡货运走廊交通量与增长预测 |
+| 21 | [`.../departures_baseline.csv`](./kempower-challenge/kempower-challenge-data/departures_baseline.csv) | 27.2 KB | 606 行 | S1, S2, S5 车队实际出发 SoC 与欠电失误记录 |
+| 22 | [`.../equipment_costs.csv`](./kempower-challenge/kempower-challenge-data/equipment_costs.csv) | 353 B | 10 行 | 充电站核心设备公开采购参考单价表 |
+| 23 | [`.../faults.csv`](./kempower-challenge/kempower-challenge-data/faults.csv) | 2.6 KB | 19 行 | S1~S5 发生的 19 起真实硬件故障明细与解除方式 |
+| 24 | [`.../firmware.csv`](./kempower-challenge/kempower-challenge-data/firmware.csv) | 2.4 KB | 100 行 | 全网 100 个站点的当前固件版本分布与升级记录 |
+| 25 | [`.../fleet_schedule.csv`](./kempower-challenge/kempower-challenge-data/fleet_schedule.csv) | 47.3 KB | 656 行 | S1, S2, S5 车队到站、离站计划与目标 SoC 约束 |
+| 26 | [`.../grid_capacity.csv`](./kempower-challenge/kempower-challenge-data/grid_capacity.csv) | 3.5 KB | 95 行 | 全网 95 个站点的电网升级上限、成本、周期与柔性限电承诺 |
+| 27 | [`.../grid_events.csv`](./kempower-challenge/kempower-challenge-data/grid_events.csv) | 334 B | 2 行 | 特写站点遭遇的电网调度事件（S2 限电 400 kW 与 S4 停电） |
+| 28 | [`.../growth_forecast.csv`](./kempower-challenge/kempower-challenge-data/growth_forecast.csv) | 1.3 KB | 60 行 | 2026~2035 年各类电动车型在欧洲五国的长期增长指数 |
+| 29 | [`.../network_faults_daily.csv`](./kempower-challenge/kempower-challenge-data/network_faults_daily.csv) | 6.0 KB | 173 行 | 全网 100 站按天汇总的故障频次与停机分钟数 |
+| 30 | [`.../network_grid_events.csv`](./kempower-challenge/kempower-challenge-data/network_grid_events.csv) | 3.7 KB | 26 行 | 全网 10 个柔性接网站点的电网削峰调度指令历史 |
+| 31 | [`.../network_kpis.csv`](./kempower-challenge/kempower-challenge-data/network_kpis.csv) | 6.2 KB | 95 行 | 全网其余 95 站的 14 天人工运营基准绩效考核汇总 |
+| 32 | [`.../network_site_power.csv`](./kempower-challenge/kempower-challenge-data/network_site_power.csv) | 9.54 MB | 134,400 行 | 全网 100 站 15 分钟全景功率、储能充放、排队与弃流大矩阵 |
+| 33 | [`.../network_sites.csv`](./kempower-challenge/kempower-challenge-data/network_sites.csv) | 11.2 KB | 100 行 | 全网 100 个站点的全属性台账（含储能、光伏、大功率终端等） |
+| 34 | [`.../operations_log.csv`](./kempower-challenge/kempower-challenge-data/operations_log.csv) | 68.6 KB | 1,601 行 | 全网两周内各项人工运维操作频次与耗时日志（累计 9.3 万分钟） |
+| 35 | [`.../power_cabinets.csv`](./kempower-challenge/kempower-challenge-data/power_cabinets.csv) | 333 B | 12 行 | S1~S5 场站的 12 台 Kempower 大功率整流机柜配置 |
+| 36 | [`.../price_changes.csv`](./kempower-challenge/kempower-challenge-data/price_changes.csv) | 396 B | 8 行 | 公共充电站人工调整零售电价的历史操作记录 |
+| 37 | [`.../prices.csv`](./kempower-challenge/kempower-challenge-data/prices.csv) | 57.8 KB | 1,344 行 | 特写站所在地 15 分钟级日前现货电价与分时输配电价 |
+| 38 | [`.../public_arrivals.csv`](./kempower-challenge/kempower-challenge-data/public_arrivals.csv) | 267.5 KB | 3,939 行 | S3, S4 公共场站 3,939 位车主进站充电、排队与弃流明细 |
+| 39 | [`.../pv_production.csv`](./kempower-challenge/kempower-challenge-data/pv_production.csv) | 46.1 KB | 1,344 行 | S4 市区站屋顶 50 kWp 分布式光伏 15 分钟实际发电记录 |
+| 40 | [`.../reserve_market_prices.csv`](./kempower-challenge/kempower-challenge-data/reserve_market_prices.csv) | 83.4 KB | 2,016 行 | 北欧电网调频备用辅助服务市场（FCR-D, FCR-N, FFR）小时报价 |
+| 41 | [`.../service_tickets.csv`](./kempower-challenge/kempower-challenge-data/service_tickets.csv) | 2.0 KB | 14 行 | 现有人工售后工单处理明细（技师出勤耗时、备件消耗与成本） |
+| 42 | [`.../sessions_baseline.csv`](./kempower-challenge/kempower-challenge-data/sessions_baseline.csv) | 422.6 KB | 4,182 行 | S1~S5 两周内 4,182 次充电会话明细（插拔枪时间、充电量等） |
+| 43 | [`.../site_config.csv`](./kempower-challenge/kempower-challenge-data/site_config.csv) | 5.7 KB | 199 行 | S1~S5 场站与枪头的微观运行参数配置（含 S5 错误配置彩蛋） |
+| 44 | [`.../site_power_baseline.csv`](./kempower-challenge/kempower-challenge-data/site_power_baseline.csv) | 236.0 KB | 6,720 行 | S1~S5 场站 14 天两周内 15 分钟级电网进线负荷基线数据 |
+| 45 | [`.../sites.csv`](./kempower-challenge/kempower-challenge-data/sites.csv) | 438 B | 5 行 | S1~S5 5 个特写场站基础定义（名称、类型、电网限额、光伏等） |
+| 46 | [`.../spare_parts.csv`](./kempower-challenge/kempower-challenge-data/spare_parts.csv) | 436 B | 6 行 | 核心电气备件库存储备、进货周期与采购单价 |
+| 47 | [`.../tariffs.csv`](./kempower-challenge/kempower-challenge-data/tariffs.csv) | 152 B | 2 行 | 输配电网峰谷电价与每月最高负荷需量电费费率 |
+| 48 | [`.../technicians.csv`](./kempower-challenge/kempower-challenge-data/technicians.csv) | 296 B | 3 行 | 3 名专职现场维修技师的时薪、班次与技能清单 |
+| 49 | [`.../telemetry.csv`](./kempower-challenge/kempower-challenge-data/telemetry.csv) | 3.29 MB | 56,448 行 | S1~S5 枪头 15 分钟常规运行遥测大表（温度、错误、功率等） |
+| 50 | [`.../telemetry_1min.csv`](./kempower-challenge/kempower-challenge-data/telemetry_1min.csv) | 429.4 KB | 9,000 行 | 关键故障前 24 小时 1 分钟高频黑匣子遥测（含风扇转速，核心金矿） |
+| 51 | [`.../traffic_counts.csv`](./kempower-challenge/kempower-challenge-data/traffic_counts.csv) | 102.6 KB | 2,688 行 | S3, S4 场站临近公路断面的 15 分钟车流计数器数据 |
+| 52 | [`.../traffic_points.csv`](./kempower-challenge/kempower-challenge-data/traffic_points.csv) | 117 B | 2 行 | 交通流量监测断面与对应场站映射关系 |
+| 53 | [`.../travel_times.csv`](./kempower-challenge/kempower-challenge-data/travel_times.csv) | 199 B | 15 行 | 技师驻地至各特写站点的单程驾驶耗时矩阵 |
+| 54 | [`.../vehicles.csv`](./kempower-challenge/kempower-challenge-data/vehicles.csv) | 2.1 KB | 50 行 | 50 辆特写车队车辆档案（电池电量、最大功率、百公里能耗等） |
+| 55 | [`.../weather.csv`](./kempower-challenge/kempower-challenge-data/weather.csv) | 374.1 KB | 8,736 行 | 欧洲 26 个重点枢纽城市两周小时级室外气温监测数据 |
+| 56 | [`.../zone_prices.csv`](./kempower-challenge/kempower-challenge-data/zone_prices.csv) | 138.4 KB | 1,344 行 | 欧洲 14 个电力竞价区 15 分钟日前电力现货价格矩阵 |
 
 ---
-*本报告基于文件夹内真实数据透视生成，已同步持久化归档至环境工件库及本地工作区，供黑客松团队全流程研读使用。*
+
+## 9. 附录二：GitHub Issue #2 (29 项实证审计 `A1–D5`) 权威数据速查基准表
+
+| 编号 | 关键实证维度 | 官方 CSV 权威真值 (`kempower-challenge-data/`) |
+|---|---|---|
+| **A1, D5** | S1 同时在充上限 | `site_config.csv`: `max_simultaneous_sessions = 12`（12 桩同时最多 12 会话；波浪/双连接器系单会话枪头功率上限扩展，不可 1 桩同时充 2 车） |
+| **A2, A6, B5** | S1–S5 机柜拓扑 | `power_cabinets.csv`: S1 `3×360 kW` (`C1-1..3`), S2 `2×400 kW`, S3 `600+600+300=1,500 kW`, S4 `2×300 kW` + `150 kW` PV, S5 `2×450=900 kW` |
+| **A3, A4, B8** | S1 `C1-3` 故障与预警 | `telemetry_1min.csv`: `2026-11-12T22:31:00+02:00` 达 `59.3°C / 702 rpm`（早于 `F015` 达 **199 分钟**）；`F016` 持续 **246 分钟**（`02:25–06:31`，`cleared_by = technician`）；健康柜 `C1-1/C1-2` 维持 `720 kW` N-1（`0 kW` 自残切负荷） |
+| **A7** | 全网电网越限记录 | `network_site_power.csv` (134,400 行): `grid_kw > grid_limit_kw` 为 **0 行** |
+| **A8, B10** | 特写站 BESS 与 S4 故障 | `network_sites.csv`: S1–S5 现有 `bess_kwh = 0, bess_kw = 0`；`faults.csv`: S4 `F017` 位于 `D4-2`（`21:30`，电缆故障） |
+| **B1** | 全网与挪车人工核算 | `operations_log.csv` + `equipment_costs.csv`: `8,852` 次 / `93,412 min` = **20.76 FTE**；按 `45 €/h` (`87,750 €/FTE/年`) 合计 **1,821,534 €/年**（计入技师 `80 €/h` 为 **1,982,229 €/年**）；挪车 `5,596` 次 (**63.22%**) / `44,768 min` (**47.93%**, **9.95 FTE**) = **872,976 €/年**（S1 单站 **24,336 €/年**） |
+| **B2, B6** | S1 方案 A vs 方案 B | **方案 A**：`0 €` CAPEX 软件协同 `01:30` 单批次换枪（补齐 `1,012.00 kWh` 缺口）；**方案 B**：新增 12 枪（`18,000+9,000=27,000 €/枪`，共 **324,000 €** CAPEX，对比 S1 单站挪车人工静态回收期 **13.31 年**） |
+| **B3, B9** | S1/S2/S5 欠电发车真值 | `departures_baseline.csv`: 场景日共 **13 辆**欠电发车——S1 **4 辆** (`B04,B09,B18,B20`, `1,012.00 kWh`)、S2 **4 辆** (`T01..T04`, `283.50 kWh`)、S5 **5 辆** (`B27,B28,B33,B34,B35`, `508.95 kWh`) |
+| **B4, B7** | S3 公共站弃流率 | `public_arrivals.csv`: S3 14 天总计 `2,465` 到达、弃流 `354` (**14.36%**, `left_full=265, left_queue=89`)；2026-11-13 当日 `256` 到达、弃流 `76` (**29.69%**) |
+| **C6** | S5 三方对账自愈 | `sites.csv` (`900 kW`) + `power_cabinets.csv` (`2×450=900 kW`) vs `site_config.csv` (`grid_limit_kw=600 kW`)：校准回 `900 kW` 解锁 `300 kW × 2.5h = 750 kWh > 508.95 kWh` 赤字，并恢复 `D5-7` (`150 kW`) 与 `D5-8` (`eSIM`) |
+
+---
+*本报告基于文件夹内真实数据透视生成，已同步持久化归档至本地工作区，供黑客松团队全流程研读使用。*
