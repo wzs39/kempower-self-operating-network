@@ -1,6 +1,7 @@
 # Project Sentinel · Kempower Self-Operating Charging Network Command Center
 
-> **Track**: Kempower Challenge — *The Self-Operating Charging Network* (LahtiES Energy Tech Hackathon 2026)
+> **Track**: Kempower Challenge — *The Self-Operating Charging Network* (LahtiES Energy Tech Hackathon 2026)  
+> **Design Perspective**: Stated per the brief's first actor — the **equipment supplier / service provider** (`contracts.csv`), the party holding the hardware+service contracts and carrying departure penalties, transitioning to autonomous Energy Certainty-as-a-Service (CaaS).
 
 ## Core Verification Commands (< 5 Seconds)
 1. **Deterministic End-to-End Verifier (`0.34s`)**:

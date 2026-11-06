@@ -2,7 +2,7 @@
 
 **Challenge**: *The Self-Operating Charging Network*  
 **Theme**: Friday 13.11 Scenario Day Autonomy & 20.76 FTE Human Baseline Elimination  
-**Target Audience**: Kempower Jury, Technical Mentors, Fleet & CPO Executives  
+**Target Audience**: Kempower Jury, Technical Mentors, Fleet & Charging Executives  
 
 ---
 
