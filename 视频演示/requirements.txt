@@ -1,0 +1,12 @@
+# Kempower Self-Operating Charging Network — runtime dependencies
+# Used by Streamlit Community Cloud (and by `pip install -r requirements.txt` locally).
+
+# Dashboard runtime (>=1.49 required: app.py uses st.dataframe(width="stretch"))
+streamlit>=1.49,<2.0
+
+# Data layer (src/sim/data_loader.py, src/sim/scenario_engine.py, app.py)
+pandas>=2.2,<4.0
+numpy>=1.26,<3.0
+
+# MILP solver backend (src/core/mpc_optimizer.py uses scipy.sparse + scipy.optimize.linprog)
+scipy>=1.11,<2.0
