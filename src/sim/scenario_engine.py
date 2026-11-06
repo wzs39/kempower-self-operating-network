@@ -6,6 +6,7 @@ Executes deterministic closed-loop verification across all 5 primary stations (S
 and the 100-site network for the Friday 2026-11-13 crisis day and 14-day dataset.
 """
 
+from datetime import datetime
 from typing import Dict, Any, Optional
 import numpy as np
 
@@ -20,7 +21,11 @@ from src.core.self_healing import (
     InverterEfficiencyGuard,
 )
 from src.sim.data_loader import KempowerDataLoader
-from src.sim.discrete_sim import simulate_closed_loop_minute_by_minute
+from src.sim.discrete_sim import (
+    load_fleet_jobs,
+    run_discrete_event_simulation,
+    simulate_closed_loop_minute_by_minute,
+)
 
 
 class ScenarioEngine:
@@ -31,14 +36,16 @@ class ScenarioEngine:
 
     def run_s1_scenario(self) -> Dict[str, Any]:
         """
-        Station S1 (Bus Depot, 24 buses, 12 chargers D1-1..D1-12, 3x360 kW cabinets C1-1..C1-3):
+        Station S1 (Bus Depot, 24 night buses / 32 departures, 12 chargers D1-1..D1-12, 3x360 kW cabinets C1-1..C1-3):
         - Verifies connector constraint (#connectors = 12 < 24 buses, Issues A1, D5).
         - Verifies B04, B18, B20 had 0 sessions in sessions_baseline.csv (328 kWh each) + B09 (28 kWh) = 1,012.00 kWh.
+        - Verifies same-engine 12-gun FCFS baseline reproduces the exact 4 undercharged buses (B04, B09, B18, B20)
+          with 398.5 kWh simulated deficit and 1,080.0 kW peak.
+        - Verifies 0-CAPEX urgency scheduling on 12 guns rescues B20 (4 -> 3 missed, 398.5 -> 48.8 kWh, -87.8%).
+        - Verifies 24-point capacity expansion (324,000 € @ 27,000 €/gun, 13.31-yr payback) achieves 0 missed departures.
         - Verifies D1-9 true thermal peak at 2026-11-12T22:31:00+02:00 (59.3°C, 702 rpm, 199 min lead time, Issue B8).
         - Verifies F016 duration = 246 min (02:25-06:31, cleared_by = technician, Issue A3).
         - Verifies healthy C1-1 + C1-2 = 720 kW N-1 output without self-harming 180 kW shed (Issues A2, A4).
-        - Compares Strategy A (0 € CAPEX single 01:30 batch swap -> 0 missed departures)
-          vs Strategy B (324,000 € for 12 guns @ 27,000 €/gun -> 13.31 yr payback on S1 replugs, Issues B2, B6).
         """
         df_sess = self.loader.load_df("sessions_baseline.csv")
         s1_1113_sess = df_sess[
@@ -59,21 +66,46 @@ class ScenarioEngine:
         thermal_audit = PredictiveThermalEngine.detect_s1_historical_anomaly("D1-9")
         n1_audit = PredictiveThermalEngine.evaluate_s1_n1_post_fault_dispatch()
 
-        sim_s1 = simulate_closed_loop_minute_by_minute(site_id="S1", date="2026-11-12", strategy="urgency", cross_tie=True)
+        sim_s1_baseline = simulate_closed_loop_minute_by_minute(
+            site_id="S1", date="2026-11-13", strategy="fcfs", cross_tie=False
+        )
+        sim_s1 = simulate_closed_loop_minute_by_minute(
+            site_id="S1", date="2026-11-13", strategy="urgency", cross_tie=False
+        )
+        jobs_s1 = load_fleet_jobs("S1", "2026-11-13", night_only=True, depart_date="2026-11-13")
+        fault_ts = datetime.fromisoformat("2026-11-13T02:25:00+02:00")
+        sim_s1_expansion = run_discrete_event_simulation(
+            jobs=jobs_s1,
+            site_id="S1",
+            date="2026-11-13",
+            cabinet_kw=[360.0, 360.0, 360.0],
+            points_per_cabinet=8,
+            strategy="urgency",
+            fault=(fault_ts, [2]),
+            cross_tie=True,
+            gun_kw=150.0,
+        ).to_dict()
 
         return {
             "site_id": "S1",
-            "baseline_missed_departures": 4,
-            "baseline_deficit_kwh": 1012.00,
+            "baseline_missed_departures": sim_s1_baseline["missed_departures"],
+            "baseline_deficit_kwh": sim_s1_baseline["deficit_kwh"],
+            "baseline_official_deficit_kwh": 1012.00,  # official recorded absolute gap (0 sessions), different basis from simulated deficit
+            "baseline_undercharged_vehicles": sorted(v for v, _ in sim_s1_baseline["undercharged_vehicles"]),
+            "optimized_undercharged_vehicles": sorted(v for v, _ in sim_s1["undercharged_vehicles"]),
             "baseline_session_counts": sess_counts,
             "connector_feasibility": conn_check,
             "thermal_anomaly_audit": thermal_audit,
             "n1_post_fault_audit": n1_audit,
             "strategy_a_0capex": strategy_a,
             "strategy_b_hardware": strategy_b,
+            "baseline_discrete_sim": sim_s1_baseline,
             "discrete_sim": sim_s1,
+            "capacity_expansion_sim": sim_s1_expansion,
             "optimized_missed_departures": sim_s1["missed_departures"],
             "optimized_deficit_kwh": sim_s1["deficit_kwh"],
+            "capacity_expansion_missed_departures": sim_s1_expansion["missed_departures"],
+            "capacity_expansion_deficit_kwh": sim_s1_expansion["deficit_kwh"],
         }
 
     def run_s2_scenario(self) -> Dict[str, Any]:
@@ -116,7 +148,8 @@ class ScenarioEngine:
             priorities={"D2-5": 1.0, "D2-6": 1.0},
         )
 
-        sim_s2 = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="urgency", cross_tie=True)
+        sim_s2_baseline = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="fcfs", cross_tie=False)
+        sim_s2 = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="urgency", cross_tie=False)
 
         return {
             "site_id": "S2",
@@ -129,6 +162,7 @@ class ScenarioEngine:
             "c2_1_continuous_alloc_kw": c2_1_alloc,
             "c2_2_continuous_alloc_kw": c2_2_alloc,
             "all_8_trucks_on_time_after": True,
+            "baseline_discrete_sim": sim_s2_baseline,
             "discrete_sim": sim_s2,
             "optimized_missed_departures": sim_s2["missed_departures"],
             "optimized_deficit_kwh": sim_s2["deficit_kwh"],
@@ -221,12 +255,14 @@ class ScenarioEngine:
           03:30-06:00, eliminating the 508.95 kWh deficit across all 5 missed buses (B27, B28, B33, B34, B35).
         """
         reconcile = CommissioningAutoCalibrator.reconcile_s5_three_way()
-        sim_s5 = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="urgency", cross_tie=True)
+        sim_s5_baseline = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="fcfs", cross_tie=False)
+        sim_s5 = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="urgency", cross_tie=False)
         return {
             "site_id": "S5",
             "baseline_missed_departures": 5,
             "baseline_deficit_kwh": reconcile["s5_total_deficit_kwh"],  # 508.95 kWh
             "three_way_reconciliation": reconcile,
+            "baseline_discrete_sim": sim_s5_baseline,
             "discrete_sim": sim_s5,
             "optimized_missed_departures": sim_s5["missed_departures"],
             "optimized_deficit_kwh": sim_s5["deficit_kwh"],
@@ -252,6 +288,11 @@ class ScenarioEngine:
             + s2["optimized_missed_departures"]
             + s5["optimized_missed_departures"]
         )
+        total_after_expansion = (
+            s1["capacity_expansion_missed_departures"]
+            + s2["optimized_missed_departures"]
+            + s5["optimized_missed_departures"]
+        )
 
         return {
             "dataset_missed_summary": missed_summary,
@@ -262,5 +303,6 @@ class ScenarioEngine:
             "S4": s4,
             "S5": s5,
             "scenario_day_missed_before": total_before,  # 13
-            "scenario_day_missed_after": total_after,    # 0
+            "scenario_day_missed_after": total_after,    # 3 (zero-CAPEX software: S1=3, S2=0, S5=0)
+            "scenario_day_missed_after_expansion": total_after_expansion,  # 0 (with 324k EUR S1 expansion)
         }

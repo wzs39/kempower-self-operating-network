@@ -393,7 +393,7 @@ class TestAppLaunchStressAdversarial(unittest.TestCase):
         self.assertIn("peak_vs_energy", payload)
 
         sc = payload["scenarios"]
-        self.assertEqual(sc["scenario_day_missed_after"], 0)
+        self.assertEqual(sc["scenario_day_missed_after"], 3)
         self.assertEqual(sc["scenario_day_missed_before"], 13)
 
         labor = payload["labor"]
@@ -411,7 +411,10 @@ class TestAppLaunchStressAdversarial(unittest.TestCase):
             timeout=30,
         )
         self.assertEqual(result.returncode, 0, f"app.py failed: {result.stderr}")
-        self.assertIn("Dashboard payload verified: 13 -> 0 missed departures", result.stdout)
+        self.assertIn(
+            "Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8",
+            result.stdout,
+        )
 
     def test_app_launch_under_varied_env_vars(self):
         """Run python app.py with modified and missing environment variables."""
@@ -433,7 +436,10 @@ class TestAppLaunchStressAdversarial(unittest.TestCase):
                 env=env,
             )
             self.assertEqual(result.returncode, 0, f"app.py failed with env {extra_env}: {result.stderr}")
-            self.assertIn("Dashboard payload verified: 13 -> 0 missed departures", result.stdout)
+            self.assertIn(
+                "Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8",
+                result.stdout,
+            )
 
 
 if __name__ == "__main__":

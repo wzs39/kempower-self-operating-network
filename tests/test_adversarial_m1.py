@@ -8,7 +8,7 @@ Target Modules:
 Probes:
 1. Rapid fan speed degradation; verify Two-Stage N-1 shedding occurs BEFORE 75°C hardware trip.
 2. Sudden WAN outage; verify local DLM maintains full 1500 kW capacity and rejects naive 50 kW fallback.
-3. Corrupted or mismatched site configurations; verify auto-calibration digital twin corrects D5-7 and D5-8.
+3. Corrupted or mismatched site configurations; verify three-way config reconciler corrects D5-7 and D5-8.
 4. Dual-Gun night cycle under late arrivals, asymmetric battery capacities, and sub-zero cold ambient conditions (-14°C).
 5. Public hub Plug & Queue CV trickle handover.
 """

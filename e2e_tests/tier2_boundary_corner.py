@@ -198,7 +198,7 @@ class TestTier2BoundaryCornerCases(unittest.TestCase):
         self.assertEqual(res["state"], ContractEdgeFSM.NORMAL)
 
     # --------------------------------------------------------------------------
-    # F07 Boundaries: Digital Twin Calibration
+    # F07 Boundaries: Three-Way Config Reconciler Calibration
     # --------------------------------------------------------------------------
     def test_f07_b01_already_correct_config(self):
         """Hardware rating already matching configured rating requires no patch."""

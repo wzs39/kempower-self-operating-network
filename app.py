@@ -3,9 +3,9 @@ Kempower Self-Operating Charging Network - Autonomous Command Center (Sentinel v
 Module: app.py
 
 Interactive 4-View Cockpit:
-1. Executive Cockpit: 2029 customer story, 20.76 FTE elimination waterfall (1.82M €/yr), SLA compliance.
+1. Executive Cockpit: 2029 customer story, 20.76 FTE operational waterfall (1.82M €/yr), SLA compliance.
 2. Scenario Day 2026-11-13 Minute-by-Minute Live Player: 00:00-23:45 scrubber, live fault injection, dynamic DPR re-routing animation, 0-human self-healing.
-3. Live Hardware Digital Twin & Protocol Inspector: 25kW module matrix, wear-leveling, contactor 6-step timing (2.63s), live OCPP 2.0.1 and ISO 15118 PnC TLS 1.3 logs.
+3. Live Hardware Matrix & Protocol Inspector: 25kW module matrix, wear-leveling, contactor 6-step timing (2.63s), live OCPP 2.0.1 and ISO 15118 PnC TLS 1.3 logs.
 4. Commercial SLA & Dispute Clearing: interactive MRDT calculator, monthly settlement invoice export.
 
 Run with:
@@ -139,13 +139,13 @@ def render_view_executive_cockpit(payload: Dict[str, Any]) -> None:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Baseline Manual Labor", f"{labor['total_network_fte']} FTE", "€1,821,534 / year OPEX")
-    c2.metric("Continuous Labor in 2029", "0.00 FTE", "-100% (Fully Autonomous)")
-    c3.metric("Annual Labor Savings", "€1,821,534", "Direct OPEX cash recovery")
-    c4.metric("Scenario Day Missed Departures", "0 (was 13)", "-100% (1,804.45 kWh recovered)")
+    c2.metric("Replug Events Eliminated", "5,596 / 8,852", "-63.22% count (9.95 FTE replug)")
+    c3.metric("Annual Labor Scope", "€1,821,534", "Physical tech visits retained (F016)")
+    c4.metric("Scenario Day Missed Departures", "3 (0 €) / 0 (324k €)", "Was 13 (S1: 4->3->0, S2: 4->0, S5: 5->0)")
 
     waterfall_data = [
-        {"Operational Task Category": "1. Midnight Replugging (move_and_replug_vehicle)", "Baseline Biweekly Min": 44768, "Share of Time": "47.93%", "FTE Eliminated": 9.95, "Annual Savings (€)": 872976.0, "Autonomous Elimination Mechanism": "Satellite Dual-Gun Multiplexing & 0-CAPEX Virtual Replug"},
-        {"Operational Task Category": "2. Fault Reset & Inspection (reset_faulty_charger)", "Baseline Biweekly Min": 18520, "Share of Time": "19.83%", "FTE Eliminated": 4.12, "Annual Savings (€)": 361530.0, "Autonomous Elimination Mechanism": "Edge FSM Autonomous Self-Healing & Contactor Reset"},
+        {"Operational Task Category": "1. Midnight Replugging (move_and_replug_vehicle)", "Baseline Biweekly Min": 44768, "Share of Time": "47.93%", "FTE Eliminated": 9.95, "Annual Savings (€)": 872976.0, "Autonomous Elimination Mechanism": "Satellite Dual-Gun Multiplexing & 0-CAPEX Urgency Scheduling"},
+        {"Operational Task Category": "2. Fault Reset & Inspection (reset_faulty_charger)", "Baseline Biweekly Min": 18520, "Share of Time": "19.83%", "FTE Eliminated": 4.12, "Annual Savings (€)": 361530.0, "Autonomous Elimination Mechanism": "Edge FSM Autonomous Self-Healing (Physical F016 Tech Retained)"},
         {"Operational Task Category": "3. Manual Load Shedding & Curtailment", "Baseline Biweekly Min": 14600, "Share of Time": "15.63%", "FTE Eliminated": 3.25, "Annual Savings (€)": 285188.0, "Autonomous Elimination Mechanism": "15-Minute Rolling Horizon MILP & Local DLM Islanding"},
         {"Operational Task Category": "4. Queue Management & Manual Dispatch", "Baseline Biweekly Min": 9624, "Share of Time": "10.30%", "FTE Eliminated": 2.14, "Annual Savings (€)": 187785.0, "Autonomous Elimination Mechanism": "Kempower Modular DPR Matrix & Urgency Waterfilling (EDF)"},
         {"Operational Task Category": "5. Billing Dispute Manual Reconciliation", "Baseline Biweekly Min": 5900, "Share of Time": "6.32%", "FTE Eliminated": 1.30, "Annual Savings (€)": 114055.0, "Autonomous Elimination Mechanism": "1s Telemetry Merkle Audit & Automated Monthly Clearing"},
@@ -154,10 +154,10 @@ def render_view_executive_cockpit(payload: Dict[str, Any]) -> None:
 
     # Strategy A vs Strategy B Financial Box
     st.info(
-        f"💡 **Financial Reality Check on Site S1**:\n\n"
-        f"• **Strategy A (0 € CAPEX Software Scheduling)**: Single 01:30 wave swap recovers all 1,012.00 kWh across B04, B18, B20, B09 -> **0 missed departures at 0.00 € CAPEX**.\n\n"
-        f"• **Strategy B (Hardware Dual-Gun Expansion)**: 12 dispensers × €{equip['installed_cost_per_gun_eur']:,.0f}/gun (€18k dispenser + €9k civil) = €{equip['s1_12_guns_total_capex_with_civil_eur']:,.0f} CAPEX. "
-        f"Against S1's €{labor['s1_replug_annual_labor_eur']:,.0f}/yr replug labor, standalone payback is **{equip['s1_payback_years_with_civil']} years** (across full 100-site network, full payback is 4.45 months)."
+        f"💡 **Financial & Physical Reality Check on Site S1 (12 CCS2 Guns vs 24 Night Buses)**:\n\n"
+        f"• **Tier 1 (Same-Engine Baseline, 12 guns, FCFS)**: **4 missed departures (`B04, B09, B18, B20`)**, simulated deficit **398.5 kWh** (official recorded gap = 1,012.00 kWh across 0-session buses), peak **1,080.0 kW**.\n\n"
+        f"• **Tier 2 (Zero-CAPEX Software, 12 guns, Urgency, 0 human moves)**: **3 missed departures (`B04, B09, B18` — `B20` rescued)**, simulated deficit **48.8 kWh (-87.8%)** at **0.00 € CAPEX**.\n\n"
+        f"• **Tier 3 (Hardware Dual-Gun Expansion, 24 points)**: 12 dispensers × €{equip['installed_cost_per_gun_eur']:,.0f}/gun (€18k dispenser + €9k civil) = **€{equip['s1_12_guns_total_capex_with_civil_eur']:,.0f} CAPEX** -> **0 missed departures (0.0 kWh deficit, 0 human moves)**, standalone S1 payback **{equip['s1_payback_years_with_civil']} years**."
     )
 
     st.divider()
@@ -165,11 +165,11 @@ def render_view_executive_cockpit(payload: Dict[str, Any]) -> None:
     # Network SLA Compliance Table
     st.markdown("### 🛡️ Network-Wide SLA Compliance Across Flagship Sites")
     sla_summary = [
-        {"Site ID": "S1", "Site Type": "Bus Depot North", "Grid Limit": "1,200 kW", "Installed DC": "1,080 kW (3x360kW)", "Guns": 12, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 4, "Optimized Missed": 0, "Energy Deficit Recovered": "1,012.00 kWh", "Uptime SLA": "99.95%"},
-        {"Site ID": "S2", "Site Type": "Logistics Depot East", "Grid Limit": "800 kW", "Installed DC": "800 kW (2x400kW)", "Guns": 8, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 4, "Optimized Missed": 0, "Energy Deficit Recovered": "283.50 kWh", "Uptime SLA": "99.92%"},
-        {"Site ID": "S3", "Site Type": "Highway High-Power Hub", "Grid Limit": "1,500 kW", "Installed DC": "1,500 kW (2x600+300)", "Guns": 10, "Service Tier": "Gold (99.5%)", "Baseline Missed": 0, "Optimized Missed": 0, "Energy Deficit Recovered": "0.00 kWh (76 saved)", "Uptime SLA": "99.88%"},
-        {"Site ID": "S4", "Site Type": "City Fast Hub", "Grid Limit": "600 kW", "Installed DC": "600 kW (2x300kW)", "Guns": 6, "Service Tier": "Gold (99.5%)", "Baseline Missed": 0, "Optimized Missed": 0, "Energy Deficit Recovered": "0.00 kWh (Load shifted)", "Uptime SLA": "99.91%"},
-        {"Site ID": "S5", "Site Type": "Suburban Bus Depot", "Grid Limit": "900 kW (was 600)", "Installed DC": "900 kW (2x450kW)", "Guns": 8, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 5, "Optimized Missed": 0, "Energy Deficit Recovered": "508.95 kWh", "Uptime SLA": "99.97%"},
+        {"Site ID": "S1", "Site Type": "Bus Depot North", "Grid Limit": "1,200 kW", "Installed DC": "1,080 kW (3x360kW)", "Guns": 12, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 4, "Zero-CAPEX Missed": 3, "Expansion Missed (324k €)": 0, "Simulated Deficit (kWh)": "398.5 -> 48.8 -> 0.0 kWh", "Uptime SLA": "99.95%"},
+        {"Site ID": "S2", "Site Type": "Logistics Depot East", "Grid Limit": "800 kW", "Installed DC": "800 kW (2x400kW)", "Guns": 8, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 4, "Zero-CAPEX Missed": 0, "Expansion Missed (324k €)": 0, "Simulated Deficit (kWh)": "283.50 -> 0.0 kWh", "Uptime SLA": "99.92%"},
+        {"Site ID": "S3", "Site Type": "Highway High-Power Hub", "Grid Limit": "1,500 kW", "Installed DC": "1,500 kW (2x600+300)", "Guns": 10, "Service Tier": "Gold (99.5%)", "Baseline Missed": 0, "Zero-CAPEX Missed": 0, "Expansion Missed (324k €)": 0, "Simulated Deficit (kWh)": "0.00 kWh (Local DLM 1,425 kW)", "Uptime SLA": "99.88%"},
+        {"Site ID": "S4", "Site Type": "City Fast Hub", "Grid Limit": "600 kW", "Installed DC": "600 kW (2x300kW)", "Guns": 8, "Service Tier": "Gold (99.5%)", "Baseline Missed": 0, "Zero-CAPEX Missed": 0, "Expansion Missed (324k €)": 0, "Simulated Deficit (kWh)": "0.00 kWh (799.30 €/MWh shifted)", "Uptime SLA": "99.91%"},
+        {"Site ID": "S5", "Site Type": "Suburban Bus Depot", "Grid Limit": "900 kW (was 600)", "Installed DC": "900 kW (2x450kW)", "Guns": 8, "Service Tier": "Titanium (99.9%)", "Baseline Missed": 5, "Zero-CAPEX Missed": 0, "Expansion Missed (324k €)": 0, "Simulated Deficit (kWh)": "508.95 -> 0.0 kWh", "Uptime SLA": "99.97%"},
     ]
     st.dataframe(pd.DataFrame(sla_summary), use_container_width=True)
 
@@ -276,14 +276,14 @@ def render_view_scenario_player(payload: Dict[str, Any]) -> None:
 
 
 # ============================================================================
-# 4. View 3: Live Hardware Digital Twin & Protocol Inspector
+# 4. View 3: Live Hardware Matrix & Protocol Inspector
 # ============================================================================
 
 def render_view_hardware_twin(payload: Dict[str, Any]) -> None:
     import streamlit as st
     import pandas as pd
 
-    st.subheader("⚡ Live Hardware Digital Twin & Industrial Protocol Inspector")
+    st.subheader("⚡ Live Hardware Matrix & Industrial Protocol Inspector")
     st.markdown(
         "*25kW Modular Power Matrix | Contactor 6-Step Timing (2.63s) | Live OCPP 2.0.1 & ISO 15118 PnC TLS 1.3 Logs*"
     )
@@ -518,10 +518,10 @@ def render_streamlit_app() -> None:
 
     # Global KPI Header Ribbon
     k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Scenario Day Departures", "0 Missed (was 13)", "-100% (1,804.45 kWh recovered)")
-    k2.metric("Continuous Ops Labor", "0.00 FTE (was 20.76)", f"-100% (€{labor['total_network_annual_labor_eur']:,.0f}/yr saved)")
-    k3.metric("Grid Safety Invariant", "100.0% Compliant", "0 overlimits across 134,400 intervals")
-    k4.metric("System Availability (SLO)", "99.85% (Titanium)", "Zero-Touch Edge Islanding & PdM")
+    k1.metric("Scenario Day Departures", "13 -> 3 (0 €) / 0 (324k €)", "S1: 4->3 (-87.8% gap) | S2: 4->0 | S5: 5->0")
+    k2.metric("Replug Events Eliminated", "5,596 / 8,852", f"9.95 FTE replug (€{labor['replug_network_annual_labor_eur']:,.0f}/yr)")
+    k3.metric("Grid Safety Invariant", "0 Official grid_kw Over-Limit", "134,400 rows (9,644 delivered_kw/0.955 basis diff)")
+    k4.metric("System Availability (SLO)", "99.85% (Titanium)", "Zero-Touch Edge Islanding & Threshold+Slope PdM")
 
     # Top-Level 4-View Navigation Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -561,10 +561,10 @@ if __name__ == "__main__":
         else:
             data = build_dashboard_payload()
             print(
-                f"Dashboard payload verified: 13 -> {data['scenarios']['scenario_day_missed_after']} missed departures."
+                f"Dashboard payload verified: 13 -> {data['scenarios']['scenario_day_missed_after']} (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8."
             )
     except Exception:
         data = build_dashboard_payload()
         print(
-            f"Dashboard payload verified: 13 -> {data['scenarios']['scenario_day_missed_after']} missed departures."
+            f"Dashboard payload verified: 13 -> {data['scenarios']['scenario_day_missed_after']} (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8."
         )

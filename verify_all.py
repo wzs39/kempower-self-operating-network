@@ -41,15 +41,26 @@ def main() -> int:
 
     zero_over = results["network_zero_over_limit"]
     assert zero_over["zero_over_limit_verified"] and zero_over["total_rows"] == 134400
-    print(f"[PASS] Grid Safety Invariant  : 0 over-limit rows across {zero_over['total_rows']:,} network_site_power rows")
+    print(
+        f"[PASS] Grid Safety Invariant  : 0 over-limit rows in official grid_kw column across {zero_over['total_rows']:,} network_site_power rows\n"
+        f"       (Basis note: 9,644 rows exceed grid_limit_kw if recomputed via delivered_kw/0.955 — baseline recording basis difference, not claimed as our optimization)"
+    )
 
     s1 = results["S1"]
-    assert s1["baseline_deficit_kwh"] == 1012.00 and s1["optimized_missed_departures"] == 0
+    assert s1["baseline_missed_departures"] == 4
+    assert s1["baseline_deficit_kwh"] == 398.5
+    assert s1["baseline_undercharged_vehicles"] == ["B04", "B09", "B18", "B20"]
+    assert s1["optimized_missed_departures"] == 3
+    assert s1["optimized_deficit_kwh"] == 48.8
+    assert s1["capacity_expansion_missed_departures"] == 0
     assert s1["thermal_anomaly_audit"]["true_peak_timestamp"] == "2026-11-12T22:31:00+02:00"
     assert s1["n1_post_fault_audit"]["f016_duration_minutes"] == 246
     print(
-        f"[PASS] Station S1 (Bus Depot) : 4 missed (1,012.00 kWh) -> 0 missed | "
-        f"D1-9 59.3C @ 22:31 (199m lead) | F016 246m (technician) | N-1 720 kW"
+        "[PASS] Station S1 (Bus Depot) : 12 CCS2 guns (physical) | Official 4 below-SoC = B04/B09/B18/B20\n"
+        "       Same-engine baseline 4 missed (398.5 kWh) -> Urgency 3 missed (48.8 kWh, -87.8%)\n"
+        "       Zero-miss audit: +12 plugs alone = 8 missed (WORSE) | cabinets 3x450kW = 0 but 1,350kW > 1,200kW grid limit\n"
+        "       Only in-limit zero path = cross-cabinet busbar tie on existing 12 guns (peak stays 1,080kW), unpriced in equipment_costs.csv\n"
+        "       D1-9 59.3C @ 22:31 | N-1 720 kW"
     )
 
     s2 = results["S2"]
@@ -91,7 +102,7 @@ def main() -> int:
     assert equip["installed_cost_per_gun_eur"] == 27000.0 and equip["s1_12_guns_total_capex_with_civil_eur"] == 324000.0
     print(
         f"[PASS] Commercial & ROI Audit : 45 EUR/h (87,750 EUR/FTE) | 20.76 FTE Total (1.82M EUR/yr) | "
-        f"9.95 FTE Replug (47.93% time, 873k EUR/yr) | Strategy A 0 EUR vs Strategy B 324k EUR (13.31y at S1)"
+        f"9.95 FTE Replug (47.93% time, 873k EUR/yr) | Strategy A 0 EUR vs Strategy B 324k EUR (13.31y at S1, plugs alone = 8 missed)"
     )
 
     mrdt = SLACalculator.compute_mrdt(80.0, 30.0, 200.0, 150.0, 150.0)
@@ -99,7 +110,7 @@ def main() -> int:
     elapsed = time.time() - t0
     print("-" * 78)
     print(
-        f"VERIFICATION SUCCEEDED: 13 -> 0 Scenario Day Missed Departures | "
+        f"VERIFICATION SUCCEEDED: 13 -> 3 remain (S1=3, S2=0, S5=0) after zero-CAPEX software | zero-miss needs an unpriced busbar, not 324k EUR of plugs | "
         f"All 29 GitHub Issue #2 Items Verified in {elapsed:.2f}s (< 5.0s)"
     )
     print("=" * 78)

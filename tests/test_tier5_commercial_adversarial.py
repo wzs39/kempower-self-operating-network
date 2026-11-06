@@ -42,7 +42,7 @@ Test Classes:
    - Streamlit AppTest multi-tab rendering across all 4 cockpit views
    - Dynamic contract tier selection and interactive MRDT calculator updates
    - Simulated delay/undercharge slider interaction and JSON invoice generation
-   - Wear-leveling toggle state change in digital twin view
+   - Wear-leveling toggle state change in Hardware Matrix & Protocol Inspector view
    - 96-interval timeline scrubbing and active incident banner assertions
    - Dual CLI / Streamlit runtime execution guard resilience
 """
@@ -766,7 +766,8 @@ class TestTier5DashboardUIAndPresentationAdversarial(unittest.TestCase):
         self.assertIn("timeline_records", payload)
         self.assertIn("spot_prices", payload)
 
-        self.assertEqual(payload["scenarios"]["scenario_day_missed_after"], 0)
+        self.assertEqual(payload["scenarios"]["scenario_day_missed_after"], 3)
+        self.assertEqual(payload["scenarios"]["scenario_day_missed_after_expansion"], 0)
         self.assertEqual(payload["labor"]["total_network_fte"], 20.76)
         self.assertGreaterEqual(len(payload["timeline_records"]), 96)
         self.assertIn("18:00", payload["spot_prices"])
@@ -854,7 +855,10 @@ class TestTier5DashboardUIAndPresentationAdversarial(unittest.TestCase):
             timeout=30,
         )
         self.assertEqual(res.returncode, 0, f"app.py exited with error:\n{res.stderr}")
-        self.assertIn("Dashboard payload verified: 13 -> 0 missed departures.", res.stdout)
+        self.assertIn(
+            "Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8.",
+            res.stdout,
+        )
 
 
 if __name__ == "__main__":

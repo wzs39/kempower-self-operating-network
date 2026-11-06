@@ -61,7 +61,7 @@ class TestTier3CrossFeatureCombinations(unittest.TestCase):
         self.assertGreater(released_kw, 50.0)
 
     def test_c05_s5_auto_calibration_and_dpr_allocation(self):
-        """Digital twin auto-calibration restores D5-7 to 150 kW, properly pooled by DPR."""
+        """Three-way config reconciler auto-calibration restores D5-7 to 150 kW, properly pooled by DPR."""
         d5_7_remediated_kw = 150.0
         alloc = ContractDPRMatrix.allocate_power({"D5-7": d5_7_remediated_kw}, grid_limit_ac=500.0, cabinet_capacity_kw=450.0)
         self.assertEqual(alloc["D5-7"], 150.0)

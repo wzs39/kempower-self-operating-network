@@ -18,7 +18,7 @@ Implements:
 3. Offline Grid Islanding:
    - Local Autonomous Dynamic Load Management (Local DLM)
    - Rejects 50 kW naive fallback, enforcing full 1500 kW local transformer capacity.
-4. S5 Commissioning Digital Twin Auto-Calibration:
+4. S5 Commissioning Three-Way Config Reconciler Auto-Calibration:
    - Detection of D5-7 50 kW throttle and D5-8 dead SIM card
    - Automated runtime patch overriding D5-7 to 150 kW and activating D5-8 eSIM.
 5. Inverter Efficiency Guard (95.5% AC/DC rectification efficiency):
@@ -364,7 +364,7 @@ class OfflineIslandingController:
 
 class CommissioningAutoCalibrator:
     """
-    Digital Twin 3-way audit comparing network_sites.csv, power_cabinets.csv, and site_config.csv (Issue C6).
+    Three-way configuration reconciler comparing network_sites.csv, power_cabinets.csv, and site_config.csv (Issue C6).
     Detects and overrides:
     1. S5 SITE grid_limit_kw misconfigured to 600.0 kW (row 164 of site_config.csv) vs 900.0 kW
        in network_sites.csv and power_cabinets.csv (2 x 450 kW), which starved B27/B28/B33/B34/B35

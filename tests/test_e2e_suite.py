@@ -317,7 +317,7 @@ class TestTier1Features(unittest.TestCase):
             res = ContractEdgeFSM.tick({"fan_rpm": 1800, "baseline_fan_rpm": 1800, "internal_temp_c": temp, "wan_connected": True})
             self.assertTrue(res["safe"])
 
-    # --- F07: S5 Digital Twin Auto-Calibration ---
+    # --- F07: S5 Three-Way Config Reconciler Auto-Calibration ---
     def test_f07_01_d5_7_throttle_in_site_config(self):
         cfg_path = os.path.join(DATA_DIR, "site_config.csv")
         df_cfg = pd.read_csv(cfg_path)
@@ -668,7 +668,7 @@ class TestTier3CrossFeatureCombinations(unittest.TestCase):
         self.assertGreater(released_kw, 50.0)  # At least two 25 kW modules released!
 
     def test_c05_s5_auto_calibration_and_dpr_allocation(self):
-        """Digital twin auto-calibration restores D5-7 to 150 kW, properly pooled by DPR."""
+        """Three-way config reconciler auto-calibration restores D5-7 to 150 kW, properly pooled by DPR."""
         d5_7_remediated_kw = 150.0
         alloc = ContractDPRMatrix.allocate_power({"D5-7": d5_7_remediated_kw}, grid_limit_ac=500.0, cabinet_capacity_kw=450.0)
         self.assertEqual(alloc["D5-7"], 150.0)

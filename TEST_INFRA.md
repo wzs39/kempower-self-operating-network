@@ -34,16 +34,16 @@ The testing framework for the Self-Operating Charging Network adheres to three n
 | **F04** | Dual-Gun Topology & Multiplexing | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f04_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f04_b*` | 12 satellites = 24 plugs, A/B night sequencing, 0 replug |
 | **F05** | 95.5% Inverter Loss Constraint | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f05_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f05_b*` | $P_{AC} = P_{DC} / 0.955 \le P_{transformer\_max}$ clamp |
 | **F06** | Predictive Thermal Calibration / PdM | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f06_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f06_b*` | 1-min telemetry fan RPM drop >20%, 5-min lookahead shift |
-| **F07** | S5 Digital Twin Auto-Calibration | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f07_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f07_b*` | D5-7 50kW override to 150kW, D5-8 eSIM activation |
-| **F08** | 799.30 €/MWh Price Peak BESS | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f08_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f08_b*` | BESS peak shaving at 18:00, charge at 27.35 €/MWh |
+| **F07** | S5 Three-Way Config Reconciler | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f07_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f07_b*` | D5-7 50kW override to 150kW, D5-8 eSIM activation |
+| **F08** | 799.30 €/MWh Price Peak BESS Interface | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f08_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f08_b*` | BESS peak shaving interface at 18:00 *(interface defined, not field-validated)* |
 | **F09** | 2026-11-13 Baseline Replay | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_s1_*` to `test_s5_*` | 13 missed departures across S1 (4), S2 (4), S5 (5) |
-| **F10** | 2026-11-13 Sentinel Runner | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_closed_loop_*` | 0 missed departures, <0.5% abandoned, 0 grid breaches |
+| **F10** | 2026-11-13 Sentinel Runner | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_closed_loop_*` | 3 missed (0 € software) / 0 missed (324k € S1 expansion), <0.5% abandoned, 0 grid breaches |
 | **F11** | One-Page SLA Engine & Anti-Fraud | Tier 1, 2, 4 | `e2e_tests/tier1_feature_coverage.py::test_f11_*`<br>`e2e_tests/tier4_real_world_scenario.py::test_one_page_*` | MRDT gate, 5-layer fraud rejection, piecewise fee deduction |
-| **F12** | Commercial AEaaS ROI Model | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_commercial_*` | 20.76 FTE continuous elimination (1.82M €/yr), Strategy A vs B |
+| **F12** | Commercial AEaaS ROI Model | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_commercial_*` | 20.76 FTE continuous elimination (1.82M €/yr), Tier 2 (0 €) vs Tier 3 (324k €) |
 | **F13–F18** | High-Value Innovation Protocols | Tier 3, 4 | `e2e_tests/tier3_cross_feature.py`<br>`e2e_tests/tier4_real_world_scenario.py` | Pairwise and full Scenario Day stress validation |
 | **F19** | Zero-Regression Deterministic Verifier | Master / Root | `verify_all.py` | Sub-0.5-second execution budget validation (<5.0s) |
-| **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.41s |
-| **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass on E2E suite and legacy regression suite |
+| **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.65s |
+| **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass across `431 pytest + 106 E2E (537 total)` |
 
 ---
 
@@ -62,20 +62,20 @@ e2e_tests/
 
 ```
                                 [ TIER 4: REAL-WORLD SCENARIOS ]
-                        - S1 Depot 24-Bus Night Shift (0 Replug / 0 Missed)
+                        - S1 Depot 24-Bus Night Shift (3 Missed @ 0€ / 0 Missed @ 324k€)
                         - S2 Logistics 4-Truck DSO Curtailment (G1 400 kW)
                         - S3 Highway 256-Driver Offline Islanding (<0.5% Drop)
                         - S4 Urban Hub 799.30 €/MWh Peak & D4-2 Cable Trip
-                        - S5 Commissioning Digital Twin Self-Healing (D5-7/8)
+                        - S5 Commissioning Three-Way Config Reconciler (D5-7/8)
                         - Commercial 20.76 FTE Elimination & One-Page SLA Settlement
                                                 ▲
                                                 │
                                 [ TIER 3: CROSS-FEATURE INTERACTIONS ]
                         - Dual-Gun Multiplexing + 95.5% Inverter Clamp
                         - Offline Islanding + Predictive Thermal Shifting
-                        - 799.30 €/MWh Peak + BESS Arbitrage + Hard Schedules
+                        - 799.30 €/MWh Peak + BESS Interface + Hard Schedules
                         - Plug & Queue Reservation + CC/CV Dynamic Tapering
-                        - S5 Digital Twin Calibration + 25 kW Matrix Pooling
+                        - S5 Three-Way Config Reconciler + 25 kW Matrix Pooling
                         - S2 DSO Curtailment + Lookahead Precharging & Preemption
                         - Low Ambient Temperature (-15°C) + Matrix Contactor Cycling
                                                 ▲
@@ -96,7 +96,7 @@ e2e_tests/
                         - F04: Dual-Gun A/B Satellite Dynamic Scheduling
                         - F05: AC Inverter 95.5% Loss ($1.0471 \times P_{DC}$) Calculation
                         - F06: Predictive Thermal Maintenance (Fan RPM Gradient)
-                        - F07: Digital Twin Calibration Parameter Reconciliation
+                        - F07: Three-Way Config Reconciler Parameter Reconciliation
                         - F08: BESS Battery Degradation & Capacity Safeguard
                         - F11: One-Page SLA Formula & MRDT 5-Layer Anti-Fraud Gate
 ```
@@ -123,11 +123,11 @@ e2e_tests/
 ### Tier 4: Real-World Scenarios (`tier4_real_world_scenario.py`)
 - Replays actual operational traces from the 2026-11-13 scenario day across all five focus sites (S1–S5).
 - Directly tests against the 45 official CSV files to prove:
-  - 13 missed departures in baseline $\rightarrow$ 0 in autonomous sentinel.
+  - 13 missed departures in baseline $\rightarrow$ **3 missed (`0 €` software urgency, `10` saved; S1 deficit `398.5 -> 48.8 kWh`, `-87.8%`)** $\rightarrow$ **0 missed (`324,000 €` S1 dual-gun expansion, `13.31-yr` payback)**.
   - 29.7% highway abandonment $\rightarrow$ $<0.5\%$.
   - 20.76 FTE manual workload $\rightarrow$ 0 continuous FTE daily operations.
   - Economic arbitrage and One-Page SLA financial settlements.
-  - Network-wide grid safety: 0 over-limit intervals across 134,400 data points.
+  - Network-wide grid safety: 0 official `grid_kw` over-limit intervals across 134,400 data points.
 - **Actual Delivered**: 9 test cases (100% pass in 0.363s).
 
 ---
@@ -179,8 +179,8 @@ python e2e_tests/tier4_real_world_scenario.py
 # Run all E2E tests
 python -m pytest e2e_tests/ -v
 
-# Run legacy regression suite (179 tests)
-python -m pytest tests/ -v
+# Run full pytest suite (`431 pytest + 106 E2E (537 total)`)
+python -m pytest tests/ -q
 ```
 
 ### 5. Run Deterministic Verifier Gate (<0.5s)

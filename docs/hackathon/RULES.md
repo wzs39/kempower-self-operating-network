@@ -46,4 +46,4 @@
 
 - **Runtime**: Python 3.10+ with NumPy, Pandas, SciPy (HiGHS MILP solver), Pytest, and Streamlit UI.
 - **Offline Autonomy**: Zero external cloud API dependencies. The system operates fully self-contained using local SQLite WAL storage and edge-cached Day-Ahead electricity prices.
-- **Verification Gate**: Full test suite (`pytest tests/`, 179 tests) passes 100% in ~2.1s, and `python verify_all.py` executes in `< 0.5s`.
+- **Verification Gate**: Full test suite (`431 pytest + 106 E2E (537 total)`) passes 100%, and `python verify_all.py` executes in `< 0.5s`.
