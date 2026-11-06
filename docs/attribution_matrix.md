@@ -89,10 +89,10 @@ Both S2 and S5 discrete event simulation engines are now fully calibrated agains
   - Misconfigured `grid_limit_kw = 600 kW` (instead of `900 kW` in `sites.csv` and `power_cabinets.csv`);
   - Dispenser `D5-7` throttled to `max_kw = 50 kW`;
   - Dispenser `D5-8` inactive (`sim_active = false` -> `0 kW`).
-  - In official baseline, 12 buses arrive overnight; because only 7 guns are active, 5 buses (`B27, B28, B33, B34, B35`) miss departure with **`508.95 kWh`** recorded deficit due to operator manual replug delay until 03:30.
+  - In official baseline, 12 buses arrive overnight; only 7 guns are active, and the record shows 5 buses (`B27, B28, B33, B34, B35`) missing departure with **`508.95 kWh`** recorded deficit.
 - **Same-Engine Simulation Results**:
   - **Baseline (`fcfs`, unreconciled: 600 kW grid limit, D5-7@50kW, D5-8 inactive)**:
-    - Missed departures: **`1`** (`B35`) under unconstrained continuous simulation (**`5`** under official delayed batch swap)
+    - Missed departures: **`1`** (`B35`) — our engine reproduces **1 of the 5** official failures. The other 4 depend on plug-queueing and batch-swap timing that the engine does not model, so **S5 is a configuration fix, not a same-engine A/B**.
     - Simulated energy deficit: **`365.4 kWh`** (official recorded: `508.95 kWh`)
     - Peak power: `600.0 kW` (clamped by misconfigured grid limit)
     - Manual moves: **`4` moves**

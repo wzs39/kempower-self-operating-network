@@ -8,7 +8,7 @@
 - **Official Tasks**:
   1. Part 1: The Energy and Control Core (Multi-timescale optimization, grid limits, DPR modular routing, fault self-healing, edge islanding).
   2. Part 2: Scenario Day 2026-11-13 Demonstration with zero human intervention (S1 thermal fault, S3 WAN drop, S4 799.30 €/MWh price spike).
-  3. Part 3: Commercial Model & One-Page SLA for 2029 (20.76 continuous FTE -> 0 continuous FTE, 1.82M €/year savings, MRDT gating, capped risk).
+  3. Part 3: Commercial Model & One-Page SLA for 2029 (20.76 FTE recorded baseline -> 12.44 FTE software-addressable, 1.09M €/year claimable, 5.09 FTE technician visits retained, MRDT gating, capped risk).
 - **Five Judging Dimensions**: Autonomy 25%, Energy & Grid Impact 20%, Technical Credibility 20%, Commercial Viability 20%, Clarity 15%.
 - **Two Absolute Red Lines**:
   1. "Never change the data we gave": All 45 CSV files (240,635 rows) under `kempower-challenge-data/` remain strictly unmodified and read-only.
