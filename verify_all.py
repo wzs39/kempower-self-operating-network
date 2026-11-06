@@ -116,7 +116,7 @@ def main() -> int:
     elapsed = time.time() - t0
     print("-" * 78)
     print(
-        f"VERIFICATION SUCCEEDED: 13 -> 3 remain (S1=3, S2=0, S5=0) after zero-CAPEX software | zero-miss needs an unpriced busbar, not 324k EUR of plugs | "
+        f"VERIFICATION SUCCEEDED: 13 -> 3 remain (S1=3, S2=0, S5=0) after zero-CAPEX software | zero-miss needs 75,600 EUR of cabinet kW at the 1,200 kW cap (non-monotonic) or an unpriced busbar, not 324k EUR of plugs | "
         f"All 29 GitHub Issue #2 Items Verified in {elapsed:.2f}s (< 5.0s)"
     )
     print("=" * 78)
