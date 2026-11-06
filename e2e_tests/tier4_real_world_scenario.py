@@ -41,7 +41,7 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         failed_buses = set(s1_fails["vehicle_id"])
         self.assertEqual(failed_buses, {"B09", "B18", "B20", "B04"})
 
-        # In Sentinel mode on 12 guns (0 CAPEX) 3 buses fail (48.8 kWh); with 24 plugs 0 buses fail
+        # In Sentinel mode on 12 guns (0 CAPEX) 3 buses fail (48.8 kWh); with 24 plugs + cross-cabinet tie 0 fail (plugs alone = 8 fail)
         s1_res = ScenarioEngine().run_s1_scenario()
         self.assertEqual(s1_res["baseline_missed_departures"], 4)
         self.assertEqual(s1_res["baseline_deficit_kwh"], 398.5)

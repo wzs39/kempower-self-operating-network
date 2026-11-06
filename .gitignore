@@ -25,6 +25,7 @@ venv/
 
 # Agents internal scratchpad & background runs
 .agents/
+.workbuddy/
 
 # Temporary / Scratch
 .system_generated/

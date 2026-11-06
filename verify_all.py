@@ -66,8 +66,10 @@ def main() -> int:
     s2 = results["S2"]
     assert s2["baseline_deficit_kwh"] == 283.50 and s2["optimized_missed_departures"] == 0
     print(
-        f"[PASS] Station S2 (Logistics) : 4 missed (283.50 kWh) -> 0 missed | "
-        f"Preempted 283.50 kWh from T05-T08 ({s2['overnight_trucks_t05_t08_afternoon_kwh']:.2f} kWh pool)"
+        f"[PASS] Station S2 (Logistics) : [recorded baseline] 4 missed (283.50 kWh) -> [our engine] 0 missed | "
+        f"Preempted 283.50 kWh from T05-T08 ({s2['overnight_trucks_t05_t08_afternoon_kwh']:.2f} kWh pool)\n"
+        f"       NOTE: S2 'before' is the official departures_baseline.csv record; S2 is NOT same-engine calibrated (unlike S1).\n"
+        f"       Same-engine fcfs on our S2 model = 1 missed (T02, 24.0 kWh); urgency = 0. Use the fcfs->urgency pair for a controlled A/B."
     )
 
     s3 = results["S3"]
@@ -91,8 +93,10 @@ def main() -> int:
     assert s5["baseline_deficit_kwh"] == 508.95 and s5["optimized_missed_departures"] == 0
     assert rec_s5["site_config_grid_limit_kw_before"] == 600.0 and rec_s5["site_config_grid_limit_kw_after"] == 900.0
     print(
-        f"[PASS] Station S5 (Auto-Calib): 5 missed (508.95 kWh) -> 0 missed | "
-        f"Reconciled grid_limit_kw 600 -> 900 kW (+750 kWh), D5-7 150 kW, D5-8 eSIM"
+        f"[PASS] Station S5 (Auto-Calib): [recorded baseline] 5 missed (508.95 kWh) -> [our engine @900kW] 0 missed | "
+        f"Reconciled grid_limit_kw 600 -> 900 kW (+750 kWh), D5-7 150 kW, D5-8 eSIM\n"
+        f"       NOTE: S5 'before' is the official record under the 600 kW misconfiguration; S5 is NOT same-engine calibrated.\n"
+        f"       Same-engine: 600 kW -> 1 missed (B28, 21.5 kWh); 900 kW -> 0. So the gain is a CONFIG FIX, not scheduling."
     )
 
     labor = ROIAnalyzer.analyze_network_operations_labor()

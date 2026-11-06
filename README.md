@@ -3,6 +3,10 @@
 *Kempower Challenge · LahtiES Energy Tech Hackathon 2026 (Thu 5.11. – Sat 7.11.2026 @ LUT University Lahti / CrazyTown)*  
 *Official Challenge Lead & Mentor: Mats Mattsson (Kempower Cloud Software Leader & Judge), Panu Vartiainen (Kempower Expert)*
 
+> **Design perspective (stated as required by the brief):** We design from the **CPO (Charge Point Operator) perspective** — the party that owns the operating cost and carries the SLA liability. That is why our primary metric is **staff-hours eliminated and energy certainty delivered**, not kWh sold and not driver-app engagement. Every other module (OCPP 2.0.1, ISO 15118, anti-fraud, BESS interface) is a by-product of this single line, not a separate goal.
+>
+> **Data notice:** All figures in this repository are computed from the **synthetic** `kempower-challenge-data` pack supplied for this hackathon. None of it is real Kempower or customer data. The "2029 bus operator" story is a **fictional scenario**, not an actual customer.
+
 ---
 
 [![Pytest Tests](https://img.shields.io/badge/pytest-431%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
@@ -36,7 +40,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 | **Full-Time Equivalent (FTE) Baseline** | **20.76 FTE $\approx$ 21 FTE** (Finnish statutory 37.5 h/wk) | **9.95 FTE midnight replug (`5,596` events) + 10.81 FTE remote triage (`3,256` events) automated** |
 | **Annual Continuous Labor OPEX** | **1,821,534 € / year** (@ 45 €/h in `equipment_costs.csv`) | **1,821,534 € saved annually** (1.98M € with 80 €/h tech visits) |
 | **Depot Midnight Replugging** | **5,596 events (63.22% count / 47.93% labor duration = 9.95 FTE)** | **0 human moves**: Tier 2 (`0 €` software urgency). Tier 3 (`324,000 €` 24-plug expansion @ S1) does **not** reach `0` on its own — see the corrected Tier 3 row below |
-| **Scenario Day Crisis (Friday 13.11)** | **13 missed departures** (`S1=4, S2=4, S5=5`), **29.69% S3 abandoned** | **Tier 2 (`0 €`, 0 moves): 3 missed (`10` saved: `S1: 4→3`, `S2: 4→0`, `S5: 5→0`) · Tier 3 (`324k €` @ S1): 0 missed only with an unpriced cross-cabinet busbar tie; plugs alone = 8 missed** |
+| **Scenario Day Crisis (Friday 13.11)** | **13 missed departures** (`S1=4, S2=4, S5=5`), **29.69% S3 abandoned** | **Tier 2 (`0 €`, 0 moves): 3 missed (`10` saved: `S1: 4→3`, `S2: 4→0`, `S5: 5→0` — ⚠️ see footnote †) · Tier 3 (`324k €` @ S1): 0 missed only with an unpriced cross-cabinet busbar tie; plugs alone = 8 missed** |
 | **Grid Transformer Violations** | `0` official `grid_kw` overlimits (`9,644` rows under `delivered_kw/0.955` basis) | **0 violations** (`100.00%` compliance under 95.5% AC inverter guard; see [`docs/energy_impact.md`](./docs/energy_impact.md)) |
 
 > **Engineering Honesty on S1 (`24` Overnight Buses on `12` Single-Gun Dispensers)**:  
@@ -233,3 +237,19 @@ hackson/
 - **Challenge Sponsor**: Kempower Oyj (Lahti, Finland)
 - **Mentors & Jury**: Mats Mattsson, Panu Vartiainen, Iiro Kinnunen, Thet Zin, Chuong Pham, Paul Carlson
 - **Integrity Statement**: All 45 official CSV files under `kempower-challenge-data/` remain strictly read-only and hash-verified. All hardware pricing is grounded strictly in `equipment_costs.csv`.
+
+---
+
+### † Baseline provenance for S2 / S5 (read this before quoting the numbers)
+
+Only **S1** is same-engine calibrated: our discrete-event engine, run on the 12 physical CCS2 guns with FCFS, reproduces the official `departures_baseline.csv` **vehicle-for-vehicle** (`B04, B09, B18, B20`, `398.5 kWh`, peak `1,080 kW`). The `4 → 3` claim is therefore a **controlled A/B on one engine**.
+
+**S2 and S5 are not calibrated in this way**, and we do not pretend otherwise:
+
+| Station | Official record (`departures_baseline.csv`) | Our engine, FCFS (same engine) | Our engine, urgency | What the gain really is |
+|---|---|---|---|---|
+| S1 | 4 missed / 398.5 kWh | **4 missed / 398.5 kWh** (exact match) | 3 missed / 48.8 kWh | **Scheduling** (−87.8% deficit, B20 rescued) |
+| S2 | 4 missed / 283.50 kWh | 1 missed / 24.0 kWh (T02) | 0 missed | **Scheduling** on our model (1 → 0); the `4` is the official record, not our baseline |
+| S5 | 5 missed / 508.95 kWh | 0 missed at 900 kW; 1 missed / 21.5 kWh at 600 kW | 0 missed | **Configuration fix** (`600 → 900 kW`), not scheduling |
+
+So when we say "`10` saved", `S1`'s one vehicle is proven end-to-end; `S2` and `S5` are the official record minus our optimized result, and their engines under-reproduce the official baseline. We treat this as an open item, not as a result.
