@@ -3,7 +3,7 @@
 *Kempower Challenge · LahtiES Energy Tech Hackathon 2026 (Thu 5.11. – Sat 7.11.2026 @ LUT University Lahti / CrazyTown)*  
 *Official Challenge Lead & Mentor: Mats Mattsson (Kempower Cloud Software Leader & Judge), Panu Vartiainen (Kempower Expert)*
 
-> **Design perspective (stated as required by the brief):** We design from the **CPO (Charge Point Operator) perspective** — the party that owns the operating cost and carries the SLA liability. That is why our primary metric is **staff-hours eliminated and energy certainty delivered**, not kWh sold and not driver-app engagement. Every other module (OCPP 2.0.1, ISO 15118, anti-fraud, BESS interface) is a by-product of this single line, not a separate goal.
+> **Design perspective (stated as the brief requires — `Pick the perspective you design from … and say which one you chose`):** We design from the **equipment supplier / service provider** perspective — the brief's first actor, `the charger manufacturer that builds the equipment and often services it`. In this dataset that is the party that `delivers and services the chargers at all sites` — `18` of the `29` contracts in `contracts.csv` include service, and the same `18` carry a non-zero `penalty_eur_per_late_departure` (`150 €` at `C1`, up to `250 €` at seven others). That is why every claim below is denominated in the two things this party actually pays for — **field-service hours and contractual penalties** — and why the three layers we automate are the three it already owns: dispenser firmware (`L1`), site controller (`L2`), cloud (`L3`). Our customers are the counterparties of those contracts: `C1` City bus operator (`S1;S5`), `C2` Logistics company (`S2`), and `C3` the charge point operator running the two public hubs (`S3;S4`); the 2029 story is told through `C1`.
 >
 > **Data notice:** All figures in this repository are computed from the **synthetic** `kempower-challenge-data` pack supplied for this hackathon. None of it is real Kempower or customer data. The "2029 bus operator" story is a **fictional scenario**, not an actual customer.
 
@@ -121,7 +121,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 ### 3. Commercial CaaS Model & One-Page SLA Specification
 - **The One-Page SLA (`One_Page_SLA_Specification.md`)**:
   - **Three Commercial Tiers**: **Titanium** ($\ge 99.90\%$ SLO, $< 50\text{ ms}$ reaction, 0-touch replug), **Gold** ($\ge 99.50\%$ SLO, $< 100\text{ ms}$ reaction), and **Silver** ($\ge 99.00\%$ SLO).
-  - **Minimum Required Dwell Time (MRDT) Anti-Moral-Hazard Gate**: Protects CPOs from fraudulent delay claims by requiring:
+  - **Minimum Required Dwell Time (MRDT) Anti-Moral-Hazard Gate**: Protects the service provider from fraudulent delay claims by requiring:
     $$\text{MRDT}_j = \left( \frac{\frac{\text{SoC}_{\text{req}} - \text{SoC}_{\text{arrive}}}{100} \cdot E_{\text{batt}}}{\min(P_{\text{charger}}, P_{\text{veh}}) \cdot 0.95} \right) \cdot 60 + 15.0 \text{ min}$$
   - **150% Monthly Liability Cap**: Operators are protected by an absolute monthly payout ceiling ($\le 1.50 \times \text{Monthly Base Fee}$) and non-negative settlement invoicing.
   - **2029 Customer Story**: Features Pekka Virtanen, Fleet Operations Director at Lahti City Transit (LSL), running 24 electric articulated buses through a -18°C blizzard with zero on-site staff.
@@ -258,4 +258,4 @@ So `13 → 3` is a **mixed ledger**: `S1` and `S2` are proven end-to-end on one 
 
 ### 📋 What we added and what we assumed
 
-The brief asks for one list of everything we added and every assumption. It is in [`docs/assumptions_and_additions.md`](./docs/assumptions_and_additions.md) — 18 assumptions (`η=0.955`, taper curve, `cross_tie`, 1-min interpolation, unmodelled `F015`, S5 queueing…) and every non-dataset artefact this repository introduces.
+The brief asks for one list of everything we added and every assumption. It is in [`docs/assumptions_and_additions.md`](./docs/assumptions_and_additions.md) — 19 assumptions (`η=0.955`, taper curve, `cross_tie`, 1-min interpolation, unmodelled `F015`, S5 queueing…) and every non-dataset artefact this repository introduces.

@@ -5,9 +5,9 @@
 *Target Scoring Dimensions: Autonomy (25%) · Grid Impact (20%) · Technical Credibility (20%) · Commercial Viability (20%) · Clarity (15%)*
 
 > **Slide 1 must open with these three statements (all are hard requirements of the brief and ground rules):**
-> 1. **"We design from the CPO perspective"** — the party that owns operating cost and carries the liability. Hence our north-star metric is staff-hours and energy certainty, not kWh sold.
+> 1. **"We design from the equipment supplier's perspective"** — the brief's first actor, `the charger manufacturer that builds the equipment and often services it`. In `contracts.csv` that party holds `18` of the `29` service contracts and carries `penalty_eur_per_late_departure` on `18` of them (`150 €` at `C1`). Hence our north-star metric is staff-hours and penalties avoided, measured on the three layers that party already owns — firmware, site controller, cloud.
 > 2. **"All data shown is synthetic, supplied for this challenge; the 2029 operator is a fictional customer."**
-> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 18 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
+> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 19 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
 
 
 ---
@@ -274,7 +274,7 @@
 >
 > **Zero missed departures is reachable — but not by buying more plugs.** `324,000 EUR` of extra dispensers yields `8` missed, not `0`, because cabinet power stays at `1,080 kW`. Cabinet upsizing to `3×450 kW` reaches `0` at `1,350 kW`, over your `1,200 kW` limit. **The only zero-miss configuration that stays legal is a cross-cabinet busbar tie on the existing 12 guns (peak `1,080 kW`) — and that has no price in `equipment_costs.csv`.** Our zero-CAPEX software closes 87.8% of the energy gap (`398.5 -> 48.8 kWh`, `4 -> 3` missed) with zero human moves.
 >
-> Furthermore, we authored the **One-Page SLA Specification**. It features our Minimum Required Dwell Time (MRDT) gate, which calculates whether a truck has physically arrived with enough time to receive its energy. If a driver arrives 10 minutes before departure demanding 200 kWh, the MRDT gate protects the CPO from extortion. And our 150% monthly liability cap guarantees that the operator can never lose more than 1.5 times the monthly base fee."
+> Furthermore, we authored the **One-Page SLA Specification**. It features our Minimum Required Dwell Time (MRDT) gate, which calculates whether a truck has physically arrived with enough time to receive its energy. If a driver arrives 10 minutes before departure demanding 200 kWh, the MRDT gate protects the service provider from extortion. And our 150% monthly liability cap guarantees that the operator can never lose more than 1.5 times the monthly base fee. Today that is not hypothetical: `S1` ran `94.1 %` availability and `S5` `87.5 %` against a `97 %` contractual floor (`C1`), with `150 €` payable per undercharged departure — **`1,350 €` on the scenario day against `263 €` of daily fee**."
 
 ---
 
