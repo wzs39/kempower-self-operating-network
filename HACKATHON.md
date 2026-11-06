@@ -7,7 +7,7 @@
    ```bash
    python verify_all.py
    ```
-2. **Full Automated Test Suite (`431 pytest + 106 E2E (537 total)`, including all 29 GitHub Issue #2 items `A1–D5`)**:
+2. **Full Automated Test Suite (`433 pytest + 106 E2E (539 total)`, including all 29 GitHub Issue #2 items `A1–D5`)**:
    ```bash
    python -m pytest tests/ -q
    python -m e2e_tests.test_runner

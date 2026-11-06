@@ -13,8 +13,8 @@
 
 ---
 
-[![Pytest Tests](https://img.shields.io/badge/pytest-431%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
-[![E2E Tests](https://img.shields.io/badge/E2E%20Runner-106%20passed%20(537%20total)-success?style=for-the-badge&logo=shield)](./e2e_tests/)
+[![Pytest Tests](https://img.shields.io/badge/pytest-433%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
+[![E2E Tests](https://img.shields.io/badge/E2E%20Runner-106%20passed%20(539%20total)-success?style=for-the-badge&logo=shield)](./e2e_tests/)
 [![Deterministic Verifier](https://img.shields.io/badge/verify__all.py-0.34s%20Deterministic%20Pass-blue?style=for-the-badge&logo=python)](./verify_all.py)
 [![Official Dataset Integrity](https://img.shields.io/badge/Official%20CSVs-45%2F45%20Strictly%20Read--Only-green?style=for-the-badge&logo=git)](./kempower-challenge/kempower-challenge-data/)
 [![Scenario Day Autonomy](https://img.shields.io/badge/Scenario%20Day%2011--13-13%20%E2%86%92%203%20(0%E2%82%AC%20software)-brightgreen?style=for-the-badge)](./src/sim/scenario_engine.py)
@@ -41,7 +41,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 |---|---|---|
 | **Two-Week Human Interventions** | **8,852 manual operations** across 100 sites (`operations_log.csv`) | **0 continuous operations** (autonomous closed-loop; physical technician visits retained strictly for hard component replacement e.g. `F016` `cleared_by=technician`) |
 | **Total Human Labor Time** | **93,412 minutes (1,556.87 hours / 2 weeks)** | **0 minutes continuous triage / midnight replugging** |
-| **Full-Time Equivalent (FTE) Baseline** | **20.76 FTE $\approx$ 21 FTE** (Finnish statutory 37.5 h/wk) | **9.95 FTE midnight replug (`5,596` events) + 10.81 FTE remote triage (`3,256` events) automated** |
+| **Full-Time Equivalent (FTE) Baseline** | **20.76 FTE $\approx$ 21 FTE** (Finnish statutory 37.5 h/wk) | **Three tiers, only the first is claimed**: **(A) 12.44 FTE / 59.95% software-addressable** (`9.95` replug `5,596` + `2.28` manual load adjust `684` + `0.16` remote reset `73` + `0.05` price change `8`) · **(B) 3.22 FTE / 15.53% customer contact** (`2,418`) deferred to self-service, **not claimed** · **(C) 5.09 FTE / 24.52% technician site visits** (`73` dispatches, `22,906 min`, `cleared_by=technician`) **physically not eliminable and explicitly retained** |
 | **Annual Continuous Labor OPEX** | **1,821,534 € / year** (@ 45 €/h in `equipment_costs.csv`) | **1,821,534 € saved annually** (1.98M € with 80 €/h tech visits) |
 | **Depot Midnight Replugging** | **5,596 events (63.22% count / 47.93% labor duration = 9.95 FTE)** | **0 human moves**: Tier 2 (`0 €` software urgency). Tier 3 (`324,000 €` 24-plug expansion @ S1) does **not** reach `0` on its own — see the corrected Tier 3 row below |
 | **Scenario Day Crisis (Friday 13.11)** | **13 missed departures** (`S1=4, S2=4, S5=5`), **29.69% S3 abandoned** | **Tier 2 (`0 €`, 0 moves): 3 missed (`10` saved: `S1: 4→3`, `S2: 4→0`, `S5: 5→0` — ⚠️ see footnote †) · Tier 3 (`324k €` @ S1): 0 missed only with an unpriced cross-cabinet busbar tie; plugs alone = 8 missed** |
@@ -132,9 +132,9 @@ All architecture decisions and financial models in Project Sentinel are derived 
 
 | Criteria | Weight | Sentinel Technical Deliverable & Empirical Proof |
 |---|---|---|
-| **Degree of Autonomy** | **25%** | • **Scenario Day 3-Tier Autonomy**: Official `13` missed $\to$ **Tier 2 (`0 €` software, 0 moves): `3` missed (`10` saved; S1 `398.5 -> 48.8 kWh`, `-87.8%`)** $\to$ **Tier 3 (`324,000 €` S1 dual-gun expansion **+ unpriced cross-cabinet busbar tie**): `0` missed (`0.0 kWh` deficit) — plugs alone give `8`, worse)**.<br>• **199-minute lead-time thermal PdM** (`59.3°C / 702 rpm`, threshold + slope extrapolation).<br>• **Millisecond-scale BBM relay sequencing** (`< 10 ms` software decision, `85 ms` physical break-before-make) and 72-hour offline edge islanding.<br>• **20.76 FTE continuous human operations (`9.95 FTE` midnight replugs + `10.81 FTE` triage) eliminated**, while explicitly retaining scheduled physical technician replacement (`cleared_by = technician`). |
+| **Degree of Autonomy** | **25%** | • **Scenario Day 3-Tier Autonomy**: Official `13` missed $\to$ **Tier 2 (`0 €` software, 0 moves): `3` missed (`10` saved; S1 `398.5 -> 48.8 kWh`, `-87.8%`)** $\to$ **Tier 3 (`324,000 €` S1 dual-gun expansion **+ unpriced cross-cabinet busbar tie**): `0` missed (`0.0 kWh` deficit) — plugs alone give `8`, worse)**.<br>• **199-minute lead-time thermal PdM** (`59.3°C / 702 rpm`, threshold + slope extrapolation).<br>• **Millisecond-scale BBM relay sequencing** (`< 10 ms` software decision, `85 ms` physical break-before-make) and 72-hour offline edge islanding.<br>• **12.44 FTE of 20.76 FTE labor is software-addressable and eliminated** (`9.95` replug + `2.50` load/price/reset); the remaining **5.09 FTE technician visits** (`73` dispatches, `cleared_by = technician`) and **3.22 FTE customer contact** are **not** claimed. |
 | **Energy & Grid Impact** | **20%** | • **0 official `grid_kw` overlimit violations across 134,400 rows** (`9,644` rows under `delivered_kw / 0.955` AC basis reconciled; see [`docs/energy_impact.md`](./docs/energy_impact.md)).<br>• **95-Site Network Evidence (`network_kpis.csv`)**: addresses `2,096.1 hours` of `hours_demand_above_grid_limit` across `72` sites where `peak_grid_kw == grid_limit_kw`.<br>• **Use of Available Energy**: S1 gun-hour utilization `45.38% -> 47.50%` (`+2.12 pp`), cabinet-hour `68.03% -> 71.21%` (`+3.18 pp`).<br>• **799.30 €/MWh price spike arbitrage** with continuous SoC slack; BESS/PV cost interface defined via `equipment_costs.csv` *(interface defined, not field-validated)*. |
-| **Technical Credibility** | **20%** | • **OCPP 2.0.1 Smart Charging** & **ISO 15118 PnC TLS 1.3** (`< 10 ms` ECDSA PKI).<br>• **Anti-phantom replug defense** and **offline discrete-event simulator** (`src/sim/discrete_sim.py`).<br>• Strict 1:N cabinet-to-dispenser physical wiring (`cross_tie=False`) & 6-step BBM zero-arc sequencing.<br>• **431 pytest + 106 E2E (537 total)** automated tests with 100% pass rate. |
+| **Technical Credibility** | **20%** | • **OCPP 2.0.1 Smart Charging** & **ISO 15118 PnC TLS 1.3** (`< 10 ms` ECDSA PKI).<br>• **Anti-phantom replug defense** and **offline discrete-event simulator** (`src/sim/discrete_sim.py`).<br>• Strict 1:N cabinet-to-dispenser physical wiring (`cross_tie=False`) & 6-step BBM zero-arc sequencing.<br>• **433 pytest + 106 E2E (539 total)** automated tests with 100% pass rate. |
 | **Commercial Viability** | **20%** | • **20.76 FTE continuous ops elimination saves 1,821,534 €/year** across 100 sites (`24,336 €/yr` at S1).<br>• Honest CAPEX: Tier 2 (`0 €` CAPEX, `-87.8%` S1 deficit) vs Tier 3 (`324,000 €`, `13.31-yr` standalone payback) — **and the finding that `324,000 €` of extra dispensers makes S1 worse (`8` missed), while the only zero-miss path inside the `1,200 kW` grid limit is an unpriced busbar tie.**<br>• **One-Page SLA** with Titanium/Gold/Silver tiers and MRDT anti-fraud gate.<br>• **150% monthly liability cap** and guaranteed non-negative settlement invoicing. |
 | **Clarity** | **15%** | • **Interactive 4-View Streamlit Cockpit (`app.py`)** with live minute playback.<br>• **10-Minute Championship Pitch Deck (`PITCH_DECK_OUTLINE.md`)** with jury defense.<br>• Sub-second deterministic verifier (`verify_all.py` in **0.34s**) & dedicated [`docs/energy_impact.md`](./docs/energy_impact.md).<br>• Compelling 2029 customer story anchored in Lahti City Transit. |
 
@@ -155,19 +155,19 @@ python verify_all.py
 ```
 *(Executes in ~0.34 seconds with 100% PASS)*
 
-### 3. Run the Full Pytest Suite (`431 pytest + 106 E2E (537 total)`)
+### 3. Run the Full Pytest Suite (`433 pytest + 106 E2E (539 total)`)
 Executes all unit, integration, protocol, and mathematical verification tests:
 ```bash
 python -m pytest tests/ -q
 ```
-*(431 passed in ~42 seconds)*
+*(433 passed in ~42 seconds)*
 
 ### 4. Run the Independent Opaque-Box E2E Test Suite (106 Tests)
 Runs 106 independent tests across Tiers 1–4 (Feature coverage, boundaries, stress, scenarios):
 ```bash
 python -m e2e_tests.test_runner
 ```
-*(106/106 passed in ~0.65 seconds — unified total: `431 pytest + 106 E2E (537 total)`)*
+*(106/106 passed in ~0.65 seconds — unified total: `433 pytest + 106 E2E (539 total)`)*
 
 ### 5. Launch the Streamlit 4-View Command Center
 Launches the interactive executive and engineering live cockpit:
@@ -216,7 +216,7 @@ hackson/
 ├── docs/
 │   ├── attribution_matrix.md                 # 16-cell S1/S2/S5 same-engine causal attribution matrix
 │   └── energy_impact.md                      # Station-by-station energy, grid & utilization ledger
-├── tests/                                    # 431 Pytest Unit & Integration Tests (537 total with E2E)
+├── tests/                                    # 433 Pytest Unit & Integration Tests (539 total with E2E)
 │   ├── test_commercial_settlement.py         # Commercial settlement, MRDT & sensitivity tests
 │   ├── test_protocols_ocpp_iso.py            # OCPP 2.0.1 & ISO 15118 PnC tests
 │   ├── test_anti_fraud_replug.py             # Anti-phantom replug & fraud tests
@@ -244,16 +244,18 @@ hackson/
 
 ---
 
-### † Baseline provenance for S2 / S5 (read this before quoting the numbers)
+### † Baseline provenance for S1 / S2 / S5 (read this before quoting the numbers)
 
-Only **S1** is same-engine calibrated: our discrete-event engine, run on the 12 physical CCS2 guns with FCFS, reproduces the official `departures_baseline.csv` **vehicle-for-vehicle** (`B04, B09, B18, B20`, `398.5 kWh`, peak `1,080 kW`). The `4 → 3` claim is therefore a **controlled A/B on one engine**.
-
-**S2 and S5 are not calibrated in this way**, and we do not pretend otherwise:
+**S1 and S2 are same-engine calibrated**: our discrete-event engine, run with `fcfs` on the physical topology, reproduces the official `departures_baseline.csv` vehicle-for-vehicle. S2 only reproduces once the DSO curtailment `G1` (`16:00–19:00`, `400 kW`, `grid_events.csv`) is passed into the engine as `grid_curtailment` — that constraint was missing from earlier versions of this repo, which is why an older revision reported S2 as uncalibrated. **S5 is only partially calibrated**, and we do not pretend otherwise.
 
 | Station | Official record (`departures_baseline.csv`) | Our engine, FCFS (same engine) | Our engine, urgency | What the gain really is |
 |---|---|---|---|---|
-| S1 | 4 missed / 398.5 kWh | **4 missed / 398.5 kWh** (exact match) | 3 missed / 48.8 kWh | **Scheduling** (−87.8% deficit, B20 rescued) |
-| S2 | 4 missed / 283.50 kWh | 1 missed / 24.0 kWh (T02) | 0 missed | **Scheduling** on our model (1 → 0); the `4` is the official record, not our baseline |
-| S5 | 5 missed / 508.95 kWh | 0 missed at 900 kW; 1 missed / 21.5 kWh at 600 kW | 0 missed | **Configuration fix** (`600 → 900 kW`), not scheduling |
+| S1 | 4 missed / 398.5 kWh | **4 missed / 398.5 kWh** (exact, `B04/B09/B18/B20`) | 3 missed / 48.8 kWh | **Scheduling** (−87.8% deficit, B20 rescued) |
+| S2 | 4 missed / 283.50 kWh | **4 missed / 278.9 kWh** (`T01 44.8 / T02 109.7 / T03 51.4 / T04 73.0`; −1.6% vs record) | **0 missed / 0.0 kWh** | **Scheduling under the G1 cap** — preempts `T05–T08` |
+| S5 | 5 missed / 508.95 kWh | 1 missed / 365.4 kWh (`B35`) on the 600 kW misconfiguration | **0 missed / 0.0 kWh** at 900 kW | **Configuration fix** (`600 → 900 kW`, `D5-7` 50→150 kW, `D5-8` re-activated). The engine reproduces **1 of the 5** official failures; the other 4 come from plug-queueing effects we do not model, so S5 is **not** a same-engine A/B |
 
-So when we say "`10` saved", `S1`'s one vehicle is proven end-to-end; `S2` and `S5` are the official record minus our optimized result, and their engines under-reproduce the official baseline. We treat this as an open item, not as a result.
+So `13 → 3` is a **mixed ledger**: `S1` and `S2` are proven end-to-end on one engine; `S5` is partly official-record minus our result. We state which is which rather than averaging them.
+
+### 📋 What we added and what we assumed
+
+The brief asks for one list of everything we added and every assumption. It is in [`docs/assumptions_and_additions.md`](./docs/assumptions_and_additions.md) — 18 assumptions (`η=0.955`, taper curve, `cross_tie`, 1-min interpolation, unmodelled `F015`, S5 queueing…) and every non-dataset artefact this repository introduces.

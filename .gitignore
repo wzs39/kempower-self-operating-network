@@ -29,9 +29,23 @@ venv/
 
 # Temporary / Scratch
 .system_generated/
+scratch/
 *.tmp
 update_report.py
 csv_details.json
+
+# Internal review notes (working documents, deliberately not part of the submission)
+漏洞审查*.md
+
+# Third-party material that must not be redistributed from a public repo
+# (organiser kickoff deck, workshop recordings, the organiser's mentoring
+#  spreadsheet, the challenge zip, and unsourced screenshots). Files stay on
+# the local disk; they are simply not tracked.
+Kempower_LahtiES_hackathon_kickoff_*.pptx
+Kempower_video*.mp4
+kempower-challenge.zip
+Energy_Hackathon_2026_mentoring.xlsx
+*.jpg
 
 # OS / Editor
 .DS_Store

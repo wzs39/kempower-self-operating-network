@@ -412,7 +412,7 @@ class TestAppLaunchStressAdversarial(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, f"app.py failed: {result.stderr}")
         self.assertIn(
-            "Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8",
+            "Dashboard payload verified: 13 -> 3 (0 EUR software) | S1 4->3 same-engine, S2 4->0 same-engine under G1 400 kW, S5 5->0 config fix | zero-miss needs an unpriced cross-cabinet busbar; +12 plugs = 8 missed, worse",
             result.stdout,
         )
 
@@ -437,7 +437,7 @@ class TestAppLaunchStressAdversarial(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, f"app.py failed with env {extra_env}: {result.stderr}")
             self.assertIn(
-                "Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8",
+                "Dashboard payload verified: 13 -> 3 (0 EUR software) | S1 4->3 same-engine, S2 4->0 same-engine under G1 400 kW, S5 5->0 config fix | zero-miss needs an unpriced cross-cabinet busbar; +12 plugs = 8 missed, worse",
                 result.stdout,
             )
 

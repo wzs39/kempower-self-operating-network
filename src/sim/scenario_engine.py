@@ -153,8 +153,11 @@ class ScenarioEngine:
 
         return {
             "site_id": "S2",
-            "baseline_missed_departures": 4,
+            "baseline_missed_departures": sim_s2_baseline["missed_departures"],
             "baseline_deficit_kwh": s2_deficit_kwh,  # 283.50 kWh
+            "baseline_sim_deficit_kwh": sim_s2_baseline["deficit_kwh"],
+            "baseline_undercharged_vehicles": sorted(v for v, _ in sim_s2_baseline["undercharged_vehicles"]),
+            "optimized_undercharged_vehicles": sorted(v for v, _ in sim_s2["undercharged_vehicles"]),
             "truck_deficits_kwh": {r["vehicle_id"]: r["deficit_kwh"] for r in s2_records},
             "true_grid_headroom_1420_1600_kwh": 33.3,
             "overnight_trucks_t05_t08_afternoon_kwh": round(t05_t08_kwh, 2),
@@ -255,12 +258,16 @@ class ScenarioEngine:
           03:30-06:00, eliminating the 508.95 kWh deficit across all 5 missed buses (B27, B28, B33, B34, B35).
         """
         reconcile = CommissioningAutoCalibrator.reconcile_s5_three_way()
-        sim_s5_baseline = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="fcfs", cross_tie=False)
-        sim_s5 = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-12", strategy="urgency", cross_tie=False)
+        sim_s5_baseline = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="fcfs", cross_tie=False)
+        sim_s5 = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="urgency", cross_tie=False)
         return {
             "site_id": "S5",
             "baseline_missed_departures": 5,
+            "baseline_sim_missed_departures": sim_s5_baseline["missed_departures"],
             "baseline_deficit_kwh": reconcile["s5_total_deficit_kwh"],  # 508.95 kWh
+            "baseline_sim_deficit_kwh": sim_s5_baseline["deficit_kwh"],
+            "baseline_undercharged_vehicles": sorted(v for v, _ in sim_s5_baseline["undercharged_vehicles"]),
+            "optimized_undercharged_vehicles": sorted(v for v, _ in sim_s5["undercharged_vehicles"]),
             "three_way_reconciliation": reconcile,
             "baseline_discrete_sim": sim_s5_baseline,
             "discrete_sim": sim_s5,
