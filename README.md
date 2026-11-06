@@ -7,6 +7,10 @@
 >
 > **Data notice:** All figures in this repository are computed from the **synthetic** `kempower-challenge-data` pack supplied for this hackathon. None of it is real Kempower or customer data. The "2029 bus operator" story is a **fictional scenario**, not an actual customer.
 
+> ### The one number worth remembering
+> Of **95** network sites, **zero** ever exceeded their grid limit in 14 days — yet **72** peaked at **exactly** the limit, and **71** of those logged demand above it for **2,096.1 hours** in total.
+> Demand went over; delivery stopped on the integer. That is not how electricity behaves — **that is how a controller behaves, and today that controller is a person** (`14,600 min` of manual load adjustment, `3.25 FTE`). We automate those `2,096.1` hours.
+
 ---
 
 [![Pytest Tests](https://img.shields.io/badge/pytest-431%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
