@@ -159,6 +159,7 @@ def load_fleet_jobs(
     site_id: str,
     date: str,
     night_only: bool = False,
+    depart_date: Optional[str] = None,
 ) -> List[Job]:
     """
     Loads vehicle charging jobs from official fleet_schedule.csv and vehicles.csv.
@@ -178,14 +179,19 @@ def load_fleet_jobs(
             if row["site_id"].strip() != site_id:
                 continue
             arr_str = row["arrive_ts"].strip()
-            if not arr_str.startswith(date):
-                continue
-
-            arr = datetime.fromisoformat(arr_str)
-            if night_only and arr.hour < 19:
-                continue
-
             dep_str = row.get("depart_ts", "").strip()
+
+            if night_only and depart_date:
+                if not dep_str.startswith(depart_date):
+                    continue
+                arr = datetime.fromisoformat(arr_str)
+            else:
+                if not arr_str.startswith(date):
+                    continue
+                arr = datetime.fromisoformat(arr_str)
+                if night_only and arr.hour < 19:
+                    continue
+
             if dep_str:
                 dep = datetime.fromisoformat(dep_str)
             else:
@@ -382,7 +388,7 @@ def run_discrete_event_simulation(
         if delivered[j.vehicle_id] < j.need_kwh - 1.0
     ]
     never = [j.vehicle_id for j in jobs if delivered[j.vehicle_id] < 1.0]
-    total_deficit = sum(d for _, d in under)
+    total_deficit = round(sum(d for _, d in under), 1)
 
     vehicle_records = [
         {
@@ -422,26 +428,27 @@ def simulate_closed_loop_minute_by_minute(
     site_id: str,
     date: str = "2026-11-13",
     strategy: str = "urgency",
-    cross_tie: bool = True,
+    cross_tie: bool = False,
 ) -> Dict[str, Any]:
     """
     Standard interface contract: executes dynamic closed-loop minute-by-minute
     simulation for any station on Scenario Day, replacing hardcoded literals.
     """
     if site_id == "S1":
-        # S1 Bus Depot: 3x360 kW cabinets, 24 connection points (dual-gun)
-        # Night arrivals on 2026-11-12 departing 2026-11-13 morning
-        jobs = load_fleet_jobs("S1", "2026-11-12", night_only=True)
+        # S1 Bus Depot: 3x360 kW cabinets, 12 connection points
+        # chargers.csv: D1-1..D1-12, one CCS2 each, 150 kW, 1:1 bound to one cabinet.
+        # Strict 1:N intra-cabinet wiring => no cross-cabinet tie (no busbar between cabinets).
+        jobs = load_fleet_jobs("S1", "2026-11-13", night_only=True, depart_date="2026-11-13")
         fault_ts = datetime.fromisoformat("2026-11-13T02:25:00+02:00")
         res = run_discrete_event_simulation(
             jobs=jobs,
             site_id="S1",
             date=date,
             cabinet_kw=[360.0, 360.0, 360.0],
-            points_per_cabinet=8,  # 3 * 8 = 24 points
+            points_per_cabinet=4,  # 3 * 4 = 12 points == 12 CCS2 guns
             strategy=strategy,
             fault=(fault_ts, [2]),  # C1-3 trips at 02:25
-            cross_tie=cross_tie,
+            cross_tie=False,
             gun_kw=150.0,
         )
         return res.to_dict()

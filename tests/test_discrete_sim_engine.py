@@ -65,18 +65,23 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertAlmostEqual(alloc["V2"], 20.0, places=2)
 
     def test_s1_closed_loop_discrete_sim(self):
-        """Verifies S1 discrete simulation dynamically yields 0 missed departures on Scenario Day."""
-        sim = simulate_closed_loop_minute_by_minute(site_id="S1", date="2026-11-13", strategy="urgency", cross_tie=True)
+        """Verifies S1 discrete simulation on 12 physical guns reproduces 4 baseline (398.5 kWh) and 3 optimized (48.8 kWh)."""
+        sim_base = simulate_closed_loop_minute_by_minute(site_id="S1", date="2026-11-13", strategy="fcfs", cross_tie=False)
+        self.assertEqual(sim_base["missed_departures"], 4)
+        self.assertEqual(sim_base["deficit_kwh"], 398.5)
+        self.assertEqual(sim_base["peak_kw"], 1080.0)
+
+        sim = simulate_closed_loop_minute_by_minute(site_id="S1", date="2026-11-13", strategy="urgency", cross_tie=False)
         self.assertEqual(sim["site_id"], "S1")
-        self.assertEqual(sim["missed_departures"], 0)
-        self.assertEqual(sim["deficit_kwh"], 0.0)
+        self.assertEqual(sim["missed_departures"], 3)
+        self.assertEqual(sim["deficit_kwh"], 48.8)
         self.assertEqual(sim["moves"], 0)
         self.assertGreater(sim["total_kwh"], 7000.0)
-        self.assertLessEqual(sim["peak_kw"], 1080.0)
+        self.assertEqual(sim["peak_kw"], 1080.0)
 
     def test_s2_closed_loop_discrete_sim(self):
         """Verifies S2 discrete simulation dynamically yields 0 missed departures for all 8 afternoon trucks."""
-        sim = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="urgency", cross_tie=True)
+        sim = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="urgency", cross_tie=False)
         self.assertEqual(sim["site_id"], "S2")
         self.assertEqual(sim["missed_departures"], 0)
         self.assertEqual(sim["deficit_kwh"], 0.0)
@@ -85,7 +90,7 @@ class TestDiscreteSimEngine(unittest.TestCase):
 
     def test_s5_closed_loop_discrete_sim(self):
         """Verifies S5 discrete simulation dynamically yields 0 missed departures under reconciled 900 kW grid limit."""
-        sim = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="urgency", cross_tie=True)
+        sim = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="urgency", cross_tie=False)
         self.assertEqual(sim["site_id"], "S5")
         self.assertEqual(sim["missed_departures"], 0)
         self.assertEqual(sim["deficit_kwh"], 0.0)
@@ -93,13 +98,19 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertLessEqual(sim["peak_kw"], 900.0)
 
     def test_scenario_engine_closed_loop_integration(self):
-        """Verifies that ScenarioEngine aggregates dynamic discrete simulations to 13 -> 0 missed departures."""
+        """Verifies that ScenarioEngine aggregates dynamic discrete simulations across three tiers (13 -> 3 -> 0)."""
         loader = KempowerDataLoader()
         engine = ScenarioEngine(loader)
         res = engine.run_all_scenarios()
         self.assertEqual(res["scenario_day_missed_before"], 13)
-        self.assertEqual(res["scenario_day_missed_after"], 0)
-        self.assertEqual(res["S1"]["optimized_missed_departures"], 0)
+        self.assertEqual(res["scenario_day_missed_after"], 3)
+        self.assertEqual(res["scenario_day_missed_after_expansion"], 0)
+        self.assertEqual(res["S1"]["baseline_missed_departures"], 4)
+        self.assertEqual(res["S1"]["baseline_deficit_kwh"], 398.5)
+        self.assertEqual(res["S1"]["baseline_undercharged_vehicles"], ["B04", "B09", "B18", "B20"])
+        self.assertEqual(res["S1"]["optimized_missed_departures"], 3)
+        self.assertEqual(res["S1"]["optimized_deficit_kwh"], 48.8)
+        self.assertEqual(res["S1"]["capacity_expansion_missed_departures"], 0)
         self.assertEqual(res["S2"]["optimized_missed_departures"], 0)
         self.assertEqual(res["S5"]["optimized_missed_departures"], 0)
 
@@ -118,7 +129,8 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertIn("labor", payload)
         self.assertIn("equip", payload)
         self.assertIn("peak_vs_energy", payload)
-        self.assertEqual(payload["scenarios"]["scenario_day_missed_after"], 0)
+        self.assertEqual(payload["scenarios"]["scenario_day_missed_after"], 3)
+        self.assertEqual(payload["scenarios"]["scenario_day_missed_after_expansion"], 0)
 
 if __name__ == "__main__":
     unittest.main()

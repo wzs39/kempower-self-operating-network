@@ -930,9 +930,12 @@ class TestTier5ScenarioEngineMasterRollup(unittest.TestCase):
         s1 = self.engine.run_s1_scenario()
         self.assertEqual(s1["site_id"], "S1")
         self.assertEqual(s1["baseline_missed_departures"], 4)
-        self.assertEqual(s1["baseline_deficit_kwh"], 1012.00)
-        self.assertEqual(s1["optimized_missed_departures"], 0)
-        self.assertEqual(s1["optimized_deficit_kwh"], 0.0)
+        self.assertEqual(s1["baseline_deficit_kwh"], 398.5)
+        self.assertEqual(s1["baseline_official_deficit_kwh"], 1012.00)
+        self.assertEqual(s1["baseline_undercharged_vehicles"], ["B04", "B09", "B18", "B20"])
+        self.assertEqual(s1["optimized_missed_departures"], 3)
+        self.assertEqual(s1["optimized_deficit_kwh"], 48.8)
+        self.assertEqual(s1["capacity_expansion_missed_departures"], 0)
         self.assertEqual(s1["n1_post_fault_audit"]["post_fault_n1_capacity_kw"], 720.0)
 
     def test_s2_scenario_detailed_structure(self):
@@ -968,10 +971,11 @@ class TestTier5ScenarioEngineMasterRollup(unittest.TestCase):
         self.assertEqual(s5["optimized_deficit_kwh"], 0.0)
 
     def test_run_all_scenarios_deterministic_roll_up(self):
-        """Probe: run_all_scenarios master roll-up verifies 13 -> 0 scenario day missed departures."""
+        """Probe: run_all_scenarios master roll-up verifies 13 -> 3 (zero-CAPEX) -> 0 (expansion) scenario day missed departures."""
         res = self.engine.run_all_scenarios()
         self.assertEqual(res["scenario_day_missed_before"], 13)
-        self.assertEqual(res["scenario_day_missed_after"], 0)
+        self.assertEqual(res["scenario_day_missed_after"], 3)
+        self.assertEqual(res["scenario_day_missed_after_expansion"], 0)
         self.assertTrue(res["network_zero_over_limit"])
 
 

@@ -24,13 +24,14 @@ From the official 45 CSV dataset (`kempower-challenge-data/`, 240,635 rows):
 
 ## 2. Sentinel Solution Architecture
 
-1. **Dual-Strategy S1 Replug Resolution (`A1, B2, B6, D5`)**:
-   - **Strategy A (0 € CAPEX Immediate Software-Coordinated Single `01:30` Batch Swap)**: Consolidates chaotic midnight replugging into a single scheduled batch swap at `01:30` with 12 existing single-gun posts, delivering `+1,012.00 kWh` and eliminating all 4 missed departures at **0 € CAPEX**.
-   - **Strategy B (2029 Hardware Expansion)**: Adds 12 dispensers (`18,000 €` dispenser + `9,000 €` civil works = `27,000 €/gun`, total `324,000 €` CAPEX per `equipment_costs.csv`, `13.31-year` standalone payback vs S1's `24,336 €/yr` replug labor).
+1. **Three-Tier S1 Replug Resolution (`A1, B2, B6, D5`)**:
+   - **Tier 2 (`0 €` CAPEX Software Urgency, 0 human moves)**: Urgency-weighted MILP scheduling (`strategy="urgency"`) on the 12 existing single-gun posts (`cross_tie=False`) reduces S1 missed departures from `4` (`B04, B09, B18, B20`) to **`3` (`B04, B09, B18` — `B20` saved)** and cuts the same-engine deficit from **`398.5 kWh` to `48.8 kWh` (`-87.8%`)** (`1,012.00 kWh` official 0-session baseline gap).
+   - **Tier 3 (`324,000 €` 2029 Hardware Dual-Gun Expansion, 0 human moves)**: Adds 12 dispensers (`18,000 €` dispenser + `9,000 €` civil works = `27,000 €/gun`, total `324,000 €` CAPEX per `equipment_costs.csv`, `13.31-year` standalone payback vs S1's `24,336 €/yr` replug labor) to provide 24 simultaneous plug points. **Critical caveat: 24 plug points alone make S1 worse — `8` missed departures (`1,040.1 kWh`), not `0` — because cabinet power stays `1,080 kW` and each gun drops from `90 kW` to `45 kW`.** Reaching `0` additionally requires a cross-cabinet busbar tie, which is absent from `chargers.csv` and unpriced in `equipment_costs.csv`. Cabinet upsizing is not an alternative either: `3×450 kW` hits `0` but peaks at `1,350 kW`, above the `1,200 kW` grid limit. **So `324,000 €` is the price of plug points, not the price of zero.**
+   - *(Note: Counterfactual Track A2 `01:30` batch swap requires 11–12 manual human moves, violating Rule 3 zero-touch autonomy; it is retained only as a counterfactual stress test.)*
 2. **Deterministic Edge FSM, Intra-Cabinet DPR & Self-Healing (`A2–A8, B8, C6`)**:
    - Enforces strict 1:N cabinet-to-dispenser physical wiring (`C1-1 -> D1-1..D1-4`, `C1-2 -> D1-5..D1-8`, `C1-3 -> D1-9..D1-12`).
-   - Early fan degradation detection (`199 min` before `F015`) and safe `720 kW` N-1 post-fault dispatch on `C1-1/C1-2` with `0 kW` self-harm while dispatching technician for `F016`.
-   - Autonomous offline islanding at S3 (`1,425 kW DC` / `1,492.15 kW AC <= 1,500 kW`, abandonment `< 0.5%`) and 3-way digital-twin reconciliation at S5 (`600 -> 900 kW`, unlocking `+750 kWh > 508.95 kWh` deficit).
+   - Early fan degradation detection (`199 min` before `F015`) and safe `720 kW` N-1 post-fault dispatch on `C1-1/C1-2` with `0 kW` self-harm while dispatching technician for `F016` (`cleared_by = technician`).
+   - Autonomous offline islanding at S3 (`1,425 kW DC` / `1,492.15 kW AC <= 1,500 kW`, abandonment `< 0.5%`) and 3-way config reconciler at S5 (`600 -> 900 kW`, unlocking `+750 kWh > 508.95 kWh` deficit).
 3. **HiGHS MILP Optimizer (`C1–C5`)**:
    - $10^{-3}$ spot price dimensional scaling factor (€/MWh $\to$ €/kWh), full monthly peak demand rate (`6.50 / 7.50 €/kW/mo`), AC inverter guard ($\eta = 0.955$), and continuous SoC deficit slack (`z_v in [0, 1]`, weight `10,000 €`) preventing false vehicle abandonment at `799.30 €/MWh`.
 4. **Commercial CaaS Model & One-Page SLA**:

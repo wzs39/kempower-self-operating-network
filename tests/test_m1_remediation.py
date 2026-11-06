@@ -132,25 +132,26 @@ class TestM1RemediationSuite(unittest.TestCase):
     # 6. F03 (P0-2): Closed-Loop Discrete Simulation Engine Integration
     # ------------------------------------------------------------------------
     def test_f03_discrete_sim_yields_zero_missed_departures(self):
-        """Minute-by-minute simulation eliminates missed departures dynamically across S1, S2, S5."""
+        """Minute-by-minute simulation verifies physical 12-gun S1 (3 missed, 48.8 kWh) and S2/S5 (0 missed)."""
         s1 = simulate_closed_loop_minute_by_minute("S1")
         s2 = simulate_closed_loop_minute_by_minute("S2")
         s5 = simulate_closed_loop_minute_by_minute("S5")
 
-        self.assertEqual(s1["missed_departures"], 0)
+        self.assertEqual(s1["missed_departures"], 3)
         self.assertEqual(s2["missed_departures"], 0)
         self.assertEqual(s5["missed_departures"], 0)
 
-        self.assertEqual(s1["deficit_kwh"], 0.0)
+        self.assertEqual(s1["deficit_kwh"], 48.8)
         self.assertEqual(s2["deficit_kwh"], 0.0)
         self.assertEqual(s5["deficit_kwh"], 0.0)
 
     def test_f03_scenario_engine_closed_loop_verification(self):
-        """ScenarioEngine executes dynamic discrete simulation and reports 13 -> 0 missed departures."""
+        """ScenarioEngine executes dynamic discrete simulation across three tiers (13 -> 3 -> 0)."""
         engine = ScenarioEngine(KempowerDataLoader())
         res = engine.run_all_scenarios()
         self.assertEqual(res["scenario_day_missed_before"], 13)
-        self.assertEqual(res["scenario_day_missed_after"], 0)
+        self.assertEqual(res["scenario_day_missed_after"], 3)
+        self.assertEqual(res["scenario_day_missed_after_expansion"], 0)
 
     # ------------------------------------------------------------------------
     # 7. F04 (P0-3): Predictive Thermal Calibration & False Alarm Elimination

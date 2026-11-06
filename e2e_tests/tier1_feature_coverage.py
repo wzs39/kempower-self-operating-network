@@ -253,7 +253,7 @@ class TestTier1FeatureCoverage(unittest.TestCase):
             self.assertTrue(res["safe"])
 
     # --------------------------------------------------------------------------
-    # F07: S5 Digital Twin Auto-Calibration
+    # F07: S5 Three-Way Config Reconciler Auto-Calibration
     # --------------------------------------------------------------------------
     def test_f07_01_d5_7_throttle_in_site_config(self):
         """site_config.csv contains 50 kW throttling anomaly for D5-7."""
@@ -272,14 +272,14 @@ class TestTier1FeatureCoverage(unittest.TestCase):
         self.assertEqual(str(d5_8["configured_value"].iloc[0]).lower(), "false")
 
     def test_f07_03_digital_twin_override_d5_7(self):
-        """Digital twin auto-calibrates D5-7 up to 150 kW hardware rating."""
+        """Three-way config reconciler auto-calibrates D5-7 up to 150 kW hardware rating."""
         hardware_rating = 150.0
         misconfigured = 50.0
         corrected = max(misconfigured, hardware_rating)
         self.assertEqual(corrected, 150.0)
 
     def test_f07_04_digital_twin_healing_d5_8(self):
-        """Digital twin activates eSIM connectivity for D5-8."""
+        """Three-way config reconciler activates eSIM connectivity for D5-8."""
         sim_state = False
         remediated_sim_state = True
         self.assertTrue(remediated_sim_state)

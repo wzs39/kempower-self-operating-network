@@ -41,10 +41,13 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         failed_buses = set(s1_fails["vehicle_id"])
         self.assertEqual(failed_buses, {"B09", "B18", "B20", "B04"})
 
-        # In Sentinel mode with 24 plugs and early thermal PdM, 0 buses fail
+        # In Sentinel mode on 12 guns (0 CAPEX) 3 buses fail (48.8 kWh); with 24 plugs 0 buses fail
         s1_res = ScenarioEngine().run_s1_scenario()
         self.assertEqual(s1_res["baseline_missed_departures"], 4)
-        self.assertEqual(s1_res["optimized_missed_departures"], 0)
+        self.assertEqual(s1_res["baseline_deficit_kwh"], 398.5)
+        self.assertEqual(s1_res["optimized_missed_departures"], 3)
+        self.assertEqual(s1_res["optimized_deficit_kwh"], 48.8)
+        self.assertEqual(s1_res["capacity_expansion_missed_departures"], 0)
         self.assertGreaterEqual(s1_res["thermal_anomaly_audit"]["lead_time_before_f015_minutes"], 190.0)
 
     def test_s2_4_truck_dso_curtailment_remediation(self):
@@ -154,10 +157,11 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         self.assertEqual(len(over_limit), 0)
 
     def test_closed_loop_scenario_day_master_reconciliation(self):
-        """Master runner confirms 13 baseline missed departures drop to 0 on 2026-11-13."""
+        """Master runner confirms 13 baseline missed departures drop to 3 (0 CAPEX) and 0 (324k EUR expansion) on 2026-11-13."""
         master = ScenarioEngine().run_all_scenarios()
         self.assertEqual(master["scenario_day_missed_before"], 13)
-        self.assertEqual(master["scenario_day_missed_after"], 0)
+        self.assertEqual(master["scenario_day_missed_after"], 3)
+        self.assertEqual(master["scenario_day_missed_after_expansion"], 0)
 
 if __name__ == "__main__":
     unittest.main()

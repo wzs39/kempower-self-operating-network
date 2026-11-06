@@ -3,12 +3,16 @@ Kempower Self-Operating Charging Network - Dual-Gun Satellite Multiplexing & Vir
 Module: src/core/virtual_replug.py
 
 Implements:
-1. Dual-Gun Satellite Hardware Topology (12 satellite posts x 2 = 24 CCS2 plugs at S1 depot).
-2. Three-Phase Autonomous Night Multiplexing Cycle:
+1. Three-Tier S1 Physical & Economic Reality Model (12 CCS2 guns in chargers.csv vs 24 night buses):
+   - Tier 1 (Same-Engine Baseline, 12 guns, FCFS, 0 human moves): 4 missed departures (B04, B09, B18, B20), 398.5 kWh simulated deficit.
+   - Tier 2 (Zero-CAPEX Software, 12 guns, Urgency, 0 human moves): 3 missed departures (B04, B09, B18 — B20 rescued), 48.8 kWh simulated deficit (-87.8%).
+   - Counterfactual Stress Test (Track A2, 12 guns + 01:30 batch manual swap): proves that achieving 0 missed departures on 12 guns requires 11-12 manual moves (violating Rule 3 zero-touch), hence NOT recommended and excluded from main autonomous results.
+   - Tier 3 (Hardware Dual-Gun Expansion, 24 plugs @ 324,000 € CAPEX [27,000 €/gun], 13.31-yr S1 payback): 0 missed departures, 0.0 kWh deficit, 0 human moves.
+2. Three-Phase Autonomous Night Multiplexing Cycle (under 24-plug expansion):
    - Phase 1 (22:00 - 02:00): Group A (buses 1-12) bulk fast charge to 85% SoC.
-   - Phase 2 (02:00 - 05:30): Group B (buses 13-24) bulk fast charge to 85% SoC via <500ms BBM.
+   - Phase 2 (02:00 - 05:30): Group B (buses 13-24) bulk fast charge to 85% SoC via millisecond-scale BBM relay sequencing (<500ms).
    - Phase 3 (05:30 - 06:00): Earliest Deadline First (EDF) dynamic top-off to >= 90.0% SoC.
-3. 100% physical connectivity upon arrival, eliminating 21 FTE yard jockeys (€1.365M/yr savings).
+3. Labor Attribution (operations_log.csv): 5,596 / 8,852 events (63.22% count, 47.93% time = 9.95 FTE = 872,976 €/yr @ 45 €/h) are midnight replugs; physical hardware faults (e.g. F016 cleared_by = technician) retain human technician dispatch.
 4. C-End Public Hub (S3/S4) Plug & Queue reservation and CV trickle module handover.
 """
 

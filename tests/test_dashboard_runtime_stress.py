@@ -55,7 +55,7 @@ class TestDashboardCLIDualModeStress(unittest.TestCase):
             timeout=30,
         )
         self.assertEqual(result.returncode, 0, f"app.py failed: {result.stderr}")
-        self.assertIn("Dashboard payload verified: 13 -> 0 missed departures.", result.stdout)
+        self.assertIn("Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8.", result.stdout)
 
     def test_cli_execution_under_hostile_environment_variables(self):
         """Verify python app.py survives hostile and unusual environment configurations."""
@@ -77,7 +77,7 @@ class TestDashboardCLIDualModeStress(unittest.TestCase):
                 env=env,
             )
             self.assertEqual(result.returncode, 0, f"Failed under env {env_delta}: {result.stderr}")
-            self.assertIn("Dashboard payload verified: 13 -> 0 missed departures.", result.stdout)
+            self.assertIn("Dashboard payload verified: 13 -> 3 (0 EUR software) | zero-miss needs cross-cabinet busbar (unpriced); +12 plugs = 324,000 EUR yields 8.", result.stdout)
 
 
 class TestDashboardPlaybackBoundaryStress(unittest.TestCase):

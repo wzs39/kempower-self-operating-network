@@ -15,10 +15,10 @@ The Independent End-to-End (E2E) Test Suite has been fully constructed in `e2e_t
   - **Tier 2 (Boundary & Corner)**: 40 tests (100% pass, 0.001s)
   - **Tier 3 (Cross-Feature Interactions)**: 12 tests (100% pass, 0.018s)
   - **Tier 4 (Real-World Scenarios)**: 9 tests (100% pass, 0.363s)
-  - **Total E2E Suite Execution Time**: **0.414 seconds** via `test_runner.py`.
-- **Legacy Regression Suite (`tests/`)**: **179 test cases** (100% pass, 2.04s via `pytest tests/`).
-- **Deterministic Verifier (`verify_all.py`)**: **100% pass in 0.22 seconds** (< 5.0s quality gate budget).
-- **Combined Network Verification Count**: **285 test cases + deterministic verifier** with **zero regressions**.
+  - **Total E2E Suite Execution Time**: **0.65 seconds** via `test_runner.py`.
+- **Full Pytest Suite (`tests/`)**: **431 test cases** (100% pass via `pytest tests/ -q`).
+- **Deterministic Verifier (`verify_all.py`)**: **100% pass in 0.34 seconds** (< 5.0s quality gate budget).
+- **Combined Network Verification Count**: **`431 pytest + 106 E2E (537 total)` + deterministic verifier** with **zero regressions**.
 
 ---
 
@@ -42,8 +42,8 @@ e2e_tests/
 - **F04 (Dual-Gun Satellite Multiplexing)**: 24-bus physical connection, Phase A fast charge, Phase B 02:00 switchover, balanced top-off before morning departure, zero replug guarantee.
 - **F05 (95.5% Inverter Loss Constraint)**: $1.04712 \times P_{DC}$ AC expansion, S3 1,432.5 kW DC limit, 57-module quantization (1,425 kW DC / 1,492.15 kW AC $\le$ 1,500 kW AC), overload trip prevention, >7 kW headroom margin.
 - **F06 (Predictive Thermal PdM)**: Telemetry fan RPM lookup from official data, 5-min lookahead temperature projection, early load migration before 65°C, N-1 capacity headroom (720 kW at S1), hardware safe envelope.
-- **F07 (S5 Digital Twin Auto-Calibration)**: D5-7 50 kW config anomaly detection, D5-8 inactive eSIM detection, 150 kW digital twin override, eSIM healing, commissioning step audit.
-- **F08 (799.30 €/MWh Price Peak BESS)**: Extreme price spike verification from `prices.csv` at 18:00:00, lowest price window (27.35 €/MWh), BESS 10% SoC reserve clamp, >90% arbitrage savings margin.
+- **F07 (S5 Three-Way Config Reconciler Auto-Calibration)**: D5-7 50 kW config anomaly detection, D5-8 inactive eSIM detection, 150 kW config reconciler override, eSIM healing, commissioning step audit.
+- **F08 (799.30 €/MWh Price Peak BESS Interface)**: Extreme price spike verification from `prices.csv` at 18:00:00, lowest price window (27.35 €/MWh), BESS 10% SoC reserve clamp *(interface defined, not field-validated)*.
 - **F11 (One-Page SLA Engine & Anti-Fraud)**: Exact MRDT formula verification, physical gate fraudulent claim rejection, fleet penalty itemized calculation, piecewise availability deductions, 150% monthly liability cap.
 
 ### 2.2 Tier 2: Boundary & Corner Cases (40 Tests)
@@ -61,25 +61,25 @@ e2e_tests/
 - **C02**: WAN outage islanding occurring concurrently with fan degradation.
 - **C03**: 799.30 €/MWh price spike colliding with urgent departure deadline.
 - **C04**: Plug & Queue reservation receiving released modules from CV tapering vehicle.
-- **C05**: S5 digital twin auto-calibration followed by DPR continuous intra-cabinet pooling.
+- **C05**: S5 three-way config reconciler auto-calibration followed by DPR continuous intra-cabinet pooling.
 - **C06**: S2 DSO curtailment (400 kW) solved by T05–T08 afternoon preemption.
 - **C07**: S1 thermal N-1 load shedding (180 kW) and zero-arc contactor rerouting.
-- **C08**: BESS arbitrage discharging without violating MRDT customer dwell requirements.
+- **C08**: BESS arbitrage interface discharging without violating MRDT customer dwell requirements.
 - **C09**: Contactor switching delay (<500ms) fitting within 1000ms micro-FSM tick interval.
 - **C10**: Multi-site concurrent crisis (S1 thermal, S2 curtailment, S3 WAN drop, S4 price peak, S5 misconfig).
 - **C11**: Sub-zero ambient temperature (-15°C) with full matrix load rebalancing.
 - **C12**: Rapid fleet timetable reschedule and rolling horizon MPC feasibility.
 
 ### 2.4 Tier 4: Real-World Scenarios (9 Tests)
-- **S1 (Bus Depot)**: 4 baseline missed departures eliminated (0 missed), D1-9 thermal peak detected 199 minutes in advance (22:31 @ 59.3°C).
+- **S1 (Bus Depot)**: 4 baseline missed departures (`398.5 kWh` simulated deficit) reduced to **3 missed (`48.8 kWh` deficit, `-87.8%`, `B20` saved)** under `0 €` software urgency and **0 missed (`0.0 kWh` deficit)** under `324,000 €` 24-plug dual-gun expansion; D1-9 thermal peak detected 199 minutes in advance (22:31 @ 59.3°C).
 - **S2 (Logistics Depot)**: 4 baseline starved trucks (283.50 kWh deficit) preempted from T05–T08 pool (1,857.06 kWh), resulting in 0 missed departures.
 - **S3 (Public Highway Hub)**: 256 drivers, WAN drop, baseline 29.69% abandonment compressed to <0.5% via 1,425 kW DC / 1,492.15 kW AC local DLM.
-- **S4 (Urban Hub)**: BESS shaves 799.30 €/MWh peak, F017 cable fault isolated with 0 stranded vehicles.
+- **S4 (Urban Hub)**: MILP continuous SoC slack shaves 799.30 €/MWh peak, F017 cable fault isolated with 0 stranded vehicles.
 - **S5 (Fast Depot)**: 5 baseline missed departures eliminated (0 missed) by reconciling grid limit 600 $\rightarrow$ 900 kW (+750 kWh) and correcting D5-7/8.
-- **Commercial AEaaS**: 20.76 FTE continuous operations eliminated (1.82M €/yr at 45 €/h), 9.95 replug FTE (873k €/yr), Strategy A (0 € CAPEX) vs Strategy B (324k € CAPEX, 13.31y payback).
+- **Commercial AEaaS**: 20.76 FTE continuous operations eliminated (1.82M €/yr at 45 €/h), 9.95 replug FTE (873k €/yr), Tier 2 (0 € CAPEX) vs Tier 3 (324k € CAPEX, 13.31y payback).
 - **One-Page SLA**: Verified itemized audit invoice generator with non-negative net payable and 150% monthly liability cap.
-- **Grid Safety Invariant**: 0 grid limit violations across 134,400 intervals in `network_site_power.csv`.
-- **Closed-Loop Reconciliation**: 13 baseline missed departures drop to 0 on Scenario Day 2026-11-13.
+- **Grid Safety Invariant**: 0 official `grid_kw` limit violations across 134,400 intervals in `network_site_power.csv`.
+- **Closed-Loop Reconciliation**: 13 baseline missed departures drop to **3 (`0 €` software urgency, `10` saved)** and **0 (`324,000 €` S1 dual-gun expansion)** on Scenario Day 2026-11-13.
 
 ---
 
@@ -92,8 +92,8 @@ python e2e_tests/test_runner.py
 # 2. Run via pytest
 python -m pytest e2e_tests/ -v
 
-# 3. Run legacy regression suite (179 tests)
-python -m pytest tests/ -v
+# 3. Run full pytest suite (`431 pytest + 106 E2E (537 total)`)
+python -m pytest tests/ -q
 
 # 4. Run deterministic verifier (<0.5s)
 python verify_all.py
