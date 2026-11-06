@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Assumptions (18)
+## 1. Assumptions (19)
 
 Legend for **Direction** — `optimistic` means our headline result would get *worse* if the assumption is wrong; `neutral` means it does not move the S1/S2/S5 ledger.
 
@@ -30,6 +30,7 @@ Legend for **Direction** — `optimistic` means our headline result would get *w
 | **A16** | FTE annualisation | `93,412 min / (37.5 h × 2 wk)` = **20.76 FTE**; 1,950 h/yr; `45 €/h` = `87,750 €/FTE/yr` | Finnish statutory 37.5 h/week, `equipment_costs.csv` | neutral | `src/commercial/roi_analyzer.py` |
 | **A17** | Tier-3 hardware price | `27,000 €/gun` = `18,000` dispenser + `9,000` civil → `324,000 €` for 12 guns | `equipment_costs.csv`; **the cross-cabinet busbar is not priced anywhere in the dataset**, so the only zero-miss path has no quote | neutral | `verify_all.py` |
 | **A18** | Energy price = Nord Pool spot + `tariffs.csv` grid tariff, 15-min | no taxes, no DSO variable fees, no imbalance settlement | Only these two series exist in the dataset | neutral | `docs/energy_impact.md` Table 1A |
+| **A19** | **Every undercharged departure counts as one `penalty_eur_per_late_departure` event** | `150 € × 4 (S1) + 150 € × 5 (S5)` = **`1,350 €`** vs `263 €` daily fee | `contracts.csv` `C1` gives the rate (`150 €`) and `baseline_kpis.csv` gives `departures_below_required_soc` (4 / 5), but **no file states the trigger clause** — we read "left below required SoC" as "left late" | **optimistic** — if the contract only pays on clock-time lateness, this number is an upper bound | `PITCH_DECK_OUTLINE.md` slide 7 |
 
 Not modelled, stated rather than hidden: **`F015`** (A8), **S5 queueing** (A13), **BESS** (`bess_kwh = 0` at all five sites — we do not claim storage arbitrage), **protocol conformance on real hardware** (OCPP 2.0.1 / ISO 15118 code paths are implemented and unit-tested, never field-validated), and the **`< 10 ms` / `85 ms` BBM envelope** (a design target from the DPR module spec, not a measurement).
 
