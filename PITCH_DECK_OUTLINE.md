@@ -15,43 +15,47 @@
 ## ⏱️ Executive Presentation Roadmap (10:00 Total)
 
 ```
-[00:00 - 00:45] Slide 1: The Core Question & The Sentinel Vision
+[00:00 - 00:45] Slide 1: The 2029 Cold Open & The Sentinel Vision (a 2:15 AM cabinet failure, frozen mid-crisis)
 [00:45 - 01:45] Slide 2: The Empirical Ground Truth: The 20.76 FTE Crisis
 [01:45 - 02:45] Slide 3: Two-Tier Architecture: Cloud (L3) & Edge FSM (L2) over Kempower DPR (L1)
 [02:45 - 04:00] Slide 4: Dimension 1 (25%): Degree of Autonomy & 3-Tier Scenario Day (S1 4→3 · S2 4→0 · S5 5→0 at 0€ / 0 total at 324k€ + busbar, busbar unpriced)
 [04:00 - 05:15] Slide 5: Dimension 2 (20%): Energy & Grid Impact (0 Overlimits, 72 Grid-Capped Sites, Utilization)
 [05:15 - 06:30] Slide 6: Dimension 3 (20%): Technical Credibility (OCPP 2.0.1, ISO 15118 PnC, 433 pytest + 106 E2E [539 total])
 [06:30 - 07:45] Slide 7: Dimension 4 (20%): Commercial Viability & The One-Page SLA (CaaS & MRDT Gate)
-[07:45 - 08:45] Slide 8: The 2029 Customer Story: A Sub-Zero Night with Pekka Virtanen
+[07:45 - 08:45] Slide 8: The 2029 Night, Resolved: Sentinel on the Scene (replay + resolution of Slide 1's cold open)
 [08:45 - 09:30] Slide 9: Dimension 5 (15%): Clarity & Live Interactive Command Center (Streamlit)
-[09:30 - 10:00] Slide 10: Conclusion & The Path to 2029 Commercial Deployment
+[09:30 - 10:00] Slide 10: Conclusion — That 2029 Night Runs Itself (close the loop on the cold open)
 [10:00+]         Defense: Rapid-Fire Q&A Defense Cards for Jury Technical Mentors
 ```
 
 ---
 
-## Slide 1: The Core Question & The Sentinel Vision (00:00 – 00:45)
+## Slide 1: The 2029 Cold Open & The Sentinel Vision (00:00 – 00:45)
 **Official Judging Focus: Clarity (15%) & Autonomy (25%)**
 
 ### Slide Content & Visual Layout
 - **Header**: **Project Sentinel: The Self-Operating Charging Network**
-- **Tagline**: *"If humans were no longer allowed to continuously operate and maintain a charging network, how would you redesign it?"*
+- **Tagline**: *"It is 2:15 AM in 2029. A cabinet fails. There is no one on site. Who fixes it?"*
 - **Visuals**:
-  - Left: Traditional Depot & Fleet Yard (Flashlight, chaotic cable tangles, orange error cones, sleep-deprived night staff moving buses at 02:00).
-  - Right: Sentinel Autonomous Depot (Dark depot, sub-zero snow, silent 25 kW modular power routing, green status LEDs, 100% on-time fleet dispatch).
+  - Left: **The 2029 scene, as it should NOT go** — a dark depot at 2:15 AM, a tripped cabinet blinking red, a fleet operations director being woken by a 3 AM phone call, buses at risk of a late rollout.
+  - Right: **The 2029 scene under Sentinel** — the same dark depot, the fault already isolated and re-routed by the edge controller, green status LEDs, 100% on-time dispatch.
 - **Core Thesis**: Moving from reactive hardware vending to **Outcome-Based Autonomous Energy Certainty (CaaS)**.
 
 ### Speaker Script (Verbatim)
-> "Good morning, Mats, Panu, and esteemed members of the jury.
+> "Good morning, Mats, Panu, and esteemed members of the jury. Let me start with a story — and it starts badly.
+>
+> It is 2:15 AM on a January night in 2029, somewhere in Finland. The temperature is minus eighteen. A depot full of electric buses is dark and silent — because there is no one there to watch it. And at exactly this moment, a charging cabinet overheats and trips. Twenty-four buses are supposed to roll out at 5:30 in the morning.
+>
+> The question is not *whether* this happens — the fleet has already grown to 1.7 times today's size, and the failure is exactly the kind that strikes without warning. The question is: **who fixes it, when there is no one on site?**
 >
 > The challenge Kempower put to us was radical and uncompromising:
 > *'If humans were no longer allowed to continuously operate and maintain a charging network, how would you redesign it?'*
 >
-> Today, across Europe, EV charging relies on an invisible army of humans: dispatchers tweaking kilowatt limits, call center operators rebooting stalled chargers, and night shift staff walking freezing bus yards at 2 AM just to unplug bus #12 and plug in bus #13.
+> Today, across Europe, EV charging relies on an invisible army of humans: dispatchers tweaking kilowatt limits, call center operators rebooting stalled chargers, and night shift staff walking freezing bus yards at 2 AM just to unplug bus #12 and plug in bus #13. And as the growth forecast tells us, by 2029 that army would have to be five times larger — which is precisely why it cannot survive.
 >
-> We built **Project Sentinel**. Sentinel is not another monitoring dashboard; it is a full-stack, autonomous operating core that eliminates continuous human intervention. It guarantees that every commercial vehicle leaves on time with 100% required energy, protects the power grid with zero transformer violations, and turns charging infrastructure into an unshakeable commercial SLA.
+> We built **Project Sentinel** to answer that 2:15 AM call. Sentinel is not another monitoring dashboard; it is a full-stack, autonomous operating core that eliminates continuous human intervention. It guarantees that every commercial vehicle leaves on time with 100% required energy, protects the power grid with zero transformer violations, and turns charging infrastructure into an unshakeable commercial SLA.
 >
-> Let’s look at the hard empirical data that drove our engineering."
+> I am going to show you exactly how that 2029 night plays out under Sentinel — but first, the hard empirical data that drove our engineering."
 
 ---
 
@@ -157,7 +161,9 @@
 >
 > At Highway Hub S3, a 2-hour cellular outage triggered the naive 50 kW fallback in baseline. Sentinel’s edge islanding maintained the full 1,425 kW of local DC capacity with zero cloud calls, cutting drivers who walked away from 29 to 15 in our replay. To be honest about the headline number: the official file records 76 abandonments that day (29.69%), but only 13 of them fall inside the outage window and 38 happen 15:00–18:00 with the network healthy — so the outage amplifies a capacity shortage; it is not the whole story.
 >
-> And at Depot S5, our Three-Way Config Reconciler caught a human configuration error in `site_config.csv` where a 900 kW site was throttled to 600 kW. It restored full 900 kW capacity, unlocking 750 kWh of headroom and eliminating all 5 missed buses (`5 -> 0`). One honest caveat: S5 is a configuration fix — four of the five official failures come from plug-queueing our engine does not model — so this is not a same-engine A/B, and we say so."
+> And at Depot S5, our Three-Way Config Reconciler caught a human configuration error in `site_config.csv` where a 900 kW site was throttled to 600 kW. It restored full 900 kW capacity, unlocking 750 kWh of headroom and eliminating all 5 missed buses (`5 -> 0`). One honest caveat: S5 is a configuration fix — four of the five official failures come from plug-queueing our engine does not model — so this is not a same-engine A/B, and we say so.
+>
+> Every one of these five faults is the same crisis our 2029 fleet director would otherwise face in the middle of a frozen night — the fan fault, the dropped connection, the price spike, the grid cut, the misconfiguration. That is the autonomy score."
 
 ---
 
@@ -281,31 +287,31 @@
 
 ---
 
-## Slide 8: The 2029 Customer Story: A Sub-Zero Night with Pekka Virtanen (07:45 – 08:45)
+## Slide 8: The 2029 Night, Resolved: Sentinel on the Scene (07:45 – 08:45)
 **Official Judging Focus: Clarity (15%) & Commercial Viability (20%)**
 
 ### Slide Content & Visual Layout
-- **Header**: **Customer Narrative 2029: A Sub-Zero Winter Night in Lahti**
+- **Header**: **The 2029 Night, Fully Told: 2:15 AM, and How It Ends**
 - **Character**: Pekka Virtanen — a **fictional** fleet operations director at a Finnish city-bus operator (invented for this pitch; the brief asks for a customer story, and no customer names exist in the synthetic dataset).
-- **Setting**: Friday, January 2029 · sub-zero winter night · a bus depot running 24 electric buses on 12 single-gun posts (the S1 topology from the data).
+- **Setting**: Friday, January 2029 · sub-zero winter night · a bus depot running 24 electric buses on 12 single-gun posts (the S1 topology from the data) — the very scene we opened with on Slide 1.
 - **Why 2029 matters**: `growth_forecast.csv` projects city-bus charging demand in Finland at **170% of 2026** by 2029, and truck corridors up to **5×** — the same night-shift problem, at a larger fleet.
-- **The Story Arc in 3 Beats**:
+- **The Story Arc in 3 Beats (this is the full replay of Slide 1's cold open)**:
   1. **22:00 – Hands-Free Depot Ingestion**: Driver plugs in bus with ISO 15118 PnC. Mutual TLS 1.3 handshake authenticates the vehicle in ~1.1s. Driver walks home. No night-shift crew on site.
   2. **02:15 – The Failure Nobody Planned For**: A cabinet trips in the middle of the night (the `F016` pattern from Scenario Day). With no human on site, the edge controller re-routes power across the remaining guns on its own — no cloud, no phone call, no midnight replug.
   3. **05:30 – 100% Punctual Morning Rollout**: All 24 buses roll out at target SoC. Pekka wakes at 06:00, glances at his phone, and sees a single green badge: *"All 24 routes dispatched on time. Zero interventions. Monthly SLA: 99.9%."*
 
 ### Speaker Script (Verbatim)
-> "Let's bring this to life through a customer story from January 2029 — and to be clear, Pekka is a character we invented, because the brief asks for a customer story and the dataset has no real customers.
+> "Remember the night we opened with — 2:15 AM, minus eighteen degrees, a cabinet tripping and no one on site? Let me now replay that exact night, in full, and show you how it ends under Sentinel. And to be clear, Pekka is a character we invented, because the brief asks for a customer story and the dataset has no real customers.
 >
 > Meet Pekka Virtanen, fleet operations director at a Finnish city-bus operator. In 2026, Pekka’s hardest job was hiring night shift staff willing to work in sub-zero Finnish winters at 2 AM, dragging frozen cables through slush to swap plugs.
 >
 > Fast-forward to January 2029. The fleet has grown — the growth forecast says city-bus charging demand is 1.7× today's. At 10 PM, 24 electric city buses return to the depot. Drivers simply plug in. Thanks to ISO 15118 Plug & Charge, the handshake takes about a second. The drivers go home. The yard is dark and empty.
 >
-> At 2:15 AM, a cabinet trips — exactly the kind of failure that used to wake Pekka up. But no one is woken. The edge controller detects the fault and re-routes power across the remaining guns on its own. No cloud call, no technician, no midnight replug.
+> At 2:15 AM — the moment we froze on at the start — the cabinet trips, exactly the kind of failure that used to wake Pekka up. But no one is woken. The edge controller detects the fault and re-routes power across the remaining guns on its own. No cloud call, no technician, no midnight replug. The 199-minute early warning we saw at S1 is the reason it was ready before it happened.
 >
 > At 5:30 AM, all 24 buses depart with full batteries, to the exact second.
 >
-> Pekka wakes at 6 AM, sips his morning coffee, and looks at his phone. No emergency calls, no missed runs, no disputed invoices. That is what Sentinel delivers."
+> Pekka wakes at 6 AM, sips his morning coffee, and looks at his phone. No emergency calls, no missed runs, no disputed invoices. That is the end of our 2029 story — and it is the beginning of why Sentinel matters."
 
 ---
 
@@ -340,7 +346,7 @@
 **Official Judging Focus: All 5 Scoring Dimensions**
 
 ### Slide Content & Visual Layout
-- **Header**: **Summary: Why Project Sentinel Wins the Kempower Challenge**
+- **Header**: **Summary: That 2029 Night Runs Itself — Why Project Sentinel Wins**
 - **Five-Dimension Scorecard**:
   | Judging Dimension | Weight | Project Sentinel Deliverable |
   |---|---|---|
@@ -351,10 +357,13 @@
   | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Sub-second Verifier (`0.34s`) |
 
 - **Closing Call to Action**:
-  > *"Kempower built the world's most flexible DC charging hardware. Sentinel provides the autonomous brain it deserves. Together, we make 2029 zero-touch charging an industrial reality."*
+  > *"At 2:15 AM in 2029, the cabinet fails — and nothing happens. Kempower built the world's most flexible DC charging hardware. Sentinel provides the autonomous brain it deserves. Together, we make 2029 zero-touch charging an industrial reality."*
 
 ### Speaker Script (Verbatim)
-> "In conclusion:
+> "So let me close the loop on the story we opened with.
+>
+> At 2:15 AM in 2029, the cabinet fails — but nothing bad happens. No one is woken, no bus is late, no grid limit is broken. That is the whole pitch, in one sentence: **the 2029 network runs itself.**
+>
 > Kempower already manufactures the finest modular DC fast charging hardware on earth. What the industry needed was an autonomous brain capable of running that hardware without continuous human babysitting.
 >
 > Project Sentinel delivers that brain.
@@ -363,7 +372,7 @@
 > We maintained 100% grid compliance across 134,400 intervals.
 > And we backed it all with industrial protocols, **433 pytest + 106 E2E (539 total)** automated tests, and an enforceable commercial SLA.
 >
-> Thank you, and we look forward to your questions."
+> That 2029 night is not a distant future. It is the exact moment your hardware deserves to reach — hands-free, zero-touch, and safe. Thank you, and we look forward to your questions."
 
 ---
 
