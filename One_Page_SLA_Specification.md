@@ -1,6 +1,6 @@
 # 自运行充电网络工业级单页服务协议规范与 2029 客户故事
 ## One-Page Service Level Agreement (SLA) & Operating Specification: Autonomous Energy Certainty
-*Contract Form No: KEMP-AUTO-2029-SLA-V2 · Applicable to Commercial Fleets & High-Power CPO Infrastructure*  
+*Contract Form No: KEMP-AUTO-2029-SLA-V2 · Applicable to Commercial Fleets & High-Power Charging Infrastructure*  
 *Jurisdiction: Republic of Finland / European Union Energy Law · Effective Date: January 1, 2029*
 
 ---
@@ -33,8 +33,8 @@
 
 ## 🏛️ 0. 协议导言与当事方法定身份 (Preamble & Legal Binding)
 本《自运行充电网络单页服务级别协议》（以下简称“本 SLA”）由以下双方在芬兰拉赫蒂依法订立并共同遵守：
-1. **网络自治运营方（Autonomous Operator）**：Kempower Autonomous Energy Services Oy（负责提供基于 Kempower DPR 动态功率矩阵、边缘微网网关及自主控制算法的 100% 零人工充电网络托管运营服务）；
-2. **签约客户（Contracted Client）**：商用电动公交车队（如拉赫蒂公交 LSL）、干线重卡物流运营商或商业充电场站业主（统称“客户”）。
+1. **网络自治运营方（Autonomous Operator / Service Provider）**：Kempower Autonomous Energy Services Oy（由设备制造与服务商 Kempower 升级转型，负责提供基于 Kempower DPR 动态功率矩阵、边缘微网网关及自主控制算法的 100% 零人工充电网络托管运营服务）；
+2. **签约客户（Contracted Client）**：商用电动公交车队（C1 如拉赫蒂公交 LSL）、干线重卡物流运营商（C2）或公共充电场站运营商（C3）（统称“客户”）。
 
 **核心标的**：客户将其场站资产委托由网络自治控制中枢接管。双方明确约定：日常运营与调度全面剥离持续人工介入，实行**以“确定性能量交付服务（Outcome-based Charging-as-a-Service, CaaS）”为核心的自主闭环运行机制**。
 

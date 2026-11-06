@@ -5,9 +5,9 @@
 *Target Scoring Dimensions: Autonomy (25%) · Grid Impact (20%) · Technical Credibility (20%) · Commercial Viability (20%) · Clarity (15%)*
 
 > **Slide 1 must open with these three statements (all are hard requirements of the brief and ground rules):**
-> 1. **"We design from the equipment supplier's perspective"** — the brief's first actor, `the charger manufacturer that builds the equipment and often services it`. In `contracts.csv` that party holds `18` of the `29` service contracts and carries `penalty_eur_per_late_departure` on `18` of them (`150 €` at `C1`). Hence our north-star metric is staff-hours and penalties avoided, measured on the three layers that party already owns — firmware, site controller, cloud.
+> 1. **"We take the `Manufacturer` row on slide 15"** — the one that `Builds the chargers / Often services them`. In `contracts.csv` that party holds `18` of the `29` contracts with service scope, and a **separate** `18` carry `penalty_eur_per_late_departure` (`150 €` at `C1`, up to `250 €`) — `7` of them pure `hardware`, so the exposure is not tied to the service tier. Hence our north-star metric is staff-hours **we pay for** and penalties **we owe**, measured on the three layers that party already owns — firmware, site controller, cloud.
 > 2. **"All data shown is synthetic, supplied for this challenge; the 2029 operator is a fictional customer."**
-> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 19 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
+> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 20 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
 
 
 ---
@@ -37,7 +37,7 @@
 - **Header**: **Project Sentinel: The Self-Operating Charging Network**
 - **Tagline**: *"If humans were no longer allowed to continuously operate and maintain a charging network, how would you redesign it?"*
 - **Visuals**:
-  - Left: Traditional CPO Depot (Flashlight, chaotic cable tangles, orange error cones, sleep-deprived night staff moving buses at 02:00).
+  - Left: Traditional Depot & Fleet Yard (Flashlight, chaotic cable tangles, orange error cones, sleep-deprived night staff moving buses at 02:00).
   - Right: Sentinel Autonomous Depot (Dark depot, sub-zero snow, silent 25 kW modular power routing, green status LEDs, 100% on-time fleet dispatch).
 - **Core Thesis**: Moving from reactive hardware vending to **Outcome-Based Autonomous Energy Certainty (CaaS)**.
 
@@ -242,7 +242,7 @@
 ### Slide Content & Visual Layout
 - **Header**: **Commercial Viability: Outcome-Based CaaS & Enforceable SLA**
 - **The Financial Transformation**:
-  - **OPEX, honestly sized**: the recorded baseline is **20.76 FTE / 93,412 min**, but only **12.44 FTE (59.95%) is software-addressable** (`9.95` replug + `2.50` load/price/reset) = **1,091,610 €/yr**. The other **5.09 FTE is 73 technician site visits** and **3.22 FTE is customer contact** — retained, not claimed. Say this out loud before the jury asks.
+  - **OPEX, honestly sized — and correctly attributed**: the recorded baseline is **20.76 FTE / 93,412 min**. Of that, **`9.95 FTE` (`872,976 €/yr`) is the customer's own night-shift replugging** (`5,596` events a fleet pays for) — so it is **the value we sell, not a cost we carry**. **`5.09 FTE` (`446,667 €/yr`) is our technician roll-outs** (`73` dispatches, `cleared_by = technician`), and **`2.50 FTE` is remote load/price/reset**, ours only on the `18/29` contracts with service scope. **`3.22 FTE` customer contact** is retained, not claimed. Quote those two sides apart: pricing a customer's saving as our own margin is exactly how a CaaS contract goes wrong.
   - **S1 Three-Tier Strategy Comparison (Transparently Grounded in `equipment_costs.csv`)**:
     - **Tier 2 — Zero-CAPEX Software (`0 €` CAPEX, `0` human moves)**:
       - Uses existing 12 single-gun dispensers (`cross_tie=False`) with urgency-weighted MILP (`strategy="urgency"`).
@@ -318,7 +318,7 @@
 - **Clarity Metric**: Fully transparent, reproducible with a single command: `streamlit run app.py`.
 
 ### Speaker Script (Verbatim)
-> "To ensure that non-technical judges and CPO executives have complete visibility, we packaged the entire system into a 4-quadrant interactive Streamlit cockpit.
+> "To ensure that non-technical judges and customer executives have complete visibility, we packaged the entire system into a 4-quadrant interactive Streamlit cockpit.
 >
 > In Quadrant 1, executives track the exact labor hours and FTE savings across all 100 sites.
 >
