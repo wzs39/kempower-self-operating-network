@@ -136,7 +136,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 | **Energy & Grid Impact** | **20%** | • **0 official `grid_kw` overlimit violations across 134,400 rows** (`9,644` rows under `delivered_kw / 0.955` AC basis reconciled; see [`docs/energy_impact.md`](./docs/energy_impact.md)).<br>• **95-Site Network Evidence (`network_kpis.csv`)**: addresses `2,096.1 hours` of `hours_demand_above_grid_limit` across `72` sites where `peak_grid_kw == grid_limit_kw`.<br>• **Use of Available Energy**: S1 gun-hour utilization `45.38% -> 47.50%` (`+2.12 pp`), cabinet-hour `68.03% -> 71.21%` (`+3.18 pp`).<br>• **799.30 €/MWh price spike arbitrage** with continuous SoC slack; BESS/PV cost interface defined via `equipment_costs.csv` *(interface defined, not field-validated)*. |
 | **Technical Credibility** | **20%** | • **OCPP 2.0.1 Smart Charging** & **ISO 15118 PnC TLS 1.3** (`< 10 ms` ECDSA PKI).<br>• **Anti-phantom replug defense** and **offline discrete-event simulator** (`src/sim/discrete_sim.py`).<br>• Strict 1:N cabinet-to-dispenser physical wiring (`cross_tie=False`) & 6-step BBM zero-arc sequencing.<br>• **434 pytest + 106 E2E (540 total)** automated tests with 100% pass rate. |
 | **Commercial Viability** | **20%** | • **`12.44` of the `20.76` baseline FTE is software-addressable — but it splits by payer**: `9.95 FTE` (`872,976 €/yr`) is the **customer's** night-shift replugging (`5,596` events, `24,336 €/yr` at S1) — the value we sell, not a cost we carry; `2.50 FTE` is remote load/price/reset, ours only on the `18/29` contracts with service scope. **Our own cost line is the `5.09 FTE` (`446,667 €/yr`) of technician roll-outs** — no software removes a truck roll, and that is what the SLA must price. Customer contact (`3.22 FTE`) is retained and **not** monetised.<br>• Honest CAPEX: Tier 2 (`0 €` CAPEX, `-87.8%` S1 deficit) vs Tier 3 (`324,000 €`, `13.31-yr` standalone payback) — **and the finding that `324,000 €` of extra dispensers makes S1 worse (`8` missed), while the monotone zero-miss path inside the `1,200 kW` grid limit is an unpriced busbar tie.**<br>• **One-Page SLA** with Titanium/Gold/Silver tiers and MRDT anti-fraud gate.<br>• **150% monthly liability cap** and guaranteed non-negative settlement invoicing. |
-| **Clarity** | **15%** | • **Interactive 4-View Streamlit Cockpit (`app.py`)** with live minute playback.<br>• **10-Minute Championship Pitch Deck (`PITCH_DECK_OUTLINE.md`)** with jury defense.<br>• Deterministic verifier (`verify_all.py`: its own timed section **0.36-0.39 s** warm / **0.49 s** cold; **total wall clock 1.5-1.8 s** once Python and pandas start) & dedicated [`docs/energy_impact.md`](./docs/energy_impact.md).<br>• Compelling 2029 customer story anchored in Lahti City Transit. |
+| **Clarity** | **15%** | • **Interactive 4-View Streamlit Cockpit (`app.py`)** with live minute playback.<br>• **10-Minute Championship Pitch Deck (`PITCH_DECK_OUTLINE.md`)** with jury defense.<br>• Deterministic verifier (`verify_all.py`: its own timed section **under 0.5 s of timed work** warm / **0.49 s** cold; **total wall clock 1.5-1.8 s** once Python and pandas start) & dedicated [`docs/energy_impact.md`](./docs/energy_impact.md).<br>• Compelling 2029 customer story anchored in Lahti City Transit. |
 
 ---
 
@@ -153,7 +153,7 @@ Runs the zero-regression gate verifying all S1–S5 scenarios, 29 GitHub Issue #
 ```bash
 python verify_all.py
 ```
-*(100% PASS. Two different numbers, both measured: `verify_all.py` prints its own timed section as 0.36-0.39 s warm and 0.49 s on a fresh clone; the total wall-clock of `python verify_all.py` is 1.5-1.8 s because Python startup plus the pandas import dominate. Quote the timed section, or quote the wall clock, never the two blended.)*
+*(100% PASS, and the run is deterministic - only the clock varies. Read the number off the output line: `verify_all.py` prints its own timed section (measured 0.36-0.49 s across this session's runs, always inside the 5.0 s gate), while `python verify_all.py` as a whole takes 1.5-1.8 s of wall clock because Python and pandas start up first. On stage, quote the printed line, never a memorised figure, and never blend the two timers.)*
 
 ### 3. Run the Full Pytest Suite (`434 pytest + 106 E2E (540 total)`)
 Executes all unit, integration, protocol, and mathematical verification tests:
@@ -186,7 +186,7 @@ streamlit run app.py
 ```
 hackson/
 ├── app.py                                    # 4-Quadrant Interactive Streamlit Command Center
-├── verify_all.py                             # Deterministic verifier (timed section 0.36-0.49 s; wall clock 1.5-1.8 s)
+├── verify_all.py                             # Deterministic verifier (timed section under 0.5 s of timed work; wall clock 1.5-1.8 s)
 ├── requirements.txt                          # Packaging dependencies
 ├── PROJECT.md                                # Single source of engineering truth
 ├── PITCH_DECK_OUTLINE.md                     # 10-Minute Championship Pitch Deck & Jury Defense

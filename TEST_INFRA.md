@@ -62,7 +62,7 @@ e2e_tests/
 
 ```
                                 [ TIER 4: REAL-WORLD SCENARIOS ]
-                        - S1 Depot 24-Bus Night Shift (3 Missed @ 0€ / 0 Missed @ 324k€)
+                        - S1 Depot 24-Bus Night Shift (3 Missed @ 0€ software; 0 Missed only with an unpriced cross-cabinet busbar tie - plugs alone = 8)
                         - S2 Logistics 4-Truck DSO Curtailment (G1 400 kW)
                         - S3 Highway 256-Driver Offline Islanding (1,425 kW DC held vs 500 kW fallback)
                         - S4 Urban Hub 799.30 €/MWh Peak & D4-2 Cable Trip
@@ -123,8 +123,8 @@ e2e_tests/
 ### Tier 4: Real-World Scenarios (`tier4_real_world_scenario.py`)
 - Replays actual operational traces from the 2026-11-13 scenario day across all five focus sites (S1–S5).
 - Directly tests against the 45 official CSV files to prove:
-  - 13 missed departures in baseline $\rightarrow$ **3 missed (`0 €` software urgency, `10` saved; S1 deficit `398.5 -> 48.8 kWh`, `-87.8%`)** $\rightarrow$ **0 missed (`324,000 €` S1 dual-gun expansion, `13.31-yr` payback)**.
-  - 29.7% highway abandonment $\rightarrow$ $<0.5\%$.
+  - 13 missed departures in baseline $\rightarrow$ **3 missed (`0 €` software urgency, `10` saved; S1 deficit `398.5 -> 48.8 kWh`, `-87.8%`)**. The remaining 3 are not bought by the `324,000 €` of extra plugs (that variant measures **8 missed**, i.e. worse); `0 missed` appears only with `cross_tie=True`, a busbar tie that `equipment_costs.csv` does not price - a documented capability boundary, not a product tier.
+  - S3 recorded abandonment `29.69%` (76/256, row level in `public_arrivals.csv`) is reported as the **capacity we hold offline** (`1,425 kW DC` vs the `500 kW` fallback); no post-fix abandonment percentage is published, because no simulation produces one.
   - 20.76 FTE manual workload $\rightarrow$ 0 continuous FTE daily operations.
   - Economic arbitrage and One-Page SLA financial settlements.
   - Network-wide grid safety: 0 official `grid_kw` over-limit intervals across 134,400 data points.

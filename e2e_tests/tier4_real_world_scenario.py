@@ -73,7 +73,7 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         self.assertEqual(s2_res["baseline_deficit_kwh"], 283.50)
 
     def test_s3_highway_256_driver_offline_session(self):
-        """S3 Highway: 29.7% abandonment (76 drivers) compressed via local DLM."""
+        """S3 Highway: official abandonment is 29.69% (76/256); the test asserts the offline capacity held, not a post-fix rate."""
         arr_path = os.path.join(DATA_DIR, "public_arrivals.csv")
         df_arr = pd.read_csv(arr_path)
         s3_arr = df_arr[(df_arr["site_id"] == "S3") & (df_arr["ts"].str.startswith("2026-11-13"))]
@@ -105,7 +105,7 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         self.assertEqual(len(s4_res["mpc_extreme_price_unmet_vehicles"]), 0)
 
     def test_s5_commissioning_digital_twin_self_healing(self):
-        """S5 Depot: 5 missed departures in baseline eliminated by correcting D5-7/8."""
+        """S5 Depot: official record 5 missed; the same engine reproduces 1, so this is reported as a config fix (A13), not a same-engine A/B."""
         dep_path = os.path.join(DATA_DIR, "departures_baseline.csv")
         df_dep = pd.read_csv(dep_path)
         s5_fails = df_dep[(df_dep["site_id"] == "S5") & (df_dep["depart_ts"].str.startswith("2026-11-13")) & (df_dep["below_required"] == 1)]

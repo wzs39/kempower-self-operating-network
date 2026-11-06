@@ -10,7 +10,7 @@ Across the 100-site European charging network (`240,635` rows across 45 official
 - **S5 Bus Depot (official `5 -> 0`; same-engine `1 -> 0`, `365.4 -> 0.0 kWh`)**: Three-Way Config Reconciler detects `site_config.csv` capping `grid_limit_kw` at `600 kW` (vs `900 kW` in `sites.csv`/`network_sites.csv` and `power_cabinets.csv`), restoring `900 kW` (`+750 kWh` in `03:30–06:00`), `D5-7` (`50 -> 150 kW`), and `D5-8` (`sim_active -> True`). **Stated limit**: our engine reproduces 1 of the 5 official undercharged departures (`B35`) because it does not model plug-queueing or the operator's batch-swap delay, so S5 is reported as a configuration fix, not as a same-engine A/B (assumption A13).
 
 ## 3. Verification & Reproducibility Checklist
-- [x] `python verify_all.py` exits 0, printing a timed section of 0.36–0.39 s (wall clock 1.5–1.8 s — the number a stopwatch on stage will show).
+- [x] `python verify_all.py` exits 0, printing a timed section of under 0.5 s of timed work (wall clock 1.5–1.8 s — the number a stopwatch on stage will show).
 - [x] `434 pytest + 106 E2E (540 total)` automated tests pass 100%.
 - [x] `streamlit run app.py` launches the 4-quadrant interactive command center.
 - [x] `streamlit run 视频演示/app.py` launches the six-fault replay demo. **It imports the same `src/` engine as `verify_all.py`** — the duplicate engine copy that used to live in `视频演示/src/` has been deleted, so the stage app and the verifier can no longer disagree. Both print `13 -> 3`.

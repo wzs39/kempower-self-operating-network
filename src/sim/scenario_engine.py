@@ -42,7 +42,7 @@ class ScenarioEngine:
         - Verifies same-engine 12-gun FCFS baseline reproduces the exact 4 undercharged buses (B04, B09, B18, B20)
           with 398.5 kWh simulated deficit and 1,080.0 kW peak.
         - Verifies 0-CAPEX urgency scheduling on 12 guns rescues B20 (4 -> 3 missed, 398.5 -> 48.8 kWh, -87.8%).
-        - Verifies 24-point capacity expansion (324,000 € @ 27,000 €/gun, 13.31-yr payback) achieves 0 missed departures.
+        - Verifies the 24-point variant reaches 0 missed departures ONLY with cross_tie=True (the busbar tie); the same 24 points without the tie is worse (8 missed), and the tie is unpriced in equipment_costs.csv, so the 324,000 € of plugs is NOT what buys the 0.
         - Verifies D1-9 true thermal peak at 2026-11-12T22:31:00+02:00 (59.3°C, 702 rpm, 199 min lead time, Issue B8).
         - Verifies F016 duration = 246 min (02:25-06:31, cleared_by = technician, Issue A3).
         - Verifies healthy C1-1 + C1-2 = 720 kW N-1 output without self-harming 180 kW shed (Issues A2, A4).

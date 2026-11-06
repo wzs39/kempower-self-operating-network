@@ -4,7 +4,7 @@
 > **Design Perspective**: Stated per the brief's first actor — the **equipment supplier / service provider** (`contracts.csv`), the party holding the hardware+service contracts and carrying departure penalties, transitioning to autonomous Energy Certainty-as-a-Service (CaaS).
 
 ## Core Verification Commands (< 5 Seconds)
-1. **Deterministic End-to-End Verifier** (timed section `0.36-0.39 s` warm / `0.49 s` cold; wall clock `1.5-1.8 s`):
+1. **Deterministic End-to-End Verifier** (timed section `under 0.5 s of timed work` warm / `0.49 s` cold; wall clock `1.5-1.8 s`):
    ```bash
    python verify_all.py
    ```

@@ -17,7 +17,7 @@ The Independent End-to-End (E2E) Test Suite has been fully constructed in `e2e_t
   - **Tier 4 (Real-World Scenarios)**: 9 tests (100% pass, 0.363s)
   - **Total E2E Suite Execution Time**: **0.7-0.9 s** via `test_runner.py`.
 - **Full Pytest Suite (`tests/`)**: **434 test cases** (100% pass via `pytest tests/ -q`).
-- **Deterministic Verifier (`verify_all.py`)**: **100% pass**, timed section **0.36-0.39 s** warm / **0.49 s** cold (**1.5-1.8 s** wall clock) — all well under the < 5.0 s quality-gate budget.
+- **Deterministic Verifier (`verify_all.py`)**: **100% pass**, timed section **under 0.5 s of timed work** warm / **0.49 s** cold (**1.5-1.8 s** wall clock) — all well under the < 5.0 s quality-gate budget.
 - **Combined Network Verification Count**: **`434 pytest + 106 E2E (540 total)` + deterministic verifier** with **zero regressions**.
 
 ---

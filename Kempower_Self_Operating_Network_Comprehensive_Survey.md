@@ -229,7 +229,7 @@ graph TD
 |---|---|---|---|---|---|
 | **端层 (Cabinet & Dispenser MCU)** | 双核 ARM Cortex-M7/M4 或 TI C2000 DSP (功能安全 SIL-2 级) | **毫秒级 BBM 时序 (软件决策 <10ms, 切换 <100ms)** | 内部 CANopen、SPI、HomePlug GreenPHY (PLC)、PWM (CP/PP) | 硬件绝缘与接地保护、直流母线高压互锁、继电器先断后合动作时序控制、ISO 15118 报文解析、高频热保护 | **严禁参与跨站电价优化、长程车队排班与全局功率决策**（避免算力阻塞导致硬安全保护滞后）。 |
 | **边层 (Station Edge Controller)** | 工业级无风扇导轨式工控机 (Intel x86-64 / Quad ARM, 8-16GB, NVMe, 双网口) | **秒级至分钟级 (100ms ~ 15min)** | 内部 Modbus TCP (BESS/PV)、本地以太网、本地 MQTT / OCPP Broker | **场站电网限额（DLM）绝对防越限控制**、15分钟滚动 MPC 局部优化、BESS/PV 微网调度、离线会话缓存与断网自治接管、模块矩阵重组 | **不运行跨国重卡全局路径规划与全网大模型训练**。 |
-| **云层 (Cloud Intelligence Core)** | 跨地域高可用 Kubernetes 集群、分布式时序库、大规模运筹优化器 | **分钟级至小时级 (15min ~ 24h)** | 外部 HTTPS REST API、Nord Pool / ENTSO-E 接口、OCPP 2.0.1 WebSocket | 全欧 14 个电价区日前现货交易撮合、区域风电/负荷宏观预测、跨站重卡物流干线走廊补能规划、SLA 自动计费清算 | **严禁直接向底层接触器或 PWM 发送裸硬件动作指令**（防止网络抖动引发电网越限或人身设备事故）。 |
+| **云层 (Cloud Intelligence Core)** | 跨地域高可用 Kubernetes 集群、分布式时序库、大规模运筹优化器 | **分钟级至小时级 (15min ~ 24h)** | 外部 HTTPS REST API、现货价接口（本赛题使用官方合成 `prices.csv`，真实部署才接 Nord Pool / ENTSO-E）、OCPP 2.0.1 WebSocket | 全欧 14 个电价区日前现货交易撮合、区域风电/负荷宏观预测、跨站重卡物流干线走廊补能规划、SLA 自动计费清算 | **严禁直接向底层接触器或 PWM 发送裸硬件动作指令**（防止网络抖动引发电网越限或人身设备事故）。 |
 
 ---
 
