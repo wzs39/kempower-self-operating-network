@@ -221,10 +221,10 @@
 - **Verification Proof Table**:
   | Verification Track | Scope | Execution Time | Pass Rate |
   |---|---|---|---|
-  | **Deterministic Verifier (`verify_all.py`)** | All S1–S5 Scenarios, 29 GitHub Issue #2 items | **0.38 seconds** | **100% (29/29)** |
-  | **Pytest Unit & Integration Suite** | Protocols, DPR, MILP, Self-Healing, SLA | **45-46 s** | **100% (434 passed)** |
-  | **Independent E2E Suite (Tiers 1–4)** | Feature coverage, boundaries, stress, scenarios | **0.7-1.3 s** | **100% (106 passed)** |
-  | **Unified Automated Test Total** | **434 pytest + 106 E2E (540 total)** | **46-48 s** | **100% (540/540)** |
+  | **Deterministic Verifier (`verify_all.py`)** | All S1–S5 Scenarios, 29 GitHub Issue #2 items | **0.36–0.39 s** timed (1.5–1.8 s wall) | **100% (29/29)** |
+  | **Pytest Unit & Integration Suite** | Protocols, DPR, MILP, Self-Healing, SLA | **43-54 s (machine-load dependent)** | **100% (434 passed)** |
+  | **Independent E2E Suite (Tiers 1–4)** | Feature coverage, boundaries, stress, scenarios | **0.7-0.9 s** | **100% (106 passed)** |
+  | **Unified Automated Test Total** | **434 pytest + 106 E2E (540 total)** | **44-55 s (machine-load dependent)** | **100% (540/540)** |
   | **Official Dataset Integrity** | 45 CSV files under `kempower-challenge-data/` | Hash Verified | **100% UNTOUCHED** |
 
 ### Speaker Script (Verbatim)
@@ -237,9 +237,9 @@
 > And we validated our entire system through an offline discrete-event simulator (`src/sim/discrete_sim.py`) that models vehicle charging curves minute-by-minute under strict intra-cabinet wiring (`cross_tie=False`).
 >
 > Look at our test numbers:
-> - `verify_all.py` executes all 29 audit checks across S1 to S5; its own timed section reads **0.36-0.38 s** warm and **0.49 s** on a fresh clone (**1.5-1.8 s** wall clock once Python and pandas start).
+> - `verify_all.py` executes all 29 audit checks across S1 to S5; its own timed section reads **0.36-0.39 s** warm and **0.49 s** on a fresh clone (**1.5-1.8 s** wall clock once Python and pandas start).
 > - Our pytest suite has **434 passing tests**.
-> - Our independent 4-tier E2E test suite adds another **106 passing tests** in 0.7-1.3 s.
+> - Our independent 4-tier E2E test suite adds another **106 passing tests** in 0.7-0.9 s.
 > - That is **434 pytest + 106 E2E (540 total)** automated tests with 100% pass rate, and zero bytes of the official 45 CSV files were modified. That is technical credibility."
 
 ---
@@ -354,7 +354,7 @@
   | **Energy & Grid Impact** | **20%** | **0 Official Overlimits across 134,400 rows** · 72 Grid-Capped Network Sites · S1 Gun-Hour `45.38% -> 47.50%` |
   | **Technical Credibility** | **20%** | **OCPP 2.0.1 + ISO 15118 PnC** · Offline Discrete-Event Simulator · **434 pytest + 106 E2E (540 total)** |
   | **Commercial Viability** | **20%** | **20.76 FTE (1.82M €/yr) Eliminated** · Honest 3-Tier CAPEX (`0 €` vs `324k €` + unpriced busbar, 13.31-yr) — and plugs alone = `8` missed, worse · 150% Capped SLA |
-  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Sub-Second Verifier (`0.38 s` warm) |
+  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Deterministic Verifier (timed section `0.36-0.39 s`) |
 
 - **Closing Call to Action**:
   > *"At 2:15 AM in 2029, the cabinet fails — and nothing happens. Kempower built the world's most flexible DC charging hardware. Sentinel provides the autonomous brain it deserves. Together, we make 2029 zero-touch charging an industrial reality."*
@@ -411,5 +411,5 @@
 - **Defense Card**:
   1. Every single test imports from `src.sim.data_loader`, which directly reads the 45 unedited CSV files from `kempower-challenge/kempower-challenge-data/`.
   2. We run **434 pytest + 106 E2E (540 total)** automated tests across 5 tiers.
-  3. We also provide `verify_all.py`, an independent, standalone Python script that reads the CSV files and evaluates the mathematical invariants directly: 0.36-0.38 s of timed work warm, 0.49 s cold, 1.5-1.8 s of wall clock including interpreter startup.
+  3. We also provide `verify_all.py`, an independent, standalone Python script that reads the CSV files and evaluates the mathematical invariants directly: 0.36-0.39 s of timed work warm, 0.49 s cold, 1.5-1.8 s of wall clock including interpreter startup.
   4. You can clone the repo, run `python verify_all.py`, and inspect every calculation line by line.

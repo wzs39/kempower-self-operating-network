@@ -42,7 +42,7 @@ The testing framework for the Self-Operating Charging Network adheres to three n
 | **F12** | Commercial AEaaS ROI Model | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_commercial_*` | 20.76 FTE continuous elimination (1.82M €/yr), Tier 2 (0 €) vs Tier 3 (324k €) |
 | **F13–F18** | High-Value Innovation Protocols | Tier 3, 4 | `e2e_tests/tier3_cross_feature.py`<br>`e2e_tests/tier4_real_world_scenario.py` | Pairwise and full Scenario Day stress validation |
 | **F19** | Zero-Regression Deterministic Verifier | Master / Root | `verify_all.py` | Sub-0.5-second execution budget validation (<5.0s) |
-| **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.7-1.3 s |
+| **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.7-0.9 s |
 | **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass across `434 pytest + 106 E2E (540 total)` |
 
 ---
@@ -183,7 +183,7 @@ python -m pytest e2e_tests/ -v
 python -m pytest tests/ -q
 ```
 
-### 5. Run Deterministic Verifier Gate (&lt; 0.5s)
+### 5. Run Deterministic Verifier Gate (timed section &lt; 0.5 s; command wall clock 1.5-1.8 s)
 ```powershell
 python verify_all.py
 ```

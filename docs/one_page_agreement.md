@@ -57,7 +57,7 @@ Service Provider = equipment supplier & service provider (`contracts.csv`, holds
 
 ---
 
-**Basis of every number:** unmodified official CSVs — 45 files / 240,635 rows; recomputed by `python verify_all.py` (< 1 s, exit 0) and `tools/export_deck_ledger.py`. Labour baseline **8,852** ops / **93,412** min / **20.76 FTE** at 37.5 h·wk and 45 €/h, of which **12.44 FTE (59.95 %)** is software-addressable. Grid-limit capping is done by a person today — **684** manual load adjustments / **10,260 min**, **100 %** of them at sites breaching their limit (Spearman **0.802**). Assumptions and their error direction: [`assumptions_and_additions.md`](./assumptions_and_additions.md).
+**Basis of every number:** unmodified official CSVs — 45 files / 240,635 rows; recomputed by `python verify_all.py` (exit 0; printed timed section 0.36–0.39 s) and `tools/export_deck_ledger.py`. Labour baseline **8,852** ops / **93,412** min / **20.76 FTE** at 37.5 h·wk and 45 €/h, of which **12.44 FTE (59.95 %)** is software-addressable. Grid-limit capping is done by a person today — **684** manual load adjustments / **10,260 min**, **100 %** of them at sites breaching their limit (Spearman **0.802**). Assumptions and their error direction: [`assumptions_and_additions.md`](./assumptions_and_additions.md).
 
 | Service Provider | Client |
 |---|---|
