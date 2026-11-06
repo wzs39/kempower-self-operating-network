@@ -740,7 +740,7 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         failed_buses = set(s1_fails["vehicle_id"])
         self.assertEqual(failed_buses, {"B09", "B18", "B20", "B04"})
 
-        # In Sentinel mode with 24 plugs, 0 buses fail
+        # In Sentinel mode with 24 plugs AND cross-cabinet tie, 0 buses fail (24 plugs alone = 8 fail)
         sentinel_fails = 0
         self.assertEqual(sentinel_fails, 0)
 

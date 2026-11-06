@@ -7,7 +7,11 @@ Implements:
    - Tier 1 (Same-Engine Baseline, 12 guns, FCFS, 0 human moves): 4 missed departures (B04, B09, B18, B20), 398.5 kWh simulated deficit.
    - Tier 2 (Zero-CAPEX Software, 12 guns, Urgency, 0 human moves): 3 missed departures (B04, B09, B18 — B20 rescued), 48.8 kWh simulated deficit (-87.8%).
    - Counterfactual Stress Test (Track A2, 12 guns + 01:30 batch manual swap): proves that achieving 0 missed departures on 12 guns requires 11-12 manual moves (violating Rule 3 zero-touch), hence NOT recommended and excluded from main autonomous results.
-   - Tier 3 (Hardware Dual-Gun Expansion, 24 plugs @ 324,000 € CAPEX [27,000 €/gun], 13.31-yr S1 payback): 0 missed departures, 0.0 kWh deficit, 0 human moves.
+   - Tier 3 (Hardware Dual-Gun Expansion): the 324,000 € buys 12 extra dispensers (27,000 €/gun), but *dispensers alone are worse*:
+     24 plugs WITHOUT cross-cabinet tie = 8 missed departures (1,040.1 kWh), because cabinet power stays 1,080 kW and each gun drops 90 -> 45 kW.
+     Reaching 0 requires an additional cross-cabinet busbar tie (cross_tie=True), which is absent from chargers.csv and unpriced in equipment_costs.csv.
+     Cabinet upsizing is not an alternative: 3x450 kW reaches 0 but peaks at 1,350 kW, over the 1,200 kW grid limit.
+     The only zero-miss configuration inside the grid limit is the busbar tie on the existing 12 guns (peak stays 1,080 kW).
 2. Three-Phase Autonomous Night Multiplexing Cycle (under 24-plug expansion):
    - Phase 1 (22:00 - 02:00): Group A (buses 1-12) bulk fast charge to 85% SoC.
    - Phase 2 (02:00 - 05:30): Group B (buses 13-24) bulk fast charge to 85% SoC via millisecond-scale BBM relay sequencing (<500ms).

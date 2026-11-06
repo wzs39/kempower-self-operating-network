@@ -4,6 +4,11 @@
 *Theme: "The Self-Operating Charging Network" · Final Presentation (Saturday 07.11.2026)*  
 *Target Scoring Dimensions: Autonomy (25%) · Grid Impact (20%) · Technical Credibility (20%) · Commercial Viability (20%) · Clarity (15%)*
 
+> **Slide 1 must open with these two statements (both are hard requirements of the brief and ground rules):**
+> 1. **"We design from the CPO perspective"** — the party that owns operating cost and carries the liability. Hence our north-star metric is staff-hours and energy certainty, not kWh sold.
+> 2. **"All data shown is synthetic, supplied for this challenge; the 2029 operator is a fictional customer."**
+
+
 ---
 
 ## ⏱️ Executive Presentation Roadmap (10:00 Total)
