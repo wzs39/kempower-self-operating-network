@@ -11,5 +11,5 @@ Across the 100-site European charging network (`240,635` rows across 45 official
 
 ## 3. Verification & Reproducibility Checklist
 - [x] `python verify_all.py` completes in `< 0.5s` with 0 errors.
-- [x] `431 pytest + 106 E2E (537 total)` automated tests pass 100%.
+- [x] `433 pytest + 106 E2E (539 total)` automated tests pass 100%.
 - [x] `streamlit run app.py` launches the 4-quadrant interactive command center.

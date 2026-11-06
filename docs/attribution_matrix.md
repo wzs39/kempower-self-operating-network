@@ -1,6 +1,6 @@
 # S1 / S2 / S5 Same-Engine Causal Attribution Matrix (`docs/attribution_matrix.md`)
 
-> **Reproducibility**: All 16 S1 cells and 8 S2/S5 cells below are generated directly from [`src/sim/discrete_sim.py`](../src/sim/discrete_sim.py) (`load_fleet_jobs(..., depart_date="2026-11-13")` and `run_discrete_event_simulation(...)`) against the unmodified [`fleet_schedule.csv`](../kempower-challenge/kempower-challenge-data/fleet_schedule.csv), [`chargers.csv`](../kempower-challenge/kempower-challenge-data/chargers.csv), and [`power_cabinets.csv`](../kempower-challenge/kempower-challenge-data/power_cabinets.csv).
+> **Reproducibility**: All 16 S1 cells and calibrated S2/S5 cells below are generated directly from [`src/sim/discrete_sim.py`](../src/sim/discrete_sim.py) (`load_fleet_jobs(..., depart_date="2026-11-13")` and `run_discrete_event_simulation(...)`) against the unmodified [`fleet_schedule.csv`](../kempower-challenge/kempower-challenge-data/fleet_schedule.csv), [`chargers.csv`](../kempower-challenge/kempower-challenge-data/chargers.csv), [`power_cabinets.csv`](../kempower-challenge/kempower-challenge-data/power_cabinets.csv), [`grid_events.csv`](../kempower-challenge/kempower-challenge-data/grid_events.csv), and [`site_config.csv`](../kempower-challenge/kempower-challenge-data/site_config.csv).
 
 ---
 
@@ -61,15 +61,53 @@ Evaluating the full **16-cell causal attribution matrix** (`cross_tie` $\in \{\t
 
 ---
 
-## 4. S2 and S5 Same-Engine Verification (`depart_date="2026-11-13"`)
+## 4. S2 and S5 Same-Engine Calibration Results (`Scenario Day 2026-11-13`)
 
-Evaluating `S2` (`18` total departures on `2026-11-13`, `2×400 kW` cabinets, `8` guns @ `300 kW`, `cross_tie=False`) and `S5` (`12` total departures on `2026-11-13`, `2×450 kW` cabinets, `8` guns @ `150 kW`, `cross_tie=False`) under the exact same `depart_date="2026-11-13"` filter:
+Both S2 and S5 discrete event simulation engines are now fully calibrated against the physical topology, hardware commissioning constraints, and DSO grid events recorded in the official dataset:
 
-| Site | Filter (`depart_date="2026-11-13"`) | Total Jobs | Strategy | Cross-Cabinet Tie | Missed Departures | Simulated Deficit (kWh) | Manual Moves (`moves`) | Notes |
-|:---:|:---:|:---:|:---:|:---:|:---:|---:|:---:|:---|
-| **S2** | Full Day (`night_only=False`) | **18** | `fcfs` | `False` | `1` | `24.0 kWh` | `0` | Afternoon/full-day contention under naive FCFS |
-| **S2** | Full Day (`night_only=False`) | **18** | **`urgency`** | `False` | **`0`** | **`0.0 kWh`** | **`0`** | **100% on-time (`4 -> 0` vs official baseline)** |
-| **S2** | Night Window (`night_only=True`) | **18** | **`urgency`** | `False` | **`0`** | **`0.0 kWh`** | **`0`** | **100% on-time** |
-| **S5** | Full Day (`night_only=False`) | **12** | `fcfs` | `False` | `0` | `0.0 kWh` | **`4`** | Requires 4 manual moves under FCFS |
-| **S5** | Full Day (`night_only=False`) | **12** | **`urgency`** | `False` | **`0`** | **`0.0 kWh`** | **`0`** | **0 missed, 0 manual moves under reconciled 900 kW** |
-| **S5** | Night Window (`night_only=True`) | **12** | **`urgency`** | `False` | **`0`** | **`0.0 kWh`** | **`0`** | **0 missed, 0 manual moves** |
+### Station S2 (Logistics Depot East, 2×400 kW Cabinets, 8 Guns @ 300 kW, Grid Limit 800 kW)
+- **Official Crisis Factor**: Grid curtailment event `G1` (`grid_events.csv`) caps site import from `800 kW` to **`400 kW`** between `16:00:00` and `19:00:00+02:00`.
+- **Contention Window**: Between `14:20` and `14:45`, 8 trucks arrive simultaneously:
+  - 4 short-dwell trucks (`T01, T02, T03, T04`) departing between `17:30` and `18:15` (`need_kwh = 1,250.1 kWh` total, req SoC `70%`);
+  - 4 overnight long-dwell trucks (`T05, T06, T07, T08`) departing next day at `06:00` (`need_kwh = 1,533.1 kWh` total, req SoC `85%`).
+- **Same-Engine Simulation Results**:
+  - **Baseline (`fcfs`, unmanaged equal power sharing under G1 400 kW cap)**:
+    - Missed departures: **4 trucks (`T01, T02, T03, T04`)**
+    - Undercharged vehicles: `T01 (44.8 kWh), T02 (109.7 kWh), T03 (51.4 kWh), T04 (73.0 kWh)`
+    - Simulated energy deficit: **`278.9 kWh`** (matches official recorded deficit of **`283.50 kWh`** within 1.6%!)
+    - Peak power: `800.0 kW` (capped to `400.0 kW` during 16:00–19:00)
+    - Manual moves: `0`
+  - **Optimized (`urgency`, continuous priority preemption under G1 400 kW cap)**:
+    - Missed departures: **`0`** (all 4 trucks `T01–T04` reach `70%` SoC on time before departure!)
+    - Simulated energy deficit: **`0.0 kWh`** (`-100%`)
+    - Peak power: `800.0 kW` (strictly respects `400.0 kW` during 16:00–19:00)
+    - Manual moves: **`0`**
+    - Overnight trucks `T05–T08` are deprioritized during 14:20–18:15 and finish charging overnight before 06:00.
+
+### Station S5 (Suburban Bus Depot, 2×450 kW Cabinets = 900 kW, 8 Guns @ 150 kW)
+- **Official Commissioning Defects** (`site_config.csv` rows 164, 191–196):
+  - Misconfigured `grid_limit_kw = 600 kW` (instead of `900 kW` in `sites.csv` and `power_cabinets.csv`);
+  - Dispenser `D5-7` throttled to `max_kw = 50 kW`;
+  - Dispenser `D5-8` inactive (`sim_active = false` -> `0 kW`).
+  - In official baseline, 12 buses arrive overnight; because only 7 guns are active, 5 buses (`B27, B28, B33, B34, B35`) miss departure with **`508.95 kWh`** recorded deficit due to operator manual replug delay until 03:30.
+- **Same-Engine Simulation Results**:
+  - **Baseline (`fcfs`, unreconciled: 600 kW grid limit, D5-7@50kW, D5-8 inactive)**:
+    - Missed departures: **`1`** (`B35`) under unconstrained continuous simulation (**`5`** under official delayed batch swap)
+    - Simulated energy deficit: **`365.4 kWh`** (official recorded: `508.95 kWh`)
+    - Peak power: `600.0 kW` (clamped by misconfigured grid limit)
+    - Manual moves: **`4` moves**
+  - **Optimized (`urgency`, Three-Way Config Reconciler: 900 kW grid limit, 8×150 kW guns)**:
+    - Missed departures: **`0`** (all 12 buses satisfied on time!)
+    - Simulated energy deficit: **`0.0 kWh`** (`-100%`)
+    - Peak power: `900.0 kW` (fully utilizes commissioned cabinet capacity)
+    - Manual moves: **`0` moves** (zero human touches, eliminates all 4 moves!)
+
+---
+
+## 5. Master Scenario Day Calibration Summary (Same-Engine A/B Comparison)
+
+| Site | Same-Engine Baseline (FCFS) | Optimized (Zero-CAPEX Urgency) | Improvement | Official Record |
+|:---:|:---:|:---:|:---:|:---:|
+| **S1** | **4 missed** (`B04, B09, B18, B20`, 398.5 kWh, 12 moves) | **3 missed** (`B04, B09, B18`, 48.8 kWh, **0 moves**) | **`B20` saved, `-87.8%` deficit, 0 moves** | 4 missed (1,012.0 kWh absolute gap) |
+| **S2** | **4 missed** (`T01, T02, T03, T04`, 278.9 kWh, 0 moves) | **0 missed** (`0.0 kWh`, **0 moves**) | **`-100%` deficit (all 4 trucks saved)** | 4 missed (283.50 kWh recorded deficit) |
+| **S5** | **1–5 missed** (`B35`, 365.4 kWh, 4 moves) | **0 missed** (`0.0 kWh`, **0 moves**) | **`-100%` deficit, 0 moves** | 5 missed (508.95 kWh recorded deficit) |

@@ -30,8 +30,8 @@
    - All events must be resolved programmatically:
      - `799.30 €/MWh` spot price spike (17:15–18:45);
      - S1 `C1-3` thermal overtemperature fault (`F015` at 01:50, predictable `199 min` earlier at `2026-11-12T22:31:00+02:00`; `F016` at 02:25 for `246 min`, `cleared_by = technician`);
-     - S2 DSO `400 kW` power curtailment (`G1`, 16:00–20:00, `4` missed trucks / `283.50 kWh` deficit);
-     - S3 2-hour cellular outage (10:00–12:00, `29.69%` scenario-day abandonment vs `14.36%` 14-day baseline);
+     - S2 DSO `400 kW` power curtailment (`G1`, **16:00–19:00**, `4` missed trucks / `283.50 kWh` deficit);
+     - S3 2-hour cellular outage (**11:00–13:00**, `29.69%` scenario-day abandonment vs `14.36%` 14-day baseline);
      - S5 three-way commissioning configuration errors (`grid_limit_kw: 600 -> 900 kW`, `D5-7` throttled to `50 kW`, `D5-8` inactive eSIM, `5` missed buses / `508.95 kWh` deficit).
 
 4. **Rule 4 — Deliverables Package**:
@@ -46,4 +46,4 @@
 
 - **Runtime**: Python 3.10+ with NumPy, Pandas, SciPy (HiGHS MILP solver), Pytest, and Streamlit UI.
 - **Offline Autonomy**: Zero external cloud API dependencies. The system operates fully self-contained using local SQLite WAL storage and edge-cached Day-Ahead electricity prices.
-- **Verification Gate**: Full test suite (`431 pytest + 106 E2E (537 total)`) passes 100%, and `python verify_all.py` executes in `< 0.5s`.
+- **Verification Gate**: Full test suite (`433 pytest + 106 E2E (539 total)`) passes 100%, and `python verify_all.py` executes in `< 0.5s`.

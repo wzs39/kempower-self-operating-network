@@ -88,6 +88,13 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertEqual(sim["moves"], 0)
         self.assertLessEqual(sim["peak_kw"], 800.0)
 
+    def test_s2_same_engine_baseline_reproduces_official_misses(self):
+        """Verifies S2 same-engine baseline under G1 curtailment reproduces the 4 missed trucks T01-T04."""
+        b = simulate_closed_loop_minute_by_minute(site_id="S2", date="2026-11-13", strategy="fcfs", cross_tie=False)
+        self.assertEqual(b["missed_departures"], 4)
+        self.assertEqual(sorted(v for v, _ in b["undercharged_vehicles"]), ["T01", "T02", "T03", "T04"])
+        self.assertEqual(b["deficit_kwh"], 278.9)
+
     def test_s5_closed_loop_discrete_sim(self):
         """Verifies S5 discrete simulation dynamically yields 0 missed departures under reconciled 900 kW grid limit."""
         sim = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="urgency", cross_tie=False)
@@ -96,6 +103,13 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertEqual(sim["deficit_kwh"], 0.0)
         self.assertEqual(sim["moves"], 0)
         self.assertLessEqual(sim["peak_kw"], 900.0)
+
+    def test_s5_same_engine_baseline_reflects_commissioning_defects(self):
+        """Verifies S5 baseline reflects 600 kW misconfig and throttled guns, eliminating all deficits under reconciled config."""
+        b = simulate_closed_loop_minute_by_minute(site_id="S5", date="2026-11-13", strategy="fcfs", cross_tie=False)
+        self.assertEqual(b["missed_departures"], 1)
+        self.assertEqual(b["deficit_kwh"], 365.4)
+        self.assertEqual(b["moves"], 4)
 
     def test_scenario_engine_closed_loop_integration(self):
         """Verifies that ScenarioEngine aggregates dynamic discrete simulations across three tiers (13 -> 3 -> 0)."""
@@ -111,7 +125,12 @@ class TestDiscreteSimEngine(unittest.TestCase):
         self.assertEqual(res["S1"]["optimized_missed_departures"], 3)
         self.assertEqual(res["S1"]["optimized_deficit_kwh"], 48.8)
         self.assertEqual(res["S1"]["capacity_expansion_missed_departures"], 0)
+        self.assertEqual(res["S2"]["baseline_missed_departures"], 4)
+        self.assertEqual(res["S2"]["baseline_undercharged_vehicles"], ["T01", "T02", "T03", "T04"])
+        self.assertEqual(res["S2"]["baseline_sim_deficit_kwh"], 278.9)
         self.assertEqual(res["S2"]["optimized_missed_departures"], 0)
+        self.assertEqual(res["S5"]["baseline_missed_departures"], 5)
+        self.assertEqual(res["S5"]["baseline_sim_missed_departures"], 1)
         self.assertEqual(res["S5"]["optimized_missed_departures"], 0)
 
     def test_f02_roi_analyzer_peak_vs_energy_zero_crash(self):
