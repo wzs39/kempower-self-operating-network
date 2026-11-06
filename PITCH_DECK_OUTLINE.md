@@ -70,6 +70,8 @@
   | **Midnight Replugging** | **5,596 events (63.22% count)** | **44,768 min (47.93% duration = 9.95 FTE = 872,976 €/yr)** |
   | **Scenario Day Crisis** | Friday 2026-11-13 (S1–S5) | **13 missed departures, 1,804.45 kWh deficit, 29.69% abandonment** |
 
+- **Note on the "13"**: the 13 missed departures = **S1 (4) + S2 (4) + S5 (5)** — the three fleet sites with scheduled departures. S3/S4 are public hubs with no departure schedule; their metric is driver abandonment (76 that day at S3), which is reported separately.
+
 - **Visual Callout Box**:
   > **The Replug Bottleneck**: Moving and replugging vehicles is not an edge case—it is **47.93% of all human labor time in the entire network**. At Site S1 alone, 24 buses share 12 dispensers. Without autonomous dynamic routing, operators burn 24,336 €/year at a single depot just playing musical chairs with charging cables.
 
@@ -135,9 +137,9 @@
   |---|---|---|---|---|
   | **S1 (Depot North)** | 24 overnight buses (`32` total) on 12 single-gun posts; Cabinet C1-3 fan fails (`F015`/`F016` 246m) | 4 buses missed (`B04, B09, B18, B20`), `398.5 kWh` same-engine deficit (`1,012.00 kWh` official 0-session gap) | **199-min lead-time alert** at 22:31 (`59.3°C/702 rpm`); **Tier 2 (`0 €`)** urgency MILP on 12 guns vs **Tier 3 (`324k €`)** 24-plug dual-gun expansion | **Tier 2 (`0 €`)**: **3 missed** (`B20` saved, `398.5 -> 48.8 kWh`, `-87.8%`)<br>**Tier 3 (`324k €`)**: **0 missed** (`0.0 kWh` deficit) |
   | **S2 (Logistics East)**| DSO 400 kW curtailment (16:00–19:00) | 4 trucks missed (`T01–T04`), 283.50 kWh deficit | Priority preemption: shifts 283.5 kWh from overnight trucks `T05–T08` (1,857 kWh pool) via continuous OCPP | **0 missed departures** (100% on-time dispatch) |
-  | **S3 (Highway Hub)** | 2-hour cellular WAN drop (11:00–13:00) | Static 50 kW fallback drops throughput; **29.69% driver abandonment** | Edge controller islands locally; maintains full **1,425 kW DC** load allocation with 0 cloud calls | **Abandonment < 0.5%** (76 drivers saved) |
+  | **S3 (Highway Hub)** | 2-hour cellular WAN drop (11:00–13:00) | Static 50 kW fallback drops throughput; **29.69% abandonment that day** (76/256) | Edge controller islands locally; maintains full **1,425 kW DC** load allocation with 0 cloud calls | **Drivers leaving: 29 → 15** in our replay (0 cloud calls during the outage) |
   | **S4 (Urban Hub)** | **799.30 €/MWh spot price spike** at 18:00 + cable fault | System abandons charging or incurs ruinous cost | MILP lookahead pre-charges buffer; continuous SoC slack prevents false drop; isolates `D4-2` | **0 abandoned vehicles**, 0 overlimit |
-  | **S5 (New Depot)** | 3-way config mismatch (600 vs 900 kW) + throttled D5-7/D5-8 | 5 buses missed, 508.95 kWh deficit | Three-way config reconciler unlocks **900 kW (+750 kWh)**, unthrottles D5-7 (150kW), activates D5-8 | **0 missed departures** (508.95 kWh recovered) |
+  | **S5 (New Depot)** | 3-way config mismatch (600 vs 900 kW) + throttled D5-7/D5-8 | 5 buses missed, 508.95 kWh deficit | Three-way config reconciler unlocks **900 kW (+750 kWh)**, unthrottles D5-7 (150kW), activates D5-8 | **0 missed departures** (508.95 kWh recovered) — *a config fix, not a same-engine A/B* |
 
 - **Autonomy Highlights**:
   - **Predictive Lead Time**: 199 minutes ahead of failure (`2026-11-12T22:31:00+02:00`, `59.3°C / 702 rpm`, threshold + slope extrapolation); physical technician retained strictly for `F016` hardware replacement (`cleared_by = technician`).
@@ -153,9 +155,9 @@
 >
 > At Logistics Depot S2, the grid operator cut capacity by 400 kW. Sentinel realized that overnight trucks T05 through T08 had an 1,857 kWh flexibility pool. It throttled them to 1 kW and rerouted 283.5 kWh to afternoon trucks T01 through T04. All four departed on schedule (`4 -> 0`).
 >
-> At Highway Hub S3, a 2-hour cellular outage triggered the naive 50 kW fallback in baseline, causing 29.7% of public drivers to drive away. Sentinel’s edge islanding maintained 1,425 kW of local DC capacity, crushing abandonment to under 0.5%.
+> At Highway Hub S3, a 2-hour cellular outage triggered the naive 50 kW fallback in baseline. Sentinel’s edge islanding maintained the full 1,425 kW of local DC capacity with zero cloud calls, cutting drivers who walked away from 29 to 15 in our replay. To be honest about the headline number: the official file records 76 abandonments that day (29.69%), but only 13 of them fall inside the outage window and 38 happen 15:00–18:00 with the network healthy — so the outage amplifies a capacity shortage; it is not the whole story.
 >
-> And at Depot S5, our Three-Way Config Reconciler caught a human configuration error in `site_config.csv` where a 900 kW site was throttled to 600 kW. It restored full 900 kW capacity, unlocking 750 kWh of headroom and eliminating all 5 missed buses (`5 -> 0`)."
+> And at Depot S5, our Three-Way Config Reconciler caught a human configuration error in `site_config.csv` where a 900 kW site was throttled to 600 kW. It restored full 900 kW capacity, unlocking 750 kWh of headroom and eliminating all 5 missed buses (`5 -> 0`). One honest caveat: S5 is a configuration fix — four of the five official failures come from plug-queueing our engine does not model — so this is not a same-engine A/B, and we say so."
 
 ---
 
@@ -191,7 +193,7 @@
 
 ---
 
-## Slide 6: Dimension 3 (20% Technical Credibility): Standards, Simulation & 537 Tests (05:15 – 06:30)
+## Slide 6: Dimension 3 (20% Technical Credibility): Standards, Simulation & 539 Tests (05:15 – 06:30)
 **Official Judging Focus: Technical Credibility (20%)**
 
 ### Slide Content & Visual Layout
@@ -243,6 +245,7 @@
 - **Header**: **Commercial Viability: Outcome-Based CaaS & Enforceable SLA**
 - **The Financial Transformation**:
   - **OPEX, honestly sized — and correctly attributed**: the recorded baseline is **20.76 FTE / 93,412 min**. Of that, **`9.95 FTE` (`872,976 €/yr`) is the customer's own night-shift replugging** (`5,596` events a fleet pays for) — so it is **the value we sell, not a cost we carry**. **`5.09 FTE` (`446,667 €/yr`) is our technician roll-outs** (`73` dispatches, `cleared_by = technician`), and **`2.50 FTE` is remote load/price/reset**, ours only on the `18/29` contracts with service scope. **`3.22 FTE` customer contact** is retained, not claimed. Quote those two sides apart: pricing a customer's saving as our own margin is exactly how a CaaS contract goes wrong.
+  - **The FTE ledger in one line** (so the numbers never blur together): `20.76` total = `9.95` replug (customer's) + `5.09` technician + `2.50` remote ops + `3.22` customer contact, all rolled up from the same `93,412` minutes. "12.44 FTE software-addressable" = `9.95 + 2.50` (the slice our software actually removes).
   - **S1 Three-Tier Strategy Comparison (Transparently Grounded in `equipment_costs.csv`)**:
     - **Tier 2 — Zero-CAPEX Software (`0 €` CAPEX, `0` human moves)**:
       - Uses existing 12 single-gun dispensers (`cross_tie=False`) with urgency-weighted MILP (`strategy="urgency"`).
@@ -283,25 +286,26 @@
 
 ### Slide Content & Visual Layout
 - **Header**: **Customer Narrative 2029: A Sub-Zero Winter Night in Lahti**
-- **Character**: Pekka Virtanen, Fleet Operations Director, Lahti City Transit (Lahden Seudun Liikenne - LSL).
-- **Setting**: Friday, January 19, 2029 · -18°C sub-zero blizzard · Depot North (24 Electric Articulated Buses).
+- **Character**: Pekka Virtanen — a **fictional** fleet operations director at a Finnish city-bus operator (invented for this pitch; the brief asks for a customer story, and no customer names exist in the synthetic dataset).
+- **Setting**: Friday, January 2029 · sub-zero winter night · a bus depot running 24 electric buses on 12 single-gun posts (the S1 topology from the data).
+- **Why 2029 matters**: `growth_forecast.csv` projects city-bus charging demand in Finland at **170% of 2026** by 2029, and truck corridors up to **5×** — the same night-shift problem, at a larger fleet.
 - **The Story Arc in 3 Beats**:
-  1. **22:00 – Hands-Free Depot Ingestion**: Driver plugs in bus with ISO 15118 PnC. Mutual TLS 1.3 handshake authenticates vehicle in 1.1s. Driver walks home. No night shift crew on site.
-  2. **02:15 – Sub-Zero Thermal Self-Healing**: Temperature drops to -18°C. Battery cell acceptance drops 40%. Sentinel’s Nordic Low-Temp Self-Healing redirects 50 kW to onboard PTC battery pack pre-heating, restoring maximum charge acceptance rate in 18 minutes.
-  3. **05:30 – 100% Punctual Morning Rollout**: All 24 buses roll out onto Lahti’s snow-covered streets at 100% target SoC. Pekka wakes up at 06:00, glances at his phone, and sees a single green badge: *"All 24 routes dispatched on time. Zero interventions. Monthly SLA: 99.98%."*
+  1. **22:00 – Hands-Free Depot Ingestion**: Driver plugs in bus with ISO 15118 PnC. Mutual TLS 1.3 handshake authenticates the vehicle in ~1.1s. Driver walks home. No night-shift crew on site.
+  2. **02:15 – The Failure Nobody Planned For**: A cabinet trips in the middle of the night (the `F016` pattern from Scenario Day). With no human on site, the edge controller re-routes power across the remaining guns on its own — no cloud, no phone call, no midnight replug.
+  3. **05:30 – 100% Punctual Morning Rollout**: All 24 buses roll out at target SoC. Pekka wakes at 06:00, glances at his phone, and sees a single green badge: *"All 24 routes dispatched on time. Zero interventions. Monthly SLA: 99.9%."*
 
 ### Speaker Script (Verbatim)
-> "Let's bring this to life through a customer story from January 2029.
+> "Let's bring this to life through a customer story from January 2029 — and to be clear, Pekka is a character we invented, because the brief asks for a customer story and the dataset has no real customers.
 >
-> Meet Pekka Virtanen. Pekka is the Fleet Operations Director for Lahti City Transit. In 2026, Pekka’s hardest job was hiring night shift staff willing to work in sub-zero Finnish blizzards at 2 AM, dragging frozen 400-amp cables through slush to swap plugs.
+> Meet Pekka Virtanen, fleet operations director at a Finnish city-bus operator. In 2026, Pekka’s hardest job was hiring night shift staff willing to work in sub-zero Finnish winters at 2 AM, dragging frozen cables through slush to swap plugs.
 >
-> Fast-forward to January 2029. It is -18°C in Lahti. At 10 PM, 24 electric city buses return to Depot North. Drivers simply plug in the cables. Thanks to ISO 15118 Plug & Charge, the handshake takes 1.1 seconds. The drivers go home. The yard is completely dark and empty.
+> Fast-forward to January 2029. The fleet has grown — the growth forecast says city-bus charging demand is 1.7× today's. At 10 PM, 24 electric city buses return to the depot. Drivers simply plug in. Thanks to ISO 15118 Plug & Charge, the handshake takes about a second. The drivers go home. The yard is dark and empty.
 >
-> At 2:15 AM, the freeze sets in. Lithium-ion acceptance rates plunge. Sentinel's Nordic sub-zero self-healing controller detects the battery cold-soak, and dynamically diverts 50 kW of modular power to the buses' PTC battery thermal pre-heaters. Within 18 minutes, the packs reach optimal charging temperature, cutting total session time by 35%.
+> At 2:15 AM, a cabinet trips — exactly the kind of failure that used to wake Pekka up. But no one is woken. The edge controller detects the fault and re-routes power across the remaining guns on its own. No cloud call, no technician, no midnight replug.
 >
-> At 5:30 AM, when the citizens of Lahti step out to catch Bus Line 1 to the University, all 24 buses depart with full batteries, to the exact second.
+> At 5:30 AM, all 24 buses depart with full batteries, to the exact second.
 >
-> Pekka wakes up at 6 AM, sips his morning coffee, and looks at his phone. There are no emergency calls, no missed runs, and no disputed invoices. That is what Sentinel delivers."
+> Pekka wakes at 6 AM, sips his morning coffee, and looks at his phone. No emergency calls, no missed runs, no disputed invoices. That is what Sentinel delivers."
 
 ---
 
@@ -344,7 +348,7 @@
   | **Energy & Grid Impact** | **20%** | **0 Official Overlimits across 134,400 rows** · 72 Grid-Capped Network Sites · S1 Gun-Hour `45.38% -> 47.50%` |
   | **Technical Credibility** | **20%** | **OCPP 2.0.1 + ISO 15118 PnC** · Offline Discrete-Event Simulator · **433 pytest + 106 E2E (539 total)** |
   | **Commercial Viability** | **20%** | **20.76 FTE (1.82M €/yr) Eliminated** · Honest 3-Tier CAPEX (`0 €` vs `324k €` + unpriced busbar, 13.31-yr) — and plugs alone = `8` missed, worse · 150% Capped SLA |
-  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story · Sub-second Verifier (`0.34s`) |
+  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Sub-second Verifier (`0.34s`) |
 
 - **Closing Call to Action**:
   > *"Kempower built the world's most flexible DC charging hardware. Sentinel provides the autonomous brain it deserves. Together, we make 2029 zero-touch charging an industrial reality."*
@@ -381,7 +385,7 @@
   1. We enforce an explicit inverter conversion efficiency of $\eta = 0.955$ ($95.5\%$).
   2. Total AC power drawn is $P_{\text{AC}} = 1,425.0 \text{ kW} / 0.955 = 1,492.15 \text{ kW}$.
   3. This is strictly less than the 1,500.0 kW transformer limit, leaving a 7.85 kW safety buffer.
-  4. In contrast, the baseline naive fallback dropped power to 50 kW per dispenser (400 kW total), causing 29.69% driver abandonment. Sentinel’s autonomous local DLM kept throughput at 1,425 kW safely.
+  4. In contrast, the baseline naive fallback dropped power to 50 kW per dispenser (500 kW total across 10 guns). Sentinel’s autonomous local DLM kept throughput at 1,425 kW safely. (Note: the 29.69% abandonment that day is mostly a capacity problem — only 13 of the 76 abandonments fall inside the outage window.)
   5. Verified in `test_m1_adversarial_probe.py` and `tier2_boundary_corner.py`.
 
 ### Question 3 (Commercial Judge):
