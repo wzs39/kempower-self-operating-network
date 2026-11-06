@@ -234,6 +234,7 @@ def run_discrete_event_simulation(
     grid_limit_kw: Optional[float] = None,
     grid_curtailment: Optional[List[Tuple[datetime, datetime, float]]] = None,
     point_gun_kw: Optional[List[float]] = None,
+    trace: Optional[list] = None,
 ) -> SimulationResult:
     """
     Executes a minute-by-minute discrete event charging simulation.
@@ -244,6 +245,11 @@ def run_discrete_event_simulation(
             temporarily override grid_limit_kw during those periods.
         point_gun_kw: Per-point gun kW overrides. Length must match total points.
             If None, all points use `gun_kw`.
+        trace: Optional list. If provided (e.g. `[]`), a read-only per-minute snapshot
+            is appended to it: site power, per-cabinet liveness, per-gun occupancy and
+            the SoC of every plugged vehicle. Purely observational — it does not alter
+            the simulation, so `trace=None` is bit-identical to the previous behaviour.
+            Used by `tools/render_scenario.py` to animate the day.
     """
     if not jobs:
         return SimulationResult(site_id=site_id, date=date, strategy=strategy)
@@ -293,6 +299,8 @@ def run_discrete_event_simulation(
         return base
 
     while t <= end:
+        draw_now = 0.0
+
         # Step 1: Cabinet Fault Injection
         if fault and not fault_fired and t >= fault[0]:
             fault_fired = True
@@ -372,6 +380,7 @@ def run_discrete_event_simulation(
                 plan = [(j, lim * scale) for j, lim in plan]
             draw = sum(lim for _, lim in plan)
             peak = max(peak, draw)
+            draw_now = draw
 
             for j, limit in plan:
                 room = j.need_kwh - delivered[j.vehicle_id]
@@ -429,6 +438,45 @@ def run_discrete_event_simulation(
                 if finished(j) and j.vehicle_id not in finish_at:
                     finish_at[j.vehicle_id] = t
             peak = max(peak, total_alloc)
+            draw_now = total_alloc
+
+        if trace is not None:
+            trace.append(
+                {
+                    "t": t.isoformat(),
+                    "site_kw": round(draw_now, 1),
+                    "cabinet_alive": [c.alive for c in cabinets],
+                    "cabinet_kw": [round(c.kw, 1) for c in cabinets],
+                    "guns": [
+                        {
+                            "idx": p.idx,
+                            "cabinet": p.cabinet,
+                            "alive": p.alive,
+                            "vehicle": (p.job.vehicle_id if p.job is not None else None),
+                            "soc": (
+                                round(soc[p.job.vehicle_id], 4)
+                                if p.job is not None
+                                else None
+                            ),
+                            "depart_ts": (
+                                p.job.depart.isoformat() if p.job is not None else None
+                            ),
+                        }
+                        for p in points
+                    ],
+                    "active_points": sum(
+                        1
+                        for p in points
+                        if p.alive
+                        and p.job is not None
+                        and not finished(p.job)
+                        and (p.ready_at is None or t >= p.ready_at)
+                    ),
+                    "queue_len": len(waiting),
+                    "finished": len(finish_at),
+                    "stranded": sorted(stranded),
+                }
+            )
 
         t += dt
 
