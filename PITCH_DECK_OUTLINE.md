@@ -18,7 +18,7 @@
 [00:00 - 00:45] Slide 1: The Core Question & The Sentinel Vision
 [00:45 - 01:45] Slide 2: The Empirical Ground Truth: The 20.76 FTE Crisis
 [01:45 - 02:45] Slide 3: Two-Tier Architecture: Cloud (L3) & Edge FSM (L2) over Kempower DPR (L1)
-[02:45 - 04:00] Slide 4: Dimension 1 (25%): Degree of Autonomy & 3-Tier Scenario Day (13 -> 3 [0€] / 0 [324k€ + 母联，母联无报价])
+[02:45 - 04:00] Slide 4: Dimension 1 (25%): Degree of Autonomy & 3-Tier Scenario Day (S1 4→3 · S2 4→0 · S5 5→0 at 0€ / 0 total at 324k€ + busbar, busbar unpriced)
 [04:00 - 05:15] Slide 5: Dimension 2 (20%): Energy & Grid Impact (0 Overlimits, 72 Grid-Capped Sites, Utilization)
 [05:15 - 06:30] Slide 6: Dimension 3 (20%): Technical Credibility (OCPP 2.0.1, ISO 15118 PnC, 433 pytest + 106 E2E [539 total])
 [06:30 - 07:45] Slide 7: Dimension 4 (20%): Commercial Viability & The One-Page SLA (CaaS & MRDT Gate)
