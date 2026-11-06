@@ -1,4 +1,4 @@
-# Demo Storyboard — `scenario_day.mp4`
+# Demo Storyboard — shipped cut: `demo/presentation_demo.mp4` (75 s, 1920x1080@30fps, silent)
 
 **片名**：`Five sites, one day · without people in the loop`
 **时长**：98 秒｜1920×1080｜30 fps｜无旁白｜英文字幕
@@ -35,7 +35,7 @@
 | 编码 | H.264, yuv420p, CRF 20, 无音轨 |
 | 字体 | `DejaVu Sans`（matplotlib 内置）/ 数字用 `DejaVu Sans Mono` |
 | 渲染 | `tools/render_scenario.py` → PNG 序列 → `ffmpeg -framerate 30` |
-| 输出 | `demo/scenario_day.mp4` + `demo/scenario_day_poster.png`（封面帧） |
+| 输出 | **已交付**：`demo/presentation_demo.mp4`（75 s）+ `demo/presentation_demo_poster.png`（封面帧）。本文件原设计的 `scenario_day.mp4` / `scenario_day_poster.png` 为同一素材的旧命名，未单独产出，提交清单以 `presentation_demo.*` 为准。 |
 
 ### 配色
 

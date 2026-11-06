@@ -455,7 +455,9 @@ class PlugAndQueueHub:
         """
         When Gun A reaches CV trickle (<25 kW) or disconnects:
         DPR contactor executes <500 ms zero-arc transition to Gun B.
-        Eliminates repositioning friction and compresses abandonment from 29.7% to <0.5%.
+        Eliminates repositioning friction. Note: only left_queue arrivals are addressable by
+        queue logic (14 of the 76 abandoned on 2026-11-13), so no post-hoc abandonment
+        percentage is claimed.
         """
         if post_id in self.queue_state:
             q = self.queue_state.pop(post_id)

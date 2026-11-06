@@ -37,13 +37,13 @@ The testing framework for the Self-Operating Charging Network adheres to three n
 | **F07** | S5 Three-Way Config Reconciler | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f07_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f07_b*` | D5-7 50kW override to 150kW, D5-8 eSIM activation |
 | **F08** | 799.30 €/MWh Price Peak BESS Interface | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f08_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f08_b*` | BESS peak shaving interface at 18:00 *(interface defined, not field-validated)* |
 | **F09** | 2026-11-13 Baseline Replay | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_s1_*` to `test_s5_*` | 13 missed departures across S1 (4), S2 (4), S5 (5) |
-| **F10** | 2026-11-13 Sentinel Runner | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_closed_loop_*` | 3 missed (0 € software) / 0 missed (324k € S1 expansion), <0.5% abandoned, 0 grid breaches |
+| **F10** | 2026-11-13 Sentinel Runner | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_closed_loop_*` | 3 missed (0 € software) / 0 missed (324k € S1 expansion + unpriced busbar), offline capacity 1,425 kW DC held vs 500 kW fallback, 0 grid breaches |
 | **F11** | One-Page SLA Engine & Anti-Fraud | Tier 1, 2, 4 | `e2e_tests/tier1_feature_coverage.py::test_f11_*`<br>`e2e_tests/tier4_real_world_scenario.py::test_one_page_*` | MRDT gate, 5-layer fraud rejection, piecewise fee deduction |
 | **F12** | Commercial AEaaS ROI Model | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_commercial_*` | 20.76 FTE continuous elimination (1.82M €/yr), Tier 2 (0 €) vs Tier 3 (324k €) |
 | **F13–F18** | High-Value Innovation Protocols | Tier 3, 4 | `e2e_tests/tier3_cross_feature.py`<br>`e2e_tests/tier4_real_world_scenario.py` | Pairwise and full Scenario Day stress validation |
 | **F19** | Zero-Regression Deterministic Verifier | Master / Root | `verify_all.py` | Sub-0.5-second execution budget validation (<5.0s) |
 | **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.65s |
-| **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass across `433 pytest + 106 E2E (539 total)` |
+| **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass across `434 pytest + 106 E2E (540 total)` |
 
 ---
 
@@ -64,7 +64,7 @@ e2e_tests/
                                 [ TIER 4: REAL-WORLD SCENARIOS ]
                         - S1 Depot 24-Bus Night Shift (3 Missed @ 0€ / 0 Missed @ 324k€)
                         - S2 Logistics 4-Truck DSO Curtailment (G1 400 kW)
-                        - S3 Highway 256-Driver Offline Islanding (<0.5% Drop)
+                        - S3 Highway 256-Driver Offline Islanding (1,425 kW DC held vs 500 kW fallback)
                         - S4 Urban Hub 799.30 €/MWh Peak & D4-2 Cable Trip
                         - S5 Commissioning Three-Way Config Reconciler (D5-7/8)
                         - Commercial 20.76 FTE Elimination & One-Page SLA Settlement
@@ -179,11 +179,11 @@ python e2e_tests/tier4_real_world_scenario.py
 # Run all E2E tests
 python -m pytest e2e_tests/ -v
 
-# Run full pytest suite (`433 pytest + 106 E2E (539 total)`)
+# Run full pytest suite (`434 pytest + 106 E2E (540 total)`)
 python -m pytest tests/ -q
 ```
 
-### 5. Run Deterministic Verifier Gate (<0.5s)
+### 5. Run Deterministic Verifier Gate (&lt; 0.5s)
 ```powershell
 python verify_all.py
 ```

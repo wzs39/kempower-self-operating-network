@@ -4,11 +4,11 @@
 > **Design Perspective**: Stated per the brief's first actor — the **equipment supplier / service provider** (`contracts.csv`), the party holding the hardware+service contracts and carrying departure penalties, transitioning to autonomous Energy Certainty-as-a-Service (CaaS).
 
 ## Core Verification Commands (< 5 Seconds)
-1. **Deterministic End-to-End Verifier (`0.34s`)**:
+1. **Deterministic End-to-End Verifier (`0.38 s` warm, `0.5-0.7 s` cold)**:
    ```bash
    python verify_all.py
    ```
-2. **Full Automated Test Suite (`433 pytest + 106 E2E (539 total)`, including all 29 GitHub Issue #2 items `A1–D5`)**:
+2. **Full Automated Test Suite (`434 pytest + 106 E2E (540 total)`, including all 29 GitHub Issue #2 items `A1–D5`)**:
    ```bash
    python -m pytest tests/ -q
    python -m e2e_tests.test_runner

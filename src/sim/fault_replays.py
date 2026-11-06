@@ -348,7 +348,7 @@ def simulate_fleet(
 
 
 # --------------------------------------------------------------------------- 1. price spike
-PRICE_SPIKE_START = datetime.fromisoformat("2026-11-13T17:15:00+02:00")
+PRICE_SPIKE_START = datetime.fromisoformat("2026-11-13T17:15:00+02:00")  # ramp start (204); >600 only 17:45/18:00/18:15
 PRICE_SPIKE_END = datetime.fromisoformat("2026-11-13T18:45:00+02:00")
 PRICE_PEAK_TS = datetime.fromisoformat("2026-11-13T18:00:00+02:00")
 

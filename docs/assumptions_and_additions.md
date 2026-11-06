@@ -6,7 +6,7 @@
 
 ---
 
-## 1. Assumptions (20)
+## 1. Assumptions (21)
 
 Legend for **Direction** — `optimistic` means our headline result would get *worse* if the assumption is wrong; `neutral` means it does not move the S1/S2/S5 ledger.
 
@@ -29,9 +29,10 @@ Legend for **Direction** — `optimistic` means our headline result would get *w
 | **A15** | Power is allocated continuously (1 kW resolution) | no 25 kW module quantisation inside a cabinet | `DPRMatrix` modules are 25 kW, but intra-cabinet DPR is modelled as a continuous budget | optimistic | `docs/attribution_matrix.md` |
 | **A16** | FTE annualisation | `93,412 min / (37.5 h × 2 wk)` = **20.76 FTE**; 1,950 h/yr; `45 €/h` = `87,750 €/FTE/yr` | Finnish statutory 37.5 h/week, `equipment_costs.csv` | neutral | `src/commercial/roi_analyzer.py` |
 | **A17** | Tier-3 hardware price | `27,000 €/gun` = `18,000` dispenser + `9,000` civil → `324,000 €` for 12 guns | `equipment_costs.csv`; **the cross-cabinet busbar is not priced anywhere in the dataset, so the monotone zero-miss path has no quote** (the priced alternative, `3×450 kW` = `270 kW × 280 €/kW` = `75,600 €`, reaches `0` only when the `1,200 kW` cap is enforced, and is non-monotonic) | neutral | `verify_all.py`, `docs/attribution_matrix.md` Option 5 |
-| **A18** | Energy price = Nord Pool spot + `tariffs.csv` grid tariff, 15-min | no taxes, no DSO variable fees, no imbalance settlement | Only these two series exist in the dataset | neutral | `docs/energy_impact.md` Table 1A |
+| **A18** | Energy price = supplied `prices.csv` spot + `tariffs.csv` grid tariff, 15-min (the brief states prices are **synthetic**; we consume the provided series, not a live exchange feed) | no taxes, no DSO variable fees, no imbalance settlement | Only these two series exist in the dataset | neutral | `docs/energy_impact.md` Table 1A |
 | **A19** | **Every undercharged departure counts as one `penalty_eur_per_late_departure` event** | `150 € × 4 (S1) + 150 € × 5 (S5)` = **`1,350 €`** vs `263 €` daily fee | `contracts.csv` `C1` gives the rate (`150 €`) and `baseline_kpis.csv` gives `departures_below_required_soc` (4 / 5), but **no file states the trigger clause** — we read "left below required SoC" as "left late" | **optimistic** — if the contract only pays on clock-time lateness, this number is an upper bound | `PITCH_DECK_OUTLINE.md` slide 7 |
 | **A20** | **The penalty is payable by the supplier, not by the site owner** | the exposure sits on our side of the contract | `contracts.csv` gives a rate per customer but **names no payer**. The data README says the supplier `delivers and services the chargers at all sites`, so we read the penalty as its liability. Note **`7` of the `18` penalty-bearing contracts are pure `hardware`** — the exposure is not tied to the service tier, which strengthens this reading | **optimistic** for us — if the penalty actually falls on the fleet, our commercial case loses its cash-flow anchor and only the `5.09 FTE` technician line remains | `README.md` design-perspective block, `PITCH` slide 7 |
+| **A21** | **One basis per claim for S3 abandonment** — the day figure `29.69 %` (`76/256`) and the in-window figure `44.83 %` (`13/29`) are both **row-level** `public_arrivals.csv` and may be quoted together; the `15`-min aggregate `network_site_power.csv` gives `46.88 %` (`15/32`) for the same window and is reported separately | `44.83 %` in-window (row level) | Two official files count arrivals on different grids (per-session vs per-15-min bucket); they differ by 2 events | neutral (it is a presentation-basis guard, not a result) | `tools/export_deck_ledger.py` → `sites.S3.window_basis`, `README.md`, `docs/hackathon/DEMO_SCRIPT.md` |
 
 Not modelled, stated rather than hidden: **`F015`** (A8), **S5 queueing** (A13), **BESS** (`bess_kwh = 0` at all five sites — we do not claim storage arbitrage), **protocol conformance on real hardware** (OCPP 2.0.1 / ISO 15118 code paths are implemented and unit-tested, never field-validated), and the **`< 10 ms` / `85 ms` BBM envelope** (a design target from the DPR module spec, not a measurement).
 
@@ -52,7 +53,7 @@ Not modelled, stated rather than hidden: **`F015`** (A8), **S5 queueing** (A13),
 | `src/core/mpc_optimizer.py` | 15-min rolling-horizon MILP (SciPy HiGHS) | — |
 | `src/commercial/*` | SLA calculator (MRDT, liquidated damages) + ROI/labour analyser | — |
 | `app.py` | 4-view Streamlit cockpit with minute playback | — |
-| `verify_all.py` | Deterministic < 0.5 s verifier (the entry point a judge should run) | — |
+| `verify_all.py` | Deterministic < 1 s verifier (the entry point a judge should run) | — |
 | `tests/` (433) + `e2e_tests/` (106) | 539 tests, including an opaque-box E2E suite | — |
 
 ### 2.2 Documents and narrative

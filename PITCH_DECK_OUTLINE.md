@@ -7,7 +7,7 @@
 > **Slide 1 must open with these three statements (all are hard requirements of the brief and ground rules):**
 > 1. **"We take the `Manufacturer` row on slide 15"** — the one that `Builds the chargers / Often services them`. In `contracts.csv` that party holds `18` of the `29` contracts with service scope, and a **separate** `18` carry `penalty_eur_per_late_departure` (`150 €` at `C1`, up to `250 €`) — `7` of them pure `hardware`, so the exposure is not tied to the service tier. Hence our north-star metric is staff-hours **we pay for** and penalties **we owe**, measured on the three layers that party already owns — firmware, site controller, cloud.
 > 2. **"All data shown is synthetic, supplied for this challenge; the 2029 operator is a fictional customer."**
-> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 20 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
+> 3. **"Every assumption and every artefact we added is in one list: `docs/assumptions_and_additions.md` — 21 assumptions, with the direction of the error and how to check each."** Hand it to the jury at 00:30, before they ask.
 
 
 ---
@@ -20,7 +20,7 @@
 [01:45 - 02:45] Slide 3: Two-Tier Architecture: Cloud (L3) & Edge FSM (L2) over Kempower DPR (L1)
 [02:45 - 04:00] Slide 4: Dimension 1 (25%): Degree of Autonomy & 3-Tier Scenario Day (S1 4→3 · S2 4→0 · S5 5→0 at 0€ / 0 total at 324k€ + busbar, busbar unpriced)
 [04:00 - 05:15] Slide 5: Dimension 2 (20%): Energy & Grid Impact (0 Overlimits, 72 Grid-Capped Sites, Utilization)
-[05:15 - 06:30] Slide 6: Dimension 3 (20%): Technical Credibility (OCPP 2.0.1, ISO 15118 PnC, 433 pytest + 106 E2E [539 total])
+[05:15 - 06:30] Slide 6: Dimension 3 (20%): Technical Credibility (OCPP 2.0.1, ISO 15118 PnC, 434 pytest + 106 E2E [540 total])
 [06:30 - 07:45] Slide 7: Dimension 4 (20%): Commercial Viability & The One-Page SLA (CaaS & MRDT Gate)
 [07:45 - 08:45] Slide 8: The 2029 Night, Resolved: Sentinel on the Scene (replay + resolution of Slide 1's cold open)
 [08:45 - 09:30] Slide 9: Dimension 5 (15%): Clarity & Live Interactive Command Center (Streamlit)
@@ -51,7 +51,7 @@
 > The challenge Kempower put to us was radical and uncompromising:
 > *'If humans were no longer allowed to continuously operate and maintain a charging network, how would you redesign it?'*
 >
-> Today, across Europe, EV charging relies on an invisible army of humans: dispatchers tweaking kilowatt limits, call center operators rebooting stalled chargers, and night shift staff walking freezing bus yards at 2 AM just to unplug bus #12 and plug in bus #13. And as the growth forecast tells us, by 2029 that army would have to be five times larger — which is precisely why it cannot survive.
+> Today, across Europe, EV charging relies on an invisible army of humans: dispatchers tweaking kilowatt limits, call center operators rebooting stalled chargers, and night shift staff walking freezing bus yards at 2 AM just to unplug bus #12 and plug in bus #13. And as `growth_forecast.csv` tells us, by 2029 Finnish city-bus charging demand is 1.7x today's, public cars 1.9x and truck corridors up to 5.2x in Germany — that army would have to grow faster than the fleet, which is precisely why it cannot survive.
 >
 > We built **Project Sentinel** to answer that 2:15 AM call. Sentinel is not another monitoring dashboard; it is a full-stack, autonomous operating core that eliminates continuous human intervention. It guarantees that every commercial vehicle leaves on time with 100% required energy, protects the power grid with zero transformer violations, and turns charging infrastructure into an unshakeable commercial SLA.
 >
@@ -101,7 +101,7 @@
   ```
   [L3: Autonomous Cloud Orchestrator] (15-min horizon)
   ├── 15-min Rolling MILP Optimizer (SciPy HiGHS)
-  ├── Spot Arbitrage (Nord Pool) & Dynamic Peak Demand Shaving (6.50/7.50 €/kW/mo)
+  ├── Spot Arbitrage (official synthetic prices.csv, 15-min) & Peak Demand Shaving (6.50/7.50 €/kW/mo)
   └── Outcome-Based SLA Engine & MRDT Gate Clearing
           │ (OCPP 2.0.1 Smart Charging TxProfile / TLS 1.3 WAN)
           ▼
@@ -121,7 +121,7 @@
 ### Speaker Script (Verbatim)
 > "Sentinel is built around a fundamental engineering principle: **Never rely on the cloud for physical safety, but never rely on local heuristics for global economic optimality.**
 >
-> At Layer 3, our Autonomous Cloud Orchestrator solves a rolling 15-minute Mixed-Integer Linear Program (MILP) using the SciPy HiGHS solver. It arbitrates Nord Pool day-ahead spot prices, optimizes Finnish monthly peak demand charges, and compiles vehicle departure deadlines into OCPP 2.0.1 `TxProfiles`.
+> At Layer 3, our Autonomous Cloud Orchestrator solves a rolling 15-minute Mixed-Integer Linear Program (MILP) using the SciPy HiGHS solver. It arbitrates the supplied 15-minute spot prices from `prices.csv`, optimizes Finnish monthly peak demand charges, and compiles vehicle departure deadlines into OCPP 2.0.1 `TxProfiles`.
 >
 > At Layer 2, our Station Edge Controller runs an autonomous Finite State Machine (FSM). It executes millisecond-scale local dynamic load management, anti-phantom replug fraud screening, and threshold + slope extrapolation thermal health checks. If the WAN fiber is severed, the Edge Controller instantly islands the station for up to 72 hours with zero degradation in local capacity.
 >
@@ -141,9 +141,9 @@
   |---|---|---|---|---|
   | **S1 (Depot North)** | 24 overnight buses (`32` total) on 12 single-gun posts; Cabinet C1-3 fan fails (`F015`/`F016` 246m) | 4 buses missed (`B04, B09, B18, B20`), `398.5 kWh` same-engine deficit (`1,012.00 kWh` official 0-session gap) | **199-min lead-time alert** at 22:31 (`59.3°C/702 rpm`); **Tier 2 (`0 €`)** urgency MILP on 12 guns vs **Tier 3 (`324k €`)** 24-plug dual-gun expansion | **Tier 2 (`0 €`)**: **3 missed** (`B20` saved, `398.5 -> 48.8 kWh`, `-87.8%`)<br>**Tier 3 (`324k €`)**: **0 missed** (`0.0 kWh` deficit) |
   | **S2 (Logistics East)**| DSO 400 kW curtailment (16:00–19:00) | 4 trucks missed (`T01–T04`), 283.50 kWh deficit | Priority preemption: shifts 283.5 kWh from overnight trucks `T05–T08` (1,857 kWh pool) via continuous OCPP | **0 missed departures** (100% on-time dispatch) |
-  | **S3 (Highway Hub)** | 2-hour cellular WAN drop (11:00–13:00) | Static 50 kW fallback drops throughput; **29.69% abandonment that day** (76/256) | Edge controller islands locally; maintains full **1,425 kW DC** load allocation with 0 cloud calls | **Drivers leaving: 29 → 15** in our replay (0 cloud calls during the outage) |
+  | **S3 (Highway Hub)** | 2-hour cellular WAN drop (11:00–13:00) | Static 50 kW fallback drops throughput; **29.69% abandonment that day** (76/256) | Edge controller islands locally; maintains full **1,425 kW DC** load allocation with 0 cloud calls | **Replay model: 29 → 15 walked away** (`src/sim/outage_replay.py`, a model of driver patience from `max_wait_min`, NOT an official outcome); official record stays 29.69% day / 44.83% in-window |
   | **S4 (Urban Hub)** | **799.30 €/MWh spot price spike** at 18:00 + cable fault | System abandons charging or incurs ruinous cost | MILP lookahead pre-charges buffer; continuous SoC slack prevents false drop; isolates `D4-2` | **0 abandoned vehicles**, 0 overlimit |
-  | **S5 (New Depot)** | 3-way config mismatch (600 vs 900 kW) + throttled D5-7/D5-8 | 5 buses missed, 508.95 kWh deficit | Three-way config reconciler unlocks **900 kW (+750 kWh)**, unthrottles D5-7 (150kW), activates D5-8 | **0 missed departures** (508.95 kWh recovered) — *a config fix, not a same-engine A/B* |
+  | **S5 (New Depot)** | 3-way config mismatch (600 vs 900 kW) + throttled D5-7/D5-8 | 5 buses missed (`B27/B28/B33/B34/B35`), 508.95 kWh recorded deficit | Three-way config reconciler unlocks **900 kW (+750 kWh)**, unthrottles D5-7 (150 kW), activates D5-8 | **0 missed departures** after the fix; same-engine baseline reproduces **1 of the 5** (`365.4 kWh`) — *a config fix, not a same-engine A/B* (assumption A13) |
 
 - **Autonomy Highlights**:
   - **Predictive Lead Time**: 199 minutes ahead of failure (`2026-11-12T22:31:00+02:00`, `59.3°C / 702 rpm`, threshold + slope extrapolation); physical technician retained strictly for `F016` hardware replacement (`cleared_by = technician`).
@@ -195,11 +195,11 @@
 >
 > Many teams assume that 1,500 kW of DC charging equals 1,500 kW on the AC grid. That is an electrical fallacy. With a 95.5% inverter efficiency, 1,425 kW of DC output draws exactly 1,492.15 kW of AC power from the grid. Sentinel’s Dynamic Load Manager bakes the inverter loss guard directly into its math, keeping site load strictly below 1,500 kW with a 7.85 kW reserve margin.
 >
-> On Scenario Day, the Nord Pool spot price exploded to 799.30 €/MWh at 18:00. Naive MILP models often drop vehicles because the raw electricity cost exceeds the 250 € contractual penalty. We introduced a continuous SoC slack variable weighted at 10,000 € inside our HiGHS solver, alongside dimensional scaling of spot prices. Sentinel pre-charges vehicles prior to the spike, dynamically shaves the peak, and never leaves a customer stranded."
+> On Scenario Day, the spot price in `prices.csv` exploded to 799.30 €/MWh at 18:00 (above 600 only in the 17:45, 18:00 and 18:15 intervals). Naive MILP models often drop vehicles because the raw electricity cost exceeds the 250 € contractual penalty. We introduced a continuous SoC slack variable weighted at 10,000 € inside our HiGHS solver, alongside dimensional scaling of spot prices. Sentinel pre-charges vehicles prior to the spike, dynamically shaves the peak, and never leaves a customer stranded."
 
 ---
 
-## Slide 6: Dimension 3 (20% Technical Credibility): Standards, Simulation & 539 Tests (05:15 – 06:30)
+## Slide 6: Dimension 3 (20% Technical Credibility): Standards, Simulation & 540 Tests (05:15 – 06:30)
 **Official Judging Focus: Technical Credibility (20%)**
 
 ### Slide Content & Visual Layout
@@ -221,10 +221,10 @@
 - **Verification Proof Table**:
   | Verification Track | Scope | Execution Time | Pass Rate |
   |---|---|---|---|
-  | **Deterministic Verifier (`verify_all.py`)** | All S1–S5 Scenarios, 29 GitHub Issue #2 items | **0.34 seconds** | **100% (29/29)** |
-  | **Pytest Unit & Integration Suite** | Protocols, DPR, MILP, Self-Healing, SLA | **~42 seconds** | **100% (433 passed)** |
-  | **Independent E2E Suite (Tiers 1–4)** | Feature coverage, boundaries, stress, scenarios | **0.65 seconds** | **100% (106 passed)** |
-  | **Unified Automated Test Total** | **433 pytest + 106 E2E (539 total)** | **~43 seconds** | **100% (539/539)** |
+  | **Deterministic Verifier (`verify_all.py`)** | All S1–S5 Scenarios, 29 GitHub Issue #2 items | **0.38 seconds** | **100% (29/29)** |
+  | **Pytest Unit & Integration Suite** | Protocols, DPR, MILP, Self-Healing, SLA | **47-81 s** | **100% (434 passed)** |
+  | **Independent E2E Suite (Tiers 1–4)** | Feature coverage, boundaries, stress, scenarios | **0.7-1.3 s** | **100% (106 passed)** |
+  | **Unified Automated Test Total** | **434 pytest + 106 E2E (540 total)** | **47-82 s** | **100% (540/540)** |
   | **Official Dataset Integrity** | 45 CSV files under `kempower-challenge-data/` | Hash Verified | **100% UNTOUCHED** |
 
 ### Speaker Script (Verbatim)
@@ -237,10 +237,10 @@
 > And we validated our entire system through an offline discrete-event simulator (`src/sim/discrete_sim.py`) that models vehicle charging curves minute-by-minute under strict intra-cabinet wiring (`cross_tie=False`).
 >
 > Look at our test numbers:
-> - `verify_all.py` executes all 29 audit checks across S1 to S5 in **0.34 seconds**.
-> - Our pytest suite has **433 passing tests**.
-> - Our independent 4-tier E2E test suite adds another **106 passing tests** in 0.65 seconds.
-> - That is **433 pytest + 106 E2E (539 total)** automated tests with 100% pass rate, and zero bytes of the official 45 CSV files were modified. That is technical credibility."
+> - `verify_all.py` executes all 29 audit checks across S1 to S5 in **0.38 seconds** (0.5-0.7 s on the first run of a fresh clone: the 45 CSVs parse cold).
+> - Our pytest suite has **434 passing tests**.
+> - Our independent 4-tier E2E test suite adds another **106 passing tests** in 0.7-1.3 s.
+> - That is **434 pytest + 106 E2E (540 total)** automated tests with 100% pass rate, and zero bytes of the official 45 CSV files were modified. That is technical credibility."
 
 ---
 
@@ -294,7 +294,7 @@
 - **Header**: **The 2029 Night, Fully Told: 2:15 AM, and How It Ends**
 - **Character**: Pekka Virtanen — a **fictional** fleet operations director at a Finnish city-bus operator (invented for this pitch; the brief asks for a customer story, and no customer names exist in the synthetic dataset).
 - **Setting**: Friday, January 2029 · sub-zero winter night · a bus depot running 24 electric buses on 12 single-gun posts (the S1 topology from the data) — the very scene we opened with on Slide 1.
-- **Why 2029 matters**: `growth_forecast.csv` projects city-bus charging demand in Finland at **170% of 2026** by 2029, and truck corridors up to **5×** — the same night-shift problem, at a larger fleet.
+- **Why 2029 matters**: `growth_forecast.csv` projects city-bus charging demand in Finland at **170% of 2026** by 2029, public cars at **190%**, and truck corridors at **420% (FI)** / up to **520% (DE)** — the same night-shift problem, at a larger fleet.
 - **The Story Arc in 3 Beats (this is the full replay of Slide 1's cold open)**:
   1. **22:00 – Hands-Free Depot Ingestion**: Driver plugs in bus with ISO 15118 PnC. Mutual TLS 1.3 handshake authenticates the vehicle in ~1.1s. Driver walks home. No night-shift crew on site.
   2. **02:15 – The Failure Nobody Planned For**: A cabinet trips in the middle of the night (the `F016` pattern from Scenario Day). With no human on site, the edge controller re-routes power across the remaining guns on its own — no cloud, no phone call, no midnight replug.
@@ -305,7 +305,7 @@
 >
 > Meet Pekka Virtanen, fleet operations director at a Finnish city-bus operator. In 2026, Pekka’s hardest job was hiring night shift staff willing to work in sub-zero Finnish winters at 2 AM, dragging frozen cables through slush to swap plugs.
 >
-> Fast-forward to January 2029. The fleet has grown — the growth forecast says city-bus charging demand is 1.7× today's. At 10 PM, 24 electric city buses return to the depot. Drivers simply plug in. Thanks to ISO 15118 Plug & Charge, the handshake takes about a second. The drivers go home. The yard is dark and empty.
+> Fast-forward to January 2029. The fleet has grown — the growth forecast says city-bus charging demand is 1.7× today's. At 10 PM, 24 electric city buses return to the depot. Drivers simply plug in. Thanks to ISO 15118 Plug & Charge, the handshake is a single authenticated exchange (our implementation completes the crypto path validation in < 10 ms and the full TLS 1.3 handshake envelope in < 1.5 s). The drivers go home. The yard is dark and empty.
 >
 > At 2:15 AM — the moment we froze on at the start — the cabinet trips, exactly the kind of failure that used to wake Pekka up. But no one is woken. The edge controller detects the fault and re-routes power across the remaining guns on its own. No cloud call, no technician, no midnight replug. The 199-minute early warning we saw at S1 is the reason it was ready before it happened.
 >
@@ -352,9 +352,9 @@
   |---|---|---|
   | **Degree of Autonomy** | **25%** | **13 $\to$ 3 (`0 €`) / 0 (`324k €` + unpriced busbar) Missed Departures** · 199-min PdM · 85ms BBM Self-Healing · 72h Edge Islanding |
   | **Energy & Grid Impact** | **20%** | **0 Official Overlimits across 134,400 rows** · 72 Grid-Capped Network Sites · S1 Gun-Hour `45.38% -> 47.50%` |
-  | **Technical Credibility** | **20%** | **OCPP 2.0.1 + ISO 15118 PnC** · Offline Discrete-Event Simulator · **433 pytest + 106 E2E (539 total)** |
+  | **Technical Credibility** | **20%** | **OCPP 2.0.1 + ISO 15118 PnC** · Offline Discrete-Event Simulator · **434 pytest + 106 E2E (540 total)** |
   | **Commercial Viability** | **20%** | **20.76 FTE (1.82M €/yr) Eliminated** · Honest 3-Tier CAPEX (`0 €` vs `324k €` + unpriced busbar, 13.31-yr) — and plugs alone = `8` missed, worse · 150% Capped SLA |
-  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Sub-second Verifier (`0.34s`) |
+  | **Clarity** | **15%** | **4-Quadrant Streamlit Live Player** · 2029 Pekka Virtanen Story (fictional customer) · Sub-Second Verifier (`0.38 s` warm) |
 
 - **Closing Call to Action**:
   > *"At 2:15 AM in 2029, the cabinet fails — and nothing happens. Kempower built the world's most flexible DC charging hardware. Sentinel provides the autonomous brain it deserves. Together, we make 2029 zero-touch charging an industrial reality."*
@@ -370,7 +370,7 @@
 > We eliminated 20.76 FTEs of continuous human labor.
 > With zero capital expenditure and zero human moves, we cut Scenario Day missed departures from 13 to 3 (`-87.8%` deficit at S1, `0` missed at S2 and S5), and showed why 324,000 € of dual-gun expansion alone does **not** reach 0 (it yields 8 missed) and what the real zero-miss path is, reach 0 missed departures across the board.
 > We maintained 100% grid compliance across 134,400 intervals.
-> And we backed it all with industrial protocols, **433 pytest + 106 E2E (539 total)** automated tests, and an enforceable commercial SLA.
+> And we backed it all with industrial protocols, **434 pytest + 106 E2E (540 total)** automated tests, and an enforceable commercial SLA.
 >
 > That 2029 night is not a distant future. It is the exact moment your hardware deserves to reach — hands-free, zero-touch, and safe. Thank you, and we look forward to your questions."
 
@@ -410,6 +410,6 @@
 *"How do we know your test suite isn't just testing mock data?"*
 - **Defense Card**:
   1. Every single test imports from `src.sim.data_loader`, which directly reads the 45 unedited CSV files from `kempower-challenge/kempower-challenge-data/`.
-  2. We run **433 pytest + 106 E2E (539 total)** automated tests across 5 tiers.
-  3. We also provide `verify_all.py`, an independent, standalone Python script that reads the CSV files and evaluates the mathematical invariants directly in 0.34 seconds.
+  2. We run **434 pytest + 106 E2E (540 total)** automated tests across 5 tiers.
+  3. We also provide `verify_all.py`, an independent, standalone Python script that reads the CSV files and evaluates the mathematical invariants directly in 0.38 seconds (0.5-0.7 s on the first run of a fresh clone, because 240,635 rows are parsed cold).
   4. You can clone the repo, run `python verify_all.py`, and inspect every calculation line by line.

@@ -15,10 +15,10 @@ The Independent End-to-End (E2E) Test Suite has been fully constructed in `e2e_t
   - **Tier 2 (Boundary & Corner)**: 40 tests (100% pass, 0.001s)
   - **Tier 3 (Cross-Feature Interactions)**: 12 tests (100% pass, 0.018s)
   - **Tier 4 (Real-World Scenarios)**: 9 tests (100% pass, 0.363s)
-  - **Total E2E Suite Execution Time**: **0.65 seconds** via `test_runner.py`.
-- **Full Pytest Suite (`tests/`)**: **433 test cases** (100% pass via `pytest tests/ -q`).
-- **Deterministic Verifier (`verify_all.py`)**: **100% pass in 0.34 seconds** (< 5.0s quality gate budget).
-- **Combined Network Verification Count**: **`433 pytest + 106 E2E (539 total)` + deterministic verifier** with **zero regressions**.
+  - **Total E2E Suite Execution Time**: **0.7-1.3 s** via `test_runner.py`.
+- **Full Pytest Suite (`tests/`)**: **434 test cases** (100% pass via `pytest tests/ -q`).
+- **Deterministic Verifier (`verify_all.py`)**: **100% pass in 0.38 s** (< 5.0s quality gate budget).
+- **Combined Network Verification Count**: **`434 pytest + 106 E2E (540 total)` + deterministic verifier** with **zero regressions**.
 
 ---
 
@@ -73,7 +73,7 @@ e2e_tests/
 ### 2.4 Tier 4: Real-World Scenarios (9 Tests)
 - **S1 (Bus Depot)**: 4 baseline missed departures (`398.5 kWh` simulated deficit) reduced to **3 missed (`48.8 kWh` deficit, `-87.8%`, `B20` saved)** under `0 €` software urgency and **0 missed (`0.0 kWh` deficit)** under `324,000 €` 24-plug dual-gun expansion; D1-9 thermal peak detected 199 minutes in advance (22:31 @ 59.3°C).
 - **S2 (Logistics Depot)**: 4 baseline starved trucks (283.50 kWh deficit) preempted from T05–T08 pool (1,857.06 kWh), resulting in 0 missed departures.
-- **S3 (Public Highway Hub)**: 256 drivers, WAN drop, baseline 29.69% abandonment compressed to <0.5% via 1,425 kW DC / 1,492.15 kW AC local DLM.
+- **S3 (Public Highway Hub)**: 256 drivers, WAN drop, baseline 29.69% day / 44.83% in-window abandonment (`public_arrivals.csv` row level; the 15-min aggregate gives 46.88%); the shipped result is capacity held at 1,425 kW DC / 1,492.15 kW AC local DLM vs the 500 kW naive fallback.
 - **S4 (Urban Hub)**: MILP continuous SoC slack shaves 799.30 €/MWh peak, F017 cable fault isolated with 0 stranded vehicles.
 - **S5 (Fast Depot)**: 5 baseline missed departures eliminated (0 missed) by reconciling grid limit 600 $\rightarrow$ 900 kW (+750 kWh) and correcting D5-7/8.
 - **Commercial AEaaS**: 20.76 FTE continuous operations eliminated (1.82M €/yr at 45 €/h), 9.95 replug FTE (873k €/yr), Tier 2 (0 € CAPEX) vs Tier 3 (324k € CAPEX, 13.31y payback).
@@ -92,10 +92,10 @@ python e2e_tests/test_runner.py
 # 2. Run via pytest
 python -m pytest e2e_tests/ -v
 
-# 3. Run full pytest suite (`433 pytest + 106 E2E (539 total)`)
+# 3. Run full pytest suite (`434 pytest + 106 E2E (540 total)`)
 python -m pytest tests/ -q
 
-# 4. Run deterministic verifier (<0.5s)
+# 4. Run deterministic verifier (&lt; 0.5s)
 python verify_all.py
 ```
 

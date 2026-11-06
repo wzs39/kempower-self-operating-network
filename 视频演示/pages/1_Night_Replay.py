@@ -6,7 +6,9 @@ page "Night Replay" in the sidebar (multi-page apps: anything under pages/).
 
 What it shows, side by side, on the exact same 24 buses:
     BASELINE  12 dispensers + one operator shift at 00:30   -> 4 buses leave short
-    SENTINEL  24 connection points + cabinet busbar, 0 humans -> 0 buses leave short
+    TIER 3b   24 connection points + cabinet busbar, 0 humans -> 0 buses leave short
+              (a HARDWARE scenario; the SHIPPED 0-CAPEX software result is S1 4 -> 3,
+               0 human moves, -87.8% of the deficit — see verify_all.py)
 
 Both get the same physical shock at 02:25 (C1-3 overtemperature stop, F016).
 The point of the animation: the *only* difference is how many places a cable can
@@ -21,7 +23,7 @@ from pathlib import Path
 
 import streamlit as st
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]  # repo root: the demo shares the single authoritative src/ engine
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -304,8 +306,8 @@ def _block() -> None:
         )
     with right:
         st.markdown(
-            _panel(SENT, idx, "24 connection points · zero humans", "this system",
-                   "#E6F6EE", "#0B6E4F"),
+            _panel(SENT, idx, "24 points + busbar · zero humans", "Tier 3b hardware",
+                   "#EEF2FF", "#3730A3"),
             unsafe_allow_html=True,
         )
 

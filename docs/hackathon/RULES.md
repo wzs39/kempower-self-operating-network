@@ -28,7 +28,7 @@
 3. **Rule 3 — Zero Human Intervention on Scenario Day**:
    - The network must autonomously navigate Friday 2026-11-13 from 00:00 to 24:00 with 0 human touches.
    - All events must be resolved programmatically:
-     - `799.30 €/MWh` spot price spike (17:15–18:45);
+     - `799.30 €/MWh` spot price spike (ramp from 17:15; only 17:45/18:00/18:15 exceed 600 €/MWh, peak 799.30 at 18:00);
      - S1 `C1-3` thermal overtemperature fault (`F015` at 01:50, predictable `199 min` earlier at `2026-11-12T22:31:00+02:00`; `F016` at 02:25 for `246 min`, `cleared_by = technician`);
      - S2 DSO `400 kW` power curtailment (`G1`, **16:00–19:00**, `4` missed trucks / `283.50 kWh` deficit);
      - S3 2-hour cellular outage (**11:00–13:00**, `29.69%` scenario-day abandonment vs `14.36%` 14-day baseline);
@@ -46,4 +46,4 @@
 
 - **Runtime**: Python 3.10+ with NumPy, Pandas, SciPy (HiGHS MILP solver), Pytest, and Streamlit UI.
 - **Offline Autonomy**: Zero external cloud API dependencies. The system operates fully self-contained using local SQLite WAL storage and edge-cached Day-Ahead electricity prices.
-- **Verification Gate**: Full test suite (`433 pytest + 106 E2E (539 total)`) passes 100%, and `python verify_all.py` executes in `< 0.5s`.
+- **Verification Gate**: Full test suite (`434 pytest + 106 E2E (540 total)`) passes 100%, and `python verify_all.py` executes in `< 1 s`.

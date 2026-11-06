@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project Sentinel — One-Page Service Agreement (Kempower Challenge 2026)</title>
+<style>
+  @page { size: A4 portrait; margin: 9mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #16202b;
+    font-family: "Segoe UI", Inter, Arial, sans-serif; font-size: 6.9pt; line-height: 1.26; }
+  .page { width: 190mm; margin: 0 auto; padding: 2mm 0 0; }
+  code { font-family: Consolas, "Segoe UI", monospace; font-size: .92em; overflow-wrap: break-word; }
+  h1 { font-size: 12pt; margin: 0 0 1mm; letter-spacing: .2px; }
+  h1 span { color: #00A3E0; }
+  .sub { font-size: 7.2pt; color: #56616f; margin: 0 0 2mm; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.6mm; align-items: start; }
+  .col { border: .35mm solid #d3dae3; border-radius: 1.4mm; padding: 1.6mm 1.8mm; min-width: 0;
+         overflow-wrap: break-word; word-break: break-word; hyphens: auto; }
+  .col > h2 { font-size: 8.4pt; margin: 0 0 1.2mm; text-transform: uppercase; letter-spacing: .5px;
+    border-bottom: .35mm solid #d3dae3; padding-bottom: .9mm; }
+  .p { color: #0B6E4F; } .d { color: #1D4ED8; } .a { color: #9B1C1C; }
+  table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: .5mm 0 .8mm; }
+  th, td { text-align: left; padding: .35mm .5mm; border-bottom: .2mm solid #e6ebf0; vertical-align: top;
+           word-break: break-word; overflow-wrap: break-word; hyphens: auto; }
+  th { font-weight: 650; color: #445060; font-size: 6.9pt; hyphens: none; }
+  td.k { width: 40%; }
+  b, strong { font-weight: 680; }
+  ul { margin: .4mm 0 1mm 3.4mm; padding: 0; }
+  li { margin-bottom: .55mm; }
+  .num { font-variant-numeric: tabular-nums; }
+  .note { font-size: 6.4pt; color: #5b6672; margin-top: .8mm; }
+  .foot { margin-top: 1.4mm; border-top: .35mm solid #d3dae3; padding-top: 1mm; font-size: 6.4pt; color: #56616f; }
+  .eq { background: #f5f7fa; border-radius: .8mm; padding: .7mm .9mm; font-size: 6.5pt; margin: .5mm 0 .8mm;
+    font-family: "Cambria Math", Georgia, serif; }
+  .sign { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2mm; margin-top: 1.6mm; }
+  .sign div { border-top: .25mm solid #8b98a8; padding-top: .7mm; font-size: 6.7pt; color: #56616f; }
+  .tag { display: inline-block; font-size: 6.2pt; padding: 0 .8mm; border-radius: .7mm; margin-left: .5mm;
+    background: #eef2f6; color: #45505f; vertical-align: 1px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>Self-Operating Charging Network — <span>One-Page Service Agreement</span></h1>
+<p class="sub">
+Project Sentinel · Kempower Challenge, LahtiES Energy Tech Hackathon 2026 · Service Provider = equipment supplier &amp; service provider
+(<code class="num">contracts.csv</code>, the party holding <span class="num">18/29</span> service-scope contracts) · Client = fleet operator / site owner ·
+Scenario reference day <b class="num">2026-11-13</b> · All figures computed from the <b>synthetic</b> official dataset; the 2029 customer is fictional.
+</p>
+
+<div class="grid">
+
+<!-- ============================= PROMISES ============================= -->
+<section class="col p">
+  <h2>1 · What we promise</h2>
+  <table>
+    <tr><th style="width:29%">Commitment</th><th style="width:20%">Target</th><th>Measured as</th></tr>
+    <tr><td><b>SLO-1 Departures</b></td>
+        <td class="num">≥ 99.5 %<br><span class="tag">Titanium ≥ 99.9 %</span><br><span class="tag">Silver ≥ 99.0 %</span></td>
+        <td>monthly denominator = all scheduled departures; a departure is met when <code>SoC<sub>dep</sub> ≥ required_soc</code> and delay ≤ 0 min, provided MRDT was met.</td></tr>
+    <tr><td><b>SLO-2 Availability</b></td><td class="num">≥ 99.5 %</td>
+        <td>per-gun minutes available ÷ 720 h/month (per dispenser, not per site).</td></tr>
+    <tr><td><b>SLO-3 Off-grid</b></td><td class="num">≥ 72 h, full power</td>
+        <td>WAN loss from <code>connectivity_outages.csv</code>: station holds <b class="num">1,425 kW DC</b> (<b class="num">1,492.15 kW AC ≤ 1,500 kW</b>, η = 0.955) instead of the 50 kW/dispenser fallback (500 kW).</td></tr>
+    <tr><td><b>SLO-4 Grid limit</b></td><td class="num">100 %</td>
+        <td><code>P_AC(t) = P_DC(t)/0.955 ≤ P_limit(t)</code> evaluated on the time-varying limit; <b class="num">0</b> official over-limit rows in <b class="num">134,400</b> intervals is the reference.</td></tr>
+    <tr><td><b>SLO-5 Latency</b></td><td class="num">&lt; 10 ms decide<br>85 ms module<br>260 ms relay</td>
+        <td>software decision, intra-cabinet 25 kW module isolation, and module relay break-before-make. The macro inter-cabinet re-route is 2.63 s — a different path, not a faster promise.</td></tr>
+  </table>
+  <div class="eq"><b>Carve-outs from the measurement window</b> (they suspend the clock, they do not lower the bar): an <i>unannounced</i> medium-voltage grid outage or DSO hard curtailment at a site with no storage — <code class="num">bess_kwh = 0</code> at all five close-up sites — is excluded from SLO-1 and SLO-2 from the instant it occurs; and any arrival whose dwell time &lt; MRDT is <i>best-effort</i>, not a breach. An <i>announced</i> curtailment such as G1 (notified 14:00, active 16:00–19:00) stays inside the promise, because the system has time to re-plan.</div>
+  <div class="note"><b>Outside SLO scope by design:</b> weather, vehicle-side faults, driver arrival lateness below MRDT, and the travel time of a physical module replacement (see §3).</div>
+</section>
+
+<!-- ============================= DECISIONS ============================= -->
+<section class="col d">
+  <h2>2 · What the system decides alone</h2>
+  <ul>
+    <li><b>How much power each gun gets</b> — intra-cabinet DPR across 25 kW modules, continuous allocation, strict 1:N wiring as recorded in <code>chargers.csv</code>.</li>
+    <li><b>When and how fast each vehicle charges</b> — 15-minute rolling MILP (SciPy HiGHS) on <code>prices.csv</code> + <code>fleet_schedule.csv</code>, departure deadline weighted above price, so a feasible vehicle is never dropped to save money.</li>
+    <li><b>Who gets curtailed when the grid is cut</b> — e.g. S2 under G1 (notified 14:00, active <b class="num">16:00–19:00</b> at 400 kW): overnight trucks T05–T08 throttled with continuous setpoints, <b class="num">283.50 kWh</b> shifted to afternoon trucks T01–T04 → <b class="num">4 → 0</b> missed.</li>
+    <li><b>When to isolate, reroute and re-level</b> — thermal precursor (S1: 59.3 °C / 702 rpm at 22:31, <b class="num">199 min</b> lead), N-1 degradation to <b class="num">720 kW</b> with 0 kW self-harm, offline islanding.</li>
+    <li><b>What a station's configured limit actually is</b> — three-way reconciliation of <code>network_sites.csv</code> / <code>power_cabinets.csv</code> / <code>site_config.csv</code> (S5: 600 → 900 kW, +750 kWh).</li>
+    <li><b>Whether a claim is payable</b> — MRDT gate evaluated per session before any credit is issued.</li>
+  </ul>
+  <div class="eq">MRDT<sub>j</sub> = ΔSoC·E<sub>batt</sub> ÷ ( min(P<sub>charger</sub>, P<sub>veh</sub>)·η<sub>sys</sub> ) × 60 + 15 min
+  &nbsp;→&nbsp; worked example <b class="num">57.11 min</b> (<code>verify_all.py</code>).</div>
+  <div class="note"><b>Human decisions kept by the Client:</b> site acceptance, tariff/contract parameters, any hardware purchase
+  (§3), and physical repair dispatch. The system never overrides a local safety interlock.</div>
+</section>
+
+<!-- ============================= ACCOUNTABILITY ============================= -->
+<section class="col a">
+  <h2>3 · Accountability when it decides wrong</h2>
+  <table>
+    <tr><th style="width:38%">Event</th><th>Payable by the Service Provider</th></tr>
+    <tr><td>Departure below required SoC / late</td><td class="num">350 € <span class="tag">Titanium</span> · 250 € · 150 € per trip</td></tr>
+    <tr><td>Delay beyond the tier threshold</td><td class="num">7.50 / 5.00 / 3.00 €/min (from 10 / 15 / 20 min)</td></tr>
+    <tr><td>Energy shortfall</td><td class="num">2.00 / 1.50 / 1.00 €/kWh (+ emergency hire in Titanium)</td></tr>
+    <tr><td>Availability below target</td><td class="num">−2 % of the monthly fee per 0.1 pp shortfall, capped at 90 %; 0 % fee if &lt; 95 %</td></tr>
+  </table>
+  <ul>
+    <li><b>Hard cap:</b> aggregate monthly liability = <b class="num">150 %</b> of the monthly base fee. Invoices are non-negative; the Client can never be billed back.</li>
+    <li><b>Client-side guard:</b> if dwell time &lt; MRDT, the session is <i>best-effort</i> and no liquidated damages accrue — the gate that stops an arrival-10-minutes-late-with-200-kWh-to-go claim.</li>
+    <li><b>What we do not take liability for:</b> a cabinet that needs a human on site. <code class="num">faults.csv</code> clears <b class="num">8</b> of <b class="num">19</b> faults with <code>cleared_by = technician</code>; those <b class="num">73</b> dispatches = <b class="num">22,906 min</b> = <b class="num">5.09 FTE</b> are <b>retained, not sold</b>. Same for <b class="num">3.22 FTE</b> of customer contact.</li>
+    <li><b>Zero-miss boundary, stated:</b> on 2026-11-13 our zero-CAPEX software takes S1 <b class="num">4 → 3</b> missed (<b class="num">398.5 → 48.8 kWh, −87.8 %</b>) with <b class="num">12 → 0</b> manual replugs. Reaching <b class="num">0</b> needs an inter-cabinet busbar tie that is absent from <code class="num">chargers.csv</code> and has <b>no price</b> in <code class="num">equipment_costs.csv</code> — we hand that number back rather than invent it. Buying 12 dispensers alone (<b class="num">324,000 €</b>) yields <b class="num">8</b> missed, i.e. worse.</li>
+  </ul>
+  <div class="note"><b>Why a client signs this:</b> under the current contracts three of five close-up sites already breach their own uptime floor —
+  recorded <b class="num">S1 94.1 %</b>, <b class="num">S3 90.0 %</b>, <b class="num">S5 87.5 %</b> vs a <b class="num">97 %</b> commitment (<code class="num">C1</code>), at
+  <b class="num">150 €</b> per undercharged departure = <b class="num">1,350 €</b> on the scenario day against a <b class="num">263 €</b> daily fee. The penalty is already flowing.</div>
+</section>
+
+</div>
+
+<div class="foot">
+  <b>Basis of every number:</b> unmodified official CSVs — 45 files / 240,635 rows; recomputed by <code>python verify_all.py</code> (&lt; 1 s, exit 0) and
+  <code>tools/export_deck_ledger.py</code>. Labour baseline <b class="num">8,852</b> ops / <b class="num">93,412</b> min / <b class="num">20.76 FTE</b> at 37.5 h·wk and 45 €/h, of which
+  <b class="num">12.44 FTE (59.95 %)</b> is software-addressable; grid-limit capping is done by a person today — <b class="num">684</b> manual load adjustments / <b class="num">10,260</b> min,
+  <b class="num">100 %</b> of them at sites breaching their limit (Spearman <b class="num">0.802</b>). Assumptions and their error direction: <code>docs/assumptions_and_additions.md</code>.
+  This one-pager is the deliverable; the <b>24-article long-form contract</b> is <code>Team3-…Agreement.docx</code> (24 articles).
+</div>
+
+<div class="sign">
+  <div>Service Provider — name / signature / date</div>
+  <div>Client — name / signature / date</div>
+</div>
+
+</div>
+</body>
+</html>

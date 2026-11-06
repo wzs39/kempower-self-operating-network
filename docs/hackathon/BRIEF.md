@@ -17,7 +17,7 @@ From the official 45 CSV dataset (`kempower-challenge-data/`, 240,635 rows):
   - **S1 (Bus Depot North)**: 24 buses vs 12 single-gun dispensers (`max_simultaneous_sessions = 12`); Power Cabinet C1-3 fan degrades (`F015` at `01:50`, predictable `199 min` earlier at `2026-11-12T22:31:00+02:00` via `59.3°C / 702 rpm`) and trips (`F016` at `02:25` for `246 min`, `cleared_by = technician`), causing 4 missed departures (`B04, B09, B18, B20`, `1,012.00 kWh` deficit).
   - **S2 (Logistics Depot East)**: DSO issues 400 kW curtailment (`G1`, **16:00–19:00**); baseline results in 4 missed truck departures (`T01, T02, T03, T04`, `283.50 kWh` deficit).
   - **S3 (Highway Hub)**: 2-hour cellular outage (**11:00–13:00**) triggers naive 50 kW fallback (`offline_fallback_kw_per_dispenser = 50`), driving abandonment to **29.69%** (76/256 drivers vs **14.36%** 14-day baseline, `354/2,465`).
-  - **S4 (Urban Hub)**: Nord Pool spot price spikes to **799.30 €/MWh** at 18:00 (baseline site has 0 kWh BESS, `150 kW` PV; `F017` cable fault on `D4-2` at 21:30).
+  - **S4 (Urban Hub)**: official synthetic spot price spikes to **799.30 €/MWh** at 18:00 (baseline site has 0 kWh BESS, `150 kW` PV; `F017` cable fault on `D4-2` at 21:30).
   - **S5 (New Bus Depot)**: Three-way configuration mismatch (`sites.csv = 900 kW`, `power_cabinets.csv = 2×450 = 900 kW`, `site_config.csv grid_limit_kw = 600 kW`), plus `D5-7` throttled to `50 kW` and `D5-8` unactivated eSIM, causing 5 missed departures (`508.95 kWh` deficit).
 
 ---
@@ -31,7 +31,7 @@ From the official 45 CSV dataset (`kempower-challenge-data/`, 240,635 rows):
 2. **Deterministic Edge FSM, Intra-Cabinet DPR & Self-Healing (`A2–A8, B8, C6`)**:
    - Enforces strict 1:N cabinet-to-dispenser physical wiring (`C1-1 -> D1-1..D1-4`, `C1-2 -> D1-5..D1-8`, `C1-3 -> D1-9..D1-12`).
    - Early fan degradation detection (`199 min` before `F015`) and safe `720 kW` N-1 post-fault dispatch on `C1-1/C1-2` with `0 kW` self-harm while dispatching technician for `F016` (`cleared_by = technician`).
-   - Autonomous offline islanding at S3 (`1,425 kW DC` / `1,492.15 kW AC <= 1,500 kW`, abandonment `< 0.5%`) and 3-way config reconciler at S5 (`600 -> 900 kW`, unlocking `+750 kWh > 508.95 kWh` deficit).
+   - Autonomous offline islanding at S3 (`1,425 kW DC` / `1,492.15 kW AC <= 1,500 kW`, offline capacity `1,425 kW DC` held vs the `500 kW` naive fallback — no post-fix abandonment % claimed) and 3-way config reconciler at S5 (`600 -> 900 kW`, unlocking `+750 kWh > 508.95 kWh` deficit).
 3. **HiGHS MILP Optimizer (`C1–C5`)**:
    - $10^{-3}$ spot price dimensional scaling factor (€/MWh $\to$ €/kWh), full monthly peak demand rate (`6.50 / 7.50 €/kW/mo`), AC inverter guard ($\eta = 0.955$), and continuous SoC deficit slack (`z_v in [0, 1]`, weight `10,000 €`) preventing false vehicle abandonment at `799.30 €/MWh`.
 4. **Commercial CaaS Model & One-Page SLA**:

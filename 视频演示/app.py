@@ -10,7 +10,8 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 
-REPO_ROOT = Path(__file__).resolve().parent
+DEMO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = DEMO_ROOT.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -58,11 +59,16 @@ def render_streamlit_app() -> None:
     st.title("Kempower Self-Operating Charging Network (Sentinel v2.0)")
     st.caption(
         "LahtiES Energy Tech Hackathon 2026 | 45 Official CSVs (240,635 Rows) | "
-        "Friday 2026-11-13 Crisis Day: 13 -> 0 Missed Departures"
+        "Friday 2026-11-13 Crisis Day: all figures computed live by `ScenarioEngine` "
+        "(identical to `python verify_all.py`)"
     )
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("2026-11-13 Missed Departures", "0 (was 13)", "-100% (1,804.45 kWh recovered)")
+    c1.metric("2026-11-13 Missed Departures",
+              f"{sc['scenario_day_missed_after']} (was {sc['scenario_day_missed_before']})",
+              f"S1 {sc['S1']['baseline_missed_departures']}->{sc['S1']['optimized_missed_departures']} "
+              f"| S2 {sc['S2']['baseline_missed_departures']}->{sc['S2']['optimized_missed_departures']} "
+              f"| S5 {sc['S5']['baseline_missed_departures']}->{sc['S5']['optimized_missed_departures']}")
     c2.metric("100-Site Manual Labor (45 €/h)", f"{labor['total_network_fte']} FTE", f"€{labor['total_network_annual_labor_eur']:,.0f}/yr total")
     c3.metric("Replug Share of Work Time", f"{labor['replug_share_by_duration_pct']}%", f"{labor['replug_network_fte']} FTE (€{labor['replug_network_annual_labor_eur']:,.0f}/yr)")
     c4.metric("S3 Abandonment (14d / 11-13)", "14.36% / 29.69%", "left_full=265 (74.9%) | left_queue=89 (25.1%)")
@@ -82,7 +88,16 @@ def render_streamlit_app() -> None:
                 })
         st.dataframe(pd.DataFrame(rows), width="stretch", height=140)
         st.info(
-            f"**S1 Strategy A (0 € CAPEX)**: Wave 1 (20:00-01:30) + one 01:30 swap onto C1-1/C1-2 (720 kW) "
+            f"**S1 Tier 2 — DEPLOYED SOFTWARE (0 € CAPEX, 0 human moves)**: urgency scheduling on the existing 12 "
+            f"single-gun posts takes S1 from **{sc['S1']['baseline_missed_departures']} -> "
+            f"{sc['S1']['optimized_missed_departures']} missed** and the same-engine deficit from **398.5 -> "
+            f"{sc['S1']['optimized_deficit_kwh']} kWh (-87.8%)**. Baseline FCFS needs 12 midnight replugs; Tier 2 needs 0.\\n\\n"
+            f"**S1 Tier 3 — hardware**: +12 dispensers = €{equip['s1_12_guns_total_capex_with_civil_eur']:,.0f} "
+            f"(€{equip['installed_cost_per_gun_eur']:,.0f}/gun, {equip['s1_payback_years_with_civil']} yr payback) "
+            f"reaches 0 ONLY with a cross-cabinet busbar tie; plugs alone give 8 missed (worse).\\n\\n"
+            f"**Strategy A (counterfactual, NOT shipped — violates Rule 3 zero-touch)**: one 01:30 batch swap "
+            f"(12 human moves) would clear the official 0-session gap "
+            f"(€{sc['S1']['baseline_official_deficit_kwh']:,.2f} kWh basis, different from the simulated deficit)."
             f"recovers all 1,012.00 kWh (B04, B18, B20, B09) -> 0 missed.\n\n"
             f"**S1 Strategy B (Dual-Gun)**: 12 guns × €{equip['installed_cost_per_gun_eur']:,.0f}/gun = "
             f"€{equip['s1_12_guns_total_capex_with_civil_eur']:,.0f} CAPEX vs €{labor['s1_replug_annual_labor_eur']:,.0f}/yr "
@@ -111,11 +126,11 @@ def render_streamlit_app() -> None:
         s2 = sc["S2"]
         s4 = sc["S4"]
         summary_df = pd.DataFrame([
-            {"Station": "S1 (Bus Depot)", "Baseline Missed": 4, "Deficit (kWh)": 1012.00, "Root Cause": "12 guns vs 24 buses (B04/B18/B20 unplugged) + C1-3 F016", "Resolution": "01:30 Batch Swap / Dual-Gun + 720 kW N-1", "Optimized Missed": 0},
-            {"Station": "S2 (Truck Depot)", "Baseline Missed": 4, "Deficit (kWh)": 283.50, "Root Cause": "G1 400 kW curtailment + T05-T08 drawing 1,857 kWh", "Resolution": "Preempt T05-T08 during 14:20-18:15 (+283.50 kWh to T01-T04)", "Optimized Missed": 0},
-            {"Station": "S3 (Highway Hub)", "Baseline Missed": 0, "Deficit (kWh)": 0.0, "Root Cause": "14.36% (14d) / 29.69% (11-13) public abandonment + F017 WAN loss", "Resolution": "Local 1,425 kW DC DLM + Plug & Queue (<500ms handover)", "Optimized Missed": 0},
-            {"Station": "S4 (City Hub)", "Baseline Missed": 0, "Deficit (kWh)": 0.0, "Root Cause": "799.30 €/MWh spot spike + D4-2 connector fault", "Resolution": "0-CAPEX Load Shifting + Full Monthly Peak Protection", "Optimized Missed": 0},
-            {"Station": "S5 (Bus Depot)", "Baseline Missed": 5, "Deficit (kWh)": 508.95, "Root Cause": "site_config.csv grid_limit_kw=600 kW (vs 900 kW) starving D5-1..5", "Resolution": "3-Way Auto-Calibration (600->900 kW, D5-7 150 kW, D5-8 eSIM)", "Optimized Missed": 0},
+            {"Station": "S1 (Bus Depot)", "Baseline Missed": sc["S1"]["baseline_missed_departures"], "Deficit (kWh)": sc["S1"]["baseline_deficit_kwh"], "Root Cause": "C1-3 F016 stop 246 min (B04/B09/B18/B20); 12 guns, strict 1:N", "Resolution": "Tier 2 urgency MILP, 0 human moves (-87.8% of gap)", "Optimized Missed": sc["S1"]["optimized_missed_departures"]},
+            {"Station": "S2 (Truck Depot)", "Baseline Missed": sc["S2"]["baseline_missed_departures"], "Deficit (kWh)": sc["S2"]["baseline_deficit_kwh"], "Root Cause": "G1 400 kW curtailment (16:00-19:00) + T05-T08 drawing ~1,857 kWh", "Resolution": "Preempt T05-T08 with continuous setpoints; 283.50 kWh shifted to T01-T04", "Optimized Missed": sc["S2"]["optimized_missed_departures"]},
+            {"Station": "S3 (Highway Hub)", "Baseline Missed": 0, "Deficit (kWh)": 0.0, "Root Cause": "Public abandonment 14.36% (14d) / 29.69% (11-13 day); outage window 44.8% (13/29) on the same row-level basis", "Resolution": "Offline 1,425 kW DC DLM (vs 500 kW fallback); queue logic targets left_queue only (14/256)", "Optimized Missed": 0},
+            {"Station": "S4 (City Hub)", "Baseline Missed": 0, "Deficit (kWh)": 0.0, "Root Cause": "799.30 €/MWh spot spike (17:45-18:15 >600) + D4-2 cable fault F017", "Resolution": "0-CAPEX Load Shifting + Full Monthly Peak Protection", "Optimized Missed": 0},
+            {"Station": "S5 (Bus Depot)", "Baseline Missed": sc["S5"]["baseline_missed_departures"], "Deficit (kWh)": sc["S5"]["baseline_deficit_kwh"], "Root Cause": "site_config.csv grid_limit_kw=600 vs 900 kW + D5-7@50, D5-8 off", "Resolution": "3-Way Auto-Calibration 600->900 kW (CONFIG FIX; same-engine reproduces 1 of 5)", "Optimized Missed": sc["S5"]["optimized_missed_departures"]},
         ])
         st.dataframe(summary_df, width="stretch", height=150)
         st.caption(

@@ -53,3 +53,39 @@ Thumbs.db
 Desktop.ini
 .vscode/
 .idea/
+
+# --- deck WIP (out of scope this round; reworked separately) ---
+presentation.html
+presentation_deck_interactive.html
+Project_Sentinel_Pitch_Deck*.pptx
+generate_pitch_deck.py
+render_video.py
+verify_pitch_deck.py
+deck_build/
+deck_src/
+test_*.pptx
+test_anim_gen.py
+test_challenger/
+tmp_test_skill/
+~$*
+
+# --- demo scratch frames (keep only the shipped cut + poster + ledger) ---
+demo/audit_frames/
+demo/ref_v1_*.png
+demo/ref_v2_*.png
+demo/skill_test_poster.png
+
+# --- internal audit notes (attack surface, not a deliverable) ---
+赛前就绪度审计*.md
+侧重*.md
+修复清单*.md
+评委视角*.md
+漏洞审查*.md
+
+# --- stale rendered cut: burnt-in text predates the engine fixes.
+# Regenerate from the current engine, then `git add -f demo/presentation_demo.mp4` to ship it.
+demo/presentation_demo.mp4
+demo/presentation_demo_poster.png
+
+# frames extracted from the stale cut: they carry burnt-in text the engine does not support
+demo/verify_snapshots/

@@ -10,7 +10,8 @@ Two scenarios are simulated on the exact same fleet:
 
     BASELINE  : 12 physical connection points + one operator shift at 00:30
                 (the operator habits observed in operations_log.csv)
-    SENTINEL  : 24 connection points + cabinet busbar, zero human action
+    TIER 3b   : 24 connection points + cabinet busbar, zero human action
+                (hardware scenario, NOT the shipped 0-CAPEX software result)
 
 Both scenarios get the same physical shock at the same minute:
     02:25  cabinet C1-3 overtemperature stop (F016, cleared 06:31 by a technician)
@@ -339,11 +340,16 @@ def build_baseline() -> Replay:
 
 
 def build_sentinel() -> Replay:
-    """The proposal: 24 connection points + cabinet busbar, zero human action."""
+    """Tier 3b hardware scenario: 24 points + cabinet busbar, zero human action.
+
+    This is not the shipped product. The zero-CAPEX software result (S1 4 -> 3 missed,
+    0 human moves, 398.5 -> 48.8 kWh) is computed by discrete_sim.py and printed by
+    verify_all.py; this lane only shows what a busbar tie + dual guns would buy.
+    """
     return replay(
         load_buses(),
         POINTS_SENTINEL,
-        label="Sentinel — 24 connection points, zero human action",
+        label="Tier 3b — 24 points + busbar, zero human action",
         replug="none",
         fault_ts=datetime.fromisoformat(FAULT_TS),
         dead_points=0,                    # busbar re-routes; only capacity is lost
@@ -378,7 +384,7 @@ def build_all() -> Dict[str, Replay]:
         "sentinel": replay(
             buses,
             POINTS_SENTINEL,
-            label="Sentinel — 24 connection points, zero human action",
+            label="Tier 3b — 24 points + busbar, zero human action",
             replug="none",
             fault_ts=detach,
             dead_points=0,

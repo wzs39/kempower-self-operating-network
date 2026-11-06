@@ -143,7 +143,7 @@ graph TD
 ### 3.3 行业权威基准数据源：[`PUBLIC_SOURCES.md`](./kempower-challenge/kempower-challenge-data/PUBLIC_SOURCES.md)
 指引参赛选手在设计算法时参考欧洲真实的工业界标准与实时接口：
 - **芬兰国家电网 Fingrid Open Data**：电网负荷、风电出力、电网频率及辅助服务市场规范；
-- **Nord Pool 与 ENTSO-E**：自 2025 年起欧洲日前现货市场采用的 15 分钟级撮合交易价格；
+- **Nord Pool 与 ENTSO-E（真实世界背景，本赛题数据为合成，见 brief "About this data"）**：自 2025 年起欧洲日前现货市场采用的 15 分钟级撮合交易价格；
 - **Fintraffic 交通断面监测**：芬兰国家交通署公开的真实道路断面车流传感器统计规律；
 - **Kempower 硬件技术与 OCPP 标准**：Kempower 动态功率分配架构专利（动态将电源模块路由给任意充电枪）及 OCPP 2.0.1 协议规范。
 
@@ -316,7 +316,7 @@ graph TB
 2. **站端边缘（Site Edge Gateway）——核心智能驻留点**：
    - **离线自治动态功率分配（Local Dynamic Load Balancing）**：即便断网 2 小时，本地网关依然依据进线变压器 1500 kW 限额实时调配功率，彻底废除 50 kW 傻瓜降速，消灭 29.7% 的排队弃流；
    - **虚拟插枪与轮序切换（Virtual Replugging via Power Routing）**：利用 Kempower 独特的整流柜动态功率切换专利，无须人工现场拔枪倒车，两辆车插在两根枪上，系统充满前车后自动断开其继电器，将全部功率无缝平移给后车，**一举消灭 5,596 次的人工挪车重插劳动**！
-3. **云端（Cloud AI Core）**：接入 Nord Pool 与天气雷达，下发日前电价曲线与预测调度策略，处理跨站漫游结算与宏观调频辅助服务收益。
+3. **云端（Cloud AI Core）**：以官方 `prices.csv` / `weather.csv`（合成数据）为输入，下发 15 分钟电价曲线与预测调度策略，处理跨站漫游结算与宏观调频辅助服务收益。
 
 ### 7.2 场景日核心挑战自愈策略对比
 

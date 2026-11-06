@@ -5,7 +5,7 @@ Target: Kempower Autonomous Command Center (Sentinel v3.0).
 Focus Areas:
 1. Dual CLI / Streamlit Execution Guard verification.
 2. Playback boundary conditions (minute = 0, 1425, 1439, -1, 1500, malformed types).
-3. Incident & fault injection UI rendering (S1 Thermal Trip @ 02:25, S3 WAN Drop @ 03:15, S4 Price Spike @ 18:00).
+3. Incident & fault injection UI rendering (S1 Thermal Trip @ 02:25, S3 WAN Drop @ 11:00 per connectivity_outages.csv, S4 Price Spike @ 18:00).
 4. Rapid view switches and widget interaction across all 4 cockpit views.
 5. Commercial SLA interactive clearing resilience under extreme parameter ranges.
 """
@@ -125,7 +125,7 @@ class TestDashboardPlaybackBoundaryStress(unittest.TestCase):
         expected_times = [
             ("01:30 Wave 1 Swap", "01:30"),
             ("02:25 S1 Thermal Trip", "02:30"),
-            ("03:15 S3 WAN Outage", "03:15"),
+            ("11:00 S3 WAN Outage", "11:00"),
             ("04:00 S5 3-Way Calib", "04:00"),
             ("14:30 S2 Truck Surge", "14:30"),
             ("18:00 S4 Price Spike", "18:00"),
@@ -166,10 +166,23 @@ class TestDashboardFaultInjectionStress(unittest.TestCase):
         )
         self.assertTrue(has_thermal_banner, "S1 Thermal trip banner must be rendered in at.error.")
 
+    def test_s3_outage_window_matches_official_file(self):
+        """The UI incident times must equal the official connectivity_outages.csv window."""
+        import pandas as pd
+        from src.sim.data_loader import KempowerDataLoader
+        df = KempowerDataLoader().load_df("connectivity_outages.csv")
+        day = df[(df["site_id"] == "S3") & (df["start_ts"].astype(str).str.startswith("2026-11-13"))]
+        self.assertEqual(len(day), 1, "exactly one S3 outage is expected on the scenario day")
+        row = day.iloc[0]
+        self.assertEqual(str(row["start_ts"])[11:16], "11:00")
+        self.assertEqual(str(row["end_ts"])[11:16], "13:00")
+        self.assertNotIn("03:15", str(row["start_ts"]), "03:15 belongs to the S1 F016 window, not the S3 outage")
+
+
     def test_s3_wan_drop_fault_injection_ui_state(self):
-        """Inject S3 Cellular WAN outage at 03:15 and verify islanding warning banner."""
+        """Inject the S3 Cellular WAN outage at its official 11:00 start and check the islanding banner."""
         at = self.AppTest.from_file(str(REPO_ROOT / "app.py"), default_timeout=30).run()
-        at.session_state["scrub_time"] = "03:15"
+        at.session_state["scrub_time"] = "11:00"
         at.run()
         self.assertEqual(len(at.exception), 0)
 

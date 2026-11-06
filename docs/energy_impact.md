@@ -73,7 +73,7 @@ While `sites.csv` + `baseline_kpis.csv` cover the **5 detailed inspection sites 
 
 The third number rules out the obvious rebuttal ("the limit was simply set from the observed peak"). If the limit were derived from observed demand, demand could not have exceeded it for thousands of hours. So the sequence is: demand rises above the limit → something clamps delivery → the clamped peak lands exactly on the limit. Natural electrical load does not stop on an integer across 72 independent sites; **a controller does**.
 
-That controller today is a human: `14,600 min = 3.25 FTE` of `manual_load_adjustment` in `operations_log.csv`. Our edge DLM and 15-minute MILP automate all **`2,096.1` hours** of grid-limit enforcement while prioritizing urgent departures (`urgency waterfilling`) to prevent the `352` undercharged departures.
+That controller today is a human: `10,260 min = 2.28 FTE` of `manual_load_adjustment` (`684` events, `operations_log.csv`) - and `100%` of those minutes are logged at sites that actually breach their limit (Spearman `0.802` against over-limit hours). Our edge DLM and 15-minute MILP automate all **`2,096.1` hours** of grid-limit enforcement while prioritizing urgent departures (`urgency waterfilling`) to prevent the `352` undercharged departures.
 
 ### 2.2 `network_site_power.csv` (134,400 Rows) Two-Basis Audit
 1. **Official `grid_kw` Column Basis**: Across all `134,400` rows of `network_site_power.csv`, `grid_kw > grid_limit_kw` occurs in **`0` rows** (a built-in recording invariant of the baseline dataset).

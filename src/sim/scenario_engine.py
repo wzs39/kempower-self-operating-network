@@ -178,7 +178,7 @@ class ScenarioEngine:
           with left_full = 265 [74.86%] and left_queue = 89 [25.14%]) from 2026-11-13 crisis day
           abandonment (105 / 354 = 29.66%, left_full = 80, left_queue = 25).
         - Verifies Offline Islanding Local DLM maintains 1,425 kW DC (1,492.15 kW AC <= 1,500 kW)
-          instead of dropping to naive 50 kW fallback during cellular loss F017 (03:15-05:15).
+          instead of dropping to naive 50 kW fallback during the cellular outage 11:00-13:00 (connectivity_outages.csv; F017 is an unrelated S4 cable fault).
         """
         emp = PlugAndQueueHub.analyze_s3_public_arrivals_empirical()
         fsm = EdgeFSM(site_id="S3")

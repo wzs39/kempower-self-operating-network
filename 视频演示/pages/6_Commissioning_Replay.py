@@ -3,7 +3,7 @@ Commissioning Replay — S5 new bus depot, 2026-11-12 19:30 → 11-13 06:20.
 
 Independent scene: nothing is physically broken. The station is simply
 misconfigured — 600 kW cap instead of 900 kW, D5-7 throttled to 50 kW and
-D5-8 inactive. Sentinel's digital twin reconciles the three config sources and
+D5-8 inactive. Sentinel's three-way config reconciler compares the three sources and
 unlocks the real capacity before the first bus leaves short.
 """
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import streamlit as st
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]  # repo root: the demo shares the single authoritative src/ engine
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 

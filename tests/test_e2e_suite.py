@@ -761,7 +761,8 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         self.assertEqual(float(g1["limit_kw"].iloc[0]), 400.0)
 
     def test_s3_highway_256_driver_offline_session(self):
-        """S3 Highway: 29.7% abandonment (76 drivers) compressed to <0.5% via local DLM."""
+        """S3 Highway: official abandonment is 29.69% (76/256); the reproducible Sentinel
+        result is the offline capacity held, not a post-fix abandonment percentage."""
         arr_path = os.path.join(DATA_DIR, "public_arrivals.csv")
         df_arr = pd.read_csv(arr_path)
         s3_arr = df_arr[(df_arr["site_id"] == "S3") & (df_arr["ts"].str.startswith("2026-11-13"))]
@@ -772,10 +773,33 @@ class TestTier4RealWorldScenarios(unittest.TestCase):
         abandon_rate = (abandoned / total_drivers) * 100.0
         self.assertAlmostEqual(abandon_rate, 29.6875, places=1)
 
-        # Sentinel offline islanding eliminates 50 kW bottleneck, reducing abandonment to <= 1
-        sentinel_abandoned = 1
-        sentinel_abandon_rate = (sentinel_abandoned / total_drivers) * 100.0
-        self.assertLess(sentinel_abandon_rate, 0.5)
+        # A literal written by the test and then asserted against itself proves nothing, so the
+        # old `sentinel_abandoned = 1` check is removed. What IS reproducible: the inverter-guarded
+        # offline capacity versus the per-dispenser fallback recorded in site_config.csv, and the
+        # split of that day's abandonment into queue-addressable vs physically-full.
+        from src.core.self_healing import InverterEfficiencyGuard
+        safe_dc, n_mod, steady_ac = InverterEfficiencyGuard.max_safe_dc_kw(1500.0)
+        self.assertAlmostEqual(safe_dc, 1425.0, places=1)
+        self.assertLessEqual(steady_ac, 1500.0)
+        self.assertGreater(steady_ac, 1490.0)
+
+        cfg_path = os.path.join(DATA_DIR, "site_config.csv")
+        df_cfg = pd.read_csv(cfg_path)
+        fb = df_cfg[(df_cfg["site_id"] == "S3")
+                    & (df_cfg["parameter"] == "offline_fallback_kw_per_dispenser")]
+        fb_kw = float(fb["configured_value"].iloc[0])
+        n_guns = len(df_cfg[(df_cfg["site_id"] == "S3") & (df_cfg["parameter"] == "max_kw")])
+        fallback_station_kw = fb_kw * n_guns
+        self.assertAlmostEqual(fallback_station_kw, 500.0, places=1)
+        self.assertGreater(safe_dc, 2.5 * fallback_station_kw,
+                           "offline islanding must hold materially more than the naive fallback")
+
+        q_only = len(s3_arr[s3_arr["outcome"] == "left_queue"])
+        full_only = len(s3_arr[s3_arr["outcome"] == "left_full"])
+        self.assertEqual(q_only, 14)
+        self.assertEqual(full_only, 62)
+        self.assertLess(q_only / abandoned, 0.25,
+                        "queue-driven abandonment is a minority of the day's abandonment")
 
     def test_s4_urban_hub_price_peak_and_cable_trip(self):
         """S4 Urban: BESS shaves 799.30 €/MWh peak, D4-2 cable trip isolated."""

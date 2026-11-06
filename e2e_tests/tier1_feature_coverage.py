@@ -297,7 +297,7 @@ class TestTier1FeatureCoverage(unittest.TestCase):
     # F08: 799.30 €/MWh Price Peak BESS
     # --------------------------------------------------------------------------
     def test_f08_01_extreme_price_spike_value(self):
-        """Nord Pool spot price reaches 799.30 €/MWh on Scenario Day 2026-11-13."""
+        """Supplied synthetic spot series (prices.csv) reaches 799.30 €/MWh on Scenario Day 2026-11-13."""
         prices_path = os.path.join(DATA_DIR, "prices.csv")
         df_p = pd.read_csv(prices_path)
         scenario_prices = df_p[df_p["ts"].str.startswith("2026-11-13")]

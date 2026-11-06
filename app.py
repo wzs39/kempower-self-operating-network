@@ -206,8 +206,8 @@ def render_view_scenario_player(payload: Dict[str, Any]) -> None:
         st.session_state["scrub_time"] = "01:30"
     if qb2.button("02:25 S1 Thermal Trip"):
         st.session_state["scrub_time"] = "02:30"
-    if qb3.button("03:15 S3 WAN Outage"):
-        st.session_state["scrub_time"] = "03:15"
+    if qb3.button("11:00 S3 WAN Outage"):
+        st.session_state["scrub_time"] = "11:00"
     if qb4.button("04:00 S5 3-Way Calib"):
         st.session_state["scrub_time"] = "04:00"
     if qb5.button("14:30 S2 Truck Surge"):
@@ -240,23 +240,23 @@ def render_view_scenario_player(payload: Dict[str, Any]) -> None:
 
     # Dynamic Incident & Self-Healing Reaction Banner
     st.markdown("#### 🛡️ Autonomous Edge Reaction & DPR Matrix Status")
-    if current_time_str in ("02:15", "02:30", "02:45", "03:00"):
+    if current_time_str in ("02:15", "02:30", "02:45", "03:00", "03:15", "03:30", "03:45", "04:00", "04:15", "04:30", "04:45", "05:00", "05:15", "05:30", "05:45", "06:00", "06:15", "06:30"):
         st.error(
             "🔴 **S1 Incident Active: Cabinet C1-3 Overtemperature Stop (F016)**\n\n"
             "- Precursor detected 199 minutes prior @ 22:31 (59.3°C, 702 RPM).\n"
             "- Edge FSM executed Two-Stage N-1 Plan in <100ms: Healthy C1-1 + C1-2 (720 kW) run at 100% capacity with 0 kW shed.\n"
             "- DPR contactor matrix isolated C1-3 in 2.63s without arcing. All buses stay charged."
         )
-    elif current_time_str in ("03:15", "03:30", "03:45", "04:00", "04:15", "04:30", "04:45", "05:00"):
+    elif current_time_str in ("11:00", "11:15", "11:30", "11:45", "12:00", "12:15", "12:30", "12:45"):
         st.warning(
-            "🟠 **S3 Incident Active: Cellular WAN Outage (F017) Islanding Mode**\n\n"
+            "🟠 **S3 Incident Active: Cellular WAN Outage (11:00-13:00) Islanding Mode**\n\n"
             "- Optical fiber drop detected. Station edge controller transitions to autonomous offline islanding.\n"
             "- Local DLM enforces 1,425 kW DC limit (1,492.15 kW AC <= 1,500 kW transformer limit) at 95.5% rectifier efficiency.\n"
-            "- Zero cloud dependency; transactions written to 72-hour encrypted NVMe WAL. Abandonment crushed from 29.7% to <0.5%."
+            "- Zero cloud dependency; transactions written to 72-hour encrypted NVMe WAL. Capacity held at 1,425 kW DC vs the 500 kW naive fallback."
         )
     elif current_time_str in ("18:00", "18:15", "18:30"):
         st.error(
-            f"🔴 **S4 Extreme Spot Price Spike: €{spot_now:.2f}/MWh (Nord Pool Peak)**\n\n"
+            f"🔴 **S4 Extreme Spot Price Spike: €{spot_now:.2f}/MWh (official synthetic spot: >600 only 17:45/18:00/18:15)**\n\n"
             "- 15-minute rolling MILP shifts non-critical charging blocks while guaranteeing 100% departure SoC >= 90%.\n"
             "- Continuous SoC slack prevents artificial session drops. Station peak demand protected with 0-CAPEX load shifting."
         )
@@ -268,9 +268,9 @@ def render_view_scenario_player(payload: Dict[str, Any]) -> None:
     # Dynamic DPR Matrix Allocation Visualizer
     with st.expander("⚡ Inspect DPR Matrix Dynamic Contactor State", expanded=False):
         dpr_demo = [
-            {"Cabinet": "C1-1", "Granularity": "15x 25kW modules", "Status": "ONLINE (360 kW)", "Active Assigned Dispensers": "D1-1 (150 kW), D1-2 (150 kW), D1-3 (60 kW)", "Thermal": "42.1°C / 1,420 RPM"},
-            {"Cabinet": "C1-2", "Granularity": "15x 25kW modules", "Status": "ONLINE (360 kW)", "Active Assigned Dispensers": "D1-4 (150 kW), D1-5 (150 kW), D1-6 (60 kW)", "Thermal": "43.5°C / 1,405 RPM"},
-            {"Cabinet": "C1-3", "Granularity": "13x 25kW modules", "Status": "ISOLATED_TEMP" if current_time_str >= "02:25" and current_time_str <= "06:31" else "ONLINE (325 kW)", "Active Assigned Dispensers": "NONE (Isolated)" if current_time_str >= "02:25" and current_time_str <= "06:31" else "D1-7, D1-8", "Thermal": "62.4°C / 702 RPM (FAULT)" if current_time_str >= "02:25" and current_time_str <= "06:31" else "38.2°C / 1,410 RPM"},
+            {"Cabinet": "C1-1", "Granularity": "360 kW (25 kW module steps)", "Status": "ONLINE (360 kW)", "Active Assigned Dispensers": "D1-1, D1-2, D1-3, D1-4", "Thermal": "42.1°C / 1,420 RPM"},
+            {"Cabinet": "C1-2", "Granularity": "360 kW (25 kW module steps)", "Status": "ONLINE (360 kW)", "Active Assigned Dispensers": "D1-5, D1-6, D1-7, D1-8", "Thermal": "43.5°C / 1,405 RPM"},
+            {"Cabinet": "C1-3", "Granularity": "360 kW (25 kW module steps)", "Status": "ISOLATED_TEMP" if current_time_str >= "02:25" and current_time_str <= "06:31" else "ONLINE (360 kW)", "Active Assigned Dispensers": "NONE (Isolated)" if current_time_str >= "02:25" and current_time_str <= "06:31" else "D1-9, D1-10, D1-11, D1-12", "Thermal": "62.4°C / 702 RPM (FAULT)" if current_time_str >= "02:25" and current_time_str <= "06:31" else "38.2°C / 1,410 RPM"},
         ]
         st.dataframe(pd.DataFrame(dpr_demo), use_container_width=True)
 
@@ -285,12 +285,12 @@ def render_view_hardware_twin(payload: Dict[str, Any]) -> None:
 
     st.subheader("⚡ Live Hardware Matrix & Industrial Protocol Inspector")
     st.markdown(
-        "*25kW Modular Power Matrix | Contactor 6-Step Timing (2.63s) | Live OCPP 2.0.1 & ISO 15118 PnC TLS 1.3 Logs*"
+        "*25kW Modular Power Matrix | intra-module BBM 85 ms / module relay 260 ms / macro N-1 isolation 2.63 s | Live OCPP 2.0.1 & ISO 15118 PnC TLS 1.3 Logs*"
     )
 
     t1, t2, t3 = st.tabs([
         "🧩 25kW Module Matrix & Wear-Leveling",
-        "⏱️ Contactor 6-Step BBM Timing (2.63s)",
+        "⏱️ Contactor timing: 85 ms module / 260 ms relay / 2.63 s macro",
         "📜 Live Protocol Inspector (OCPP 2.0.1 & ISO 15118)",
     ])
 
@@ -323,7 +323,7 @@ def render_view_hardware_twin(payload: Dict[str, Any]) -> None:
         st.dataframe(pd.DataFrame(modules_s1), use_container_width=True)
 
     with t2:
-        st.markdown("### Contactor 6-Step Break-Before-Make Zero-Arc Timing (< 2.63s)")
+        st.markdown("### Contactor Break-Before-Make Zero-Arc Timing (85 ms module, 260 ms relay, 2.63 s macro inter-cabinet)")
         st.markdown(
             """
             When cabinet degradation or power reallocation occurs, physical contactors sequence
@@ -340,7 +340,7 @@ def render_view_hardware_twin(payload: Dict[str, Any]) -> None:
         ]
         st.dataframe(pd.DataFrame(steps_data), use_container_width=True)
         st.success(
-            "✅ **Inter-Cabinet Re-routing Total Delay**: **2,630.0 ms (2.63 s)** | "
+            "✅ **Inter-Cabinet (macro) Re-routing Total Delay**: **2,630.0 ms (2.63 s)** - the intra-cabinet 25 kW module relay path is **260.0 ms** | "
             "**Intra-Cabinet 25kW Fast Relay Transfer**: **260.0 ms** (< 500.0 ms safety envelope). Zero-Arc Verified."
         )
 
@@ -521,7 +521,7 @@ def render_streamlit_app() -> None:
     k1.metric("Scenario Day Departures", "13 -> 3 (0 €) / 0 (324k €)", "S1: 4->3 (-87.8% gap) | S2: 4->0 | S5: 5->0")
     k2.metric("Replug Events Eliminated", "5,596 / 8,852", f"9.95 FTE replug (€{labor['replug_network_annual_labor_eur']:,.0f}/yr)")
     k3.metric("Grid Safety Invariant", "0 Official grid_kw Over-Limit", "134,400 rows (9,644 delivered_kw/0.955 basis diff)")
-    k4.metric("System Availability (SLO)", "99.85% (Titanium)", "Zero-Touch Edge Islanding & Threshold+Slope PdM")
+    k4.metric("System Availability (SLO)", "99.85% (Titanium target)", "Recorded today: S1 94.1% / S5 87.5% vs a 97% contract floor")
 
     # Top-Level 4-View Navigation Tabs
     tab1, tab2, tab3, tab4 = st.tabs([

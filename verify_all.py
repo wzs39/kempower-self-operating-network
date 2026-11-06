@@ -113,6 +113,10 @@ def main() -> int:
 
     mrdt = SLACalculator.compute_mrdt(80.0, 30.0, 200.0, 150.0, 150.0)
     assert round(mrdt, 2) == 57.11
+
+    # NOTE: derived artefacts (rendered video, slides, speaker scripts) are deliberately
+    # NOT checked here and are NOT evidence. See tools/check_demo_artifacts.py (advisory).
+
     elapsed = time.time() - t0
     print("-" * 78)
     print(

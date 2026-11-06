@@ -3,7 +3,8 @@ Price Spike Replay — S2 logistics depot, 2026-11-13 14:00 → 11-14 06:00.
 
 Independent scene: *no grid event happens here*. Only the spot price moves.
 Baseline charges whoever is plugged in. Sentinel protects deadlines first and
-defers the flexible overnight trucks through the 17:15–18:45 spike.
+defers the flexible overnight trucks through the spike. In prices.csv only 17:45/18:00/18:15
+exceed 600 EUR/MWh (peak 799.30 at 18:00); 17:15 is the 204 EUR/MWh ramp start.
 """
 from __future__ import annotations
 
@@ -13,7 +14,7 @@ from pathlib import Path
 
 import streamlit as st
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[2]  # repo root: the demo shares the single authoritative src/ engine
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
