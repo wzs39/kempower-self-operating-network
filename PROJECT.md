@@ -69,7 +69,7 @@ Every feature identified during the comprehensive Phase 0 Survey is inventoried 
 | F10 | Anti-Phantom Replug & Fraud Defense | Detect rapid reconnects (<180s), SoC continuity (<1.0%), and abnormal current ramps ($dI/dt > 100$ A/s) to merge sessions and block fraud | M2 | survey_explorer_3 (Blueprint 1) |
 | F11 | 25 kW Module-Level DPR Self-Healing | Dynamic sub-100ms isolation of degraded 25 kW modules, intra-cabinet load rebalancing, and cycle aging duty rotation | M2 | survey_spec_miner_2 (F8) & survey_explorer_3 |
 | F12 | Nordic Sub-Zero Low-Temp Self-Healing | Model battery low-temp acceptance curves (-15°C to 15°C) and dynamically divert DPR power to vehicle PTC heating, cutting cold charging time 35% | M2 | survey_explorer_3 (Blueprint 2) |
-| F13 | Microgrid BESS/PV Coordinated Dispatch | Coordinated dispatch interface for optional 500 kWh / 250 kW BESS and solar PV smoothing against Nord Pool price spikes *(interface defined, not field-validated)* | M2 | survey_spec_miner_2 (F18..F20) |
+| F13 | Microgrid BESS/PV Coordinated Dispatch | Coordinated dispatch interface for optional 500 kWh / 250 kW BESS and solar PV smoothing against 15-minute spot price spikes (official synthetic `prices.csv`) *(interface defined, not field-validated)* | M2 | survey_spec_miner_2 (F18..F20) |
 | F14 | 72h WAL Offline Reconnection Sync | Encrypted local SQLite/NVMe Append-only WAL and idempotent reconciliation protocol upon WAN recovery with UUID tracking | M2 | survey_spec_miner_2 (F21) & survey_explorer_3 |
 | F15 | Outcome-Based 2029 SLA Billing Engine | Compute MRDT physical gate, availability tiers, delay penalty credits, and automated monthly settlement invoice generator | M3 | survey_spec_miner_2 (F23..F24) & survey_explorer_3 |
 | F16 | Commercial ROI & Sensitivity Dashboard | Full 100-station network CAPEX/OPEX/NPV/IRR model, 20.76 FTE elimination breakdown, and interactive parameter sensitivity analysis | M3 | survey_spec_miner_2 (F25) & survey_explorer_3 |
@@ -126,7 +126,7 @@ Every feature identified during the comprehensive Phase 0 Survey is inventoried 
 ```
 kempower-self-operating-network/
 ├── app.py                           # Refactored 4-View Interactive Streamlit Cockpit
-├── verify_all.py                    # Deterministic Verifier (0.38 s warm / 0.7 s cold, 1 s budget, 0-regression gate)
+├── verify_all.py                    # Deterministic Verifier (timed section 0.36-0.49 s; wall clock 1.5-1.8 s; 5 s gate budget; 0-regression)
 ├── requirements.txt                 # Packaging dependencies
 ├── PROJECT.md                       # Single source of truth: architecture, milestones, interfaces
 ├── One_Page_SLA_Specification.md    # 2029 Commercial SLA Contract specification

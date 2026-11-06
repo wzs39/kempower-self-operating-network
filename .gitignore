@@ -76,11 +76,17 @@ demo/ref_v2_*.png
 demo/skill_test_poster.png
 
 # --- internal audit notes (attack surface, not a deliverable) ---
+# NOTE: an ignore rule has NO effect on a file git already tracks.
+# These were tracked, so they had to be removed with `git rm --cached` too.
+_archive_outdated/
+
 赛前就绪度审计*.md
 侧重*.md
 修复清单*.md
 评委视角*.md
 漏洞审查*.md
+反思*.md
+黑客松初步理解*.docx
 
 # --- stale rendered cut: burnt-in text predates the engine fixes.
 # Regenerate from the current engine, then `git add -f demo/presentation_demo.mp4` to ship it.

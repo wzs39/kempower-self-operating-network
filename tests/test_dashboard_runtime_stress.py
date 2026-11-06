@@ -193,7 +193,7 @@ class TestDashboardFaultInjectionStress(unittest.TestCase):
         self.assertTrue(has_wan_banner, "S3 WAN outage islanding banner must be rendered in at.warning.")
 
     def test_s4_price_spike_fault_injection_ui_state(self):
-        """Inject S4 Nord Pool spot price spike at 18:00 and verify peak price reaction banner."""
+        """Inject the S4 official synthetic spot price spike at 18:00 and verify the peak price banner."""
         at = self.AppTest.from_file(str(REPO_ROOT / "app.py"), default_timeout=30).run()
         at.session_state["scrub_time"] = "18:00"
         at.run()

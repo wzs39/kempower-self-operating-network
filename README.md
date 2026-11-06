@@ -13,7 +13,7 @@
 
 ---
 
-[![Pytest Tests](https://img.shields.io/badge/pytest-433%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
+[![Pytest Tests](https://img.shields.io/badge/pytest-434%20passed%20(100%25)-success?style=for-the-badge&logo=pytest)](./tests/)
 [![E2E Tests](https://img.shields.io/badge/E2E%20Runner-106%20passed%20(540%20total)-success?style=for-the-badge&logo=shield)](./e2e_tests/)
 [![Deterministic Verifier](https://img.shields.io/badge/verify__all.py-0.38s%20Deterministic%20Pass-blue?style=for-the-badge&logo=python)](./verify_all.py)
 [![Official Dataset Integrity](https://img.shields.io/badge/Official%20CSVs-45%2F45%20Strictly%20Read--Only-green?style=for-the-badge&logo=git)](./kempower-challenge/kempower-challenge-data/)
@@ -119,7 +119,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 - **Offline Discrete-Event Simulator (`src/sim/discrete_sim.py`)**: High-fidelity minute-by-minute offline discrete-event simulator modeling realistic battery charging acceptance curves, contactor state transitions, strict 1:N intra-cabinet boundaries (`cross_tie=False`), and dynamic power distribution.
 
 ### 3. Commercial CaaS Model & One-Page SLA Specification
-- **The One-Page SLA (`One_Page_SLA_Specification.md`)**:
+- **The one-page service agreement handed to the jury**: [`docs/one_page_agreement.md`](./docs/one_page_agreement.md) / [`docs/one_page_agreement.html`](./docs/one_page_agreement.html) (verified: exactly one A4 page). The long-form tiered specification behind it is `One_Page_SLA_Specification.md`:
   - **Three Commercial Tiers**: **Titanium** ($\ge 99.90\%$ SLO, $< 50\text{ ms}$ reaction, 0-touch replug), **Gold** ($\ge 99.50\%$ SLO, $< 100\text{ ms}$ reaction), and **Silver** ($\ge 99.00\%$ SLO).
   - **Minimum Required Dwell Time (MRDT) Anti-Moral-Hazard Gate**: Protects the service provider from fraudulent delay claims by requiring:
     $$\text{MRDT}_j = \left( \frac{\frac{\text{SoC}_{\text{req}} - \text{SoC}_{\text{arrive}}}{100} \cdot E_{\text{batt}}}{\min(P_{\text{charger}}, P_{\text{veh}}) \cdot 0.95} \right) \cdot 60 + 15.0 \text{ min}$$
@@ -136,7 +136,7 @@ All architecture decisions and financial models in Project Sentinel are derived 
 | **Energy & Grid Impact** | **20%** | • **0 official `grid_kw` overlimit violations across 134,400 rows** (`9,644` rows under `delivered_kw / 0.955` AC basis reconciled; see [`docs/energy_impact.md`](./docs/energy_impact.md)).<br>• **95-Site Network Evidence (`network_kpis.csv`)**: addresses `2,096.1 hours` of `hours_demand_above_grid_limit` across `72` sites where `peak_grid_kw == grid_limit_kw`.<br>• **Use of Available Energy**: S1 gun-hour utilization `45.38% -> 47.50%` (`+2.12 pp`), cabinet-hour `68.03% -> 71.21%` (`+3.18 pp`).<br>• **799.30 €/MWh price spike arbitrage** with continuous SoC slack; BESS/PV cost interface defined via `equipment_costs.csv` *(interface defined, not field-validated)*. |
 | **Technical Credibility** | **20%** | • **OCPP 2.0.1 Smart Charging** & **ISO 15118 PnC TLS 1.3** (`< 10 ms` ECDSA PKI).<br>• **Anti-phantom replug defense** and **offline discrete-event simulator** (`src/sim/discrete_sim.py`).<br>• Strict 1:N cabinet-to-dispenser physical wiring (`cross_tie=False`) & 6-step BBM zero-arc sequencing.<br>• **434 pytest + 106 E2E (540 total)** automated tests with 100% pass rate. |
 | **Commercial Viability** | **20%** | • **`12.44` of the `20.76` baseline FTE is software-addressable — but it splits by payer**: `9.95 FTE` (`872,976 €/yr`) is the **customer's** night-shift replugging (`5,596` events, `24,336 €/yr` at S1) — the value we sell, not a cost we carry; `2.50 FTE` is remote load/price/reset, ours only on the `18/29` contracts with service scope. **Our own cost line is the `5.09 FTE` (`446,667 €/yr`) of technician roll-outs** — no software removes a truck roll, and that is what the SLA must price. Customer contact (`3.22 FTE`) is retained and **not** monetised.<br>• Honest CAPEX: Tier 2 (`0 €` CAPEX, `-87.8%` S1 deficit) vs Tier 3 (`324,000 €`, `13.31-yr` standalone payback) — **and the finding that `324,000 €` of extra dispensers makes S1 worse (`8` missed), while the monotone zero-miss path inside the `1,200 kW` grid limit is an unpriced busbar tie.**<br>• **One-Page SLA** with Titanium/Gold/Silver tiers and MRDT anti-fraud gate.<br>• **150% monthly liability cap** and guaranteed non-negative settlement invoicing. |
-| **Clarity** | **15%** | • **Interactive 4-View Streamlit Cockpit (`app.py`)** with live minute playback.<br>• **10-Minute Championship Pitch Deck (`PITCH_DECK_OUTLINE.md`)** with jury defense.<br>• Deterministic verifier (`verify_all.py`, **0.38 s** warm / **0.5-0.7 s** on the first run of a fresh clone) & dedicated [`docs/energy_impact.md`](./docs/energy_impact.md).<br>• Compelling 2029 customer story anchored in Lahti City Transit. |
+| **Clarity** | **15%** | • **Interactive 4-View Streamlit Cockpit (`app.py`)** with live minute playback.<br>• **10-Minute Championship Pitch Deck (`PITCH_DECK_OUTLINE.md`)** with jury defense.<br>• Deterministic verifier (`verify_all.py`: its own timed section **0.36-0.38 s** warm / **0.49 s** cold; **total wall clock 1.5-1.8 s** once Python and pandas start) & dedicated [`docs/energy_impact.md`](./docs/energy_impact.md).<br>• Compelling 2029 customer story anchored in Lahti City Transit. |
 
 ---
 
@@ -148,19 +148,19 @@ All architecture decisions and financial models in Project Sentinel are derived 
 pip install -r requirements.txt
 ```
 
-### 2. Run the Deterministic Sub-Second Verifier (&lt; 0.5s)
+### 2. Run the Deterministic Verifier (timed section &lt; 0.5 s)
 Runs the zero-regression gate verifying all S1–S5 scenarios, 29 GitHub Issue #2 items, and 134,400 grid power rows:
 ```bash
 python verify_all.py
 ```
-*(Executes in 0.38 s with 100% PASS; the first run on a fresh clone measures 0.5-0.7 s because the 45 CSVs parse cold)*
+*(100% PASS. Two different numbers, both measured: `verify_all.py` prints its own timed section as 0.36-0.38 s warm and 0.49 s on a fresh clone; the total wall-clock of `python verify_all.py` is 1.5-1.8 s because Python startup plus the pandas import dominate. Quote the timed section, or quote the wall clock, never the two blended.)*
 
 ### 3. Run the Full Pytest Suite (`434 pytest + 106 E2E (540 total)`)
 Executes all unit, integration, protocol, and mathematical verification tests:
 ```bash
 python -m pytest tests/ -q
 ```
-*(434 passed in 47-81 s)*
+*(434 passed in 45-46 s)*
 
 ### 4. Run the Independent Opaque-Box E2E Test Suite (106 Tests)
 Runs 106 independent tests across Tiers 1–4 (Feature coverage, boundaries, stress, scenarios):
@@ -186,7 +186,7 @@ streamlit run app.py
 ```
 hackson/
 ├── app.py                                    # 4-Quadrant Interactive Streamlit Command Center
-├── verify_all.py                             # Deterministic verifier (0.38 s warm, 0.5-0.7 s cold)
+├── verify_all.py                             # Deterministic verifier (timed section 0.36-0.49 s; wall clock 1.5-1.8 s)
 ├── requirements.txt                          # Packaging dependencies
 ├── PROJECT.md                                # Single source of engineering truth
 ├── PITCH_DECK_OUTLINE.md                     # 10-Minute Championship Pitch Deck & Jury Defense

@@ -37,7 +37,7 @@
 4. **Rule 4 — Deliverables Package**:
    - 10-minute presentation pitch (anchored around a 2029 customer story);
    - Live working prototype (`app.py`) and deterministic verifier (`verify_all.py`) on the dataset;
-   - One-page Service Level Agreement (SLA) contract document (`One_Page_SLA_Specification.md`);
+   - One-page Service Level Agreement (SLA) contract document: **`docs/one_page_agreement.md` / `.html`** (prints on exactly one A4 page). `One_Page_SLA_Specification.md` is the long-form 2029 story + tiered specification behind it, not the one-pager;
    - Public GitHub repository with clean reproducibility instructions and zero hardcoded paths.
 
 ---
