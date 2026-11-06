@@ -17,7 +17,7 @@
 [![E2E Tests](https://img.shields.io/badge/E2E%20Runner-106%20passed%20(539%20total)-success?style=for-the-badge&logo=shield)](./e2e_tests/)
 [![Deterministic Verifier](https://img.shields.io/badge/verify__all.py-0.34s%20Deterministic%20Pass-blue?style=for-the-badge&logo=python)](./verify_all.py)
 [![Official Dataset Integrity](https://img.shields.io/badge/Official%20CSVs-45%2F45%20Strictly%20Read--Only-green?style=for-the-badge&logo=git)](./kempower-challenge/kempower-challenge-data/)
-[![Scenario Day Autonomy](https://img.shields.io/badge/Scenario%20Day%2011--13-13%20%E2%86%92%203%20(0%E2%82%AC%20software)-brightgreen?style=for-the-badge)](./src/sim/scenario_engine.py)
+[![Scenario Day Autonomy](https://img.shields.io/badge/Scenario%20Day%20(0%E2%82%AC)-S1%204%E2%86%923%20%C2%B7%20S2%204%E2%86%920%20%C2%B7%20S5%205%E2%86%920-brightgreen?style=for-the-badge)](./src/sim/scenario_engine.py)
 [![Labor Reduction](https://img.shields.io/badge/Human%20Baseline-20.76%20FTE%20(12.44%20software--able)-orange?style=for-the-badge)](./src/commercial/roi_analyzer.py)
 
 ---
