@@ -4,8 +4,8 @@
 
 ---
 - **Package Archive**: `submission.zip`
-- **Total Deliverable Files**: 122
-- **Total Uncompressed Volume**: 1183.83 MB (1,241,337,742 bytes)
+- **Total Deliverable Files**: 129
+- **Total Uncompressed Volume**: 1200.15 MB (1,258,451,912 bytes)
 - **Zero-CJK Rule Compliance**: 100% Pure Professional English Verified (`[\u4e00-\u9fff]` match count = 0)
 - **Deterministic Verification**: `python code/verify_all.py` (29 checks passing in < 0.5s)
 - **Automated Test Coverage**: 462 Pytest + 106 E2E = 568 total automated tests (100% pass rate)
@@ -13,10 +13,10 @@
 
 ## Deliverable Summary by Category
 
-- **`root/`**: 1 files (23.78 KB)
-- **`code/`**: 82 files (979.06 KB)
-- **`docs/`**: 25 files (375.55 KB)
-- **`presentation/`**: 8 files (136.72 MB)
+- **`root/`**: 1 files (106.87 KB)
+- **`code/`**: 84 files (997.66 KB)
+- **`docs/`**: 26 files (468.32 KB)
+- **`presentation/`**: 12 files (152.85 MB)
 - **`videos/`**: 6 files (1045.77 MB)
 
 ---
@@ -104,49 +104,56 @@
 | 77 | `code` | `code/tools/check_demo_artifacts.py` | 3.12 KB | `7f35cdc91661faece79eaf71b2536df05328321d7a9bf1bb9d012d9fbd9b82d5` | Engineering verification and artifact analysis utility |
 | 78 | `code` | `code/tools/cjk_audit.py` | 1.41 KB | `3ba5b8cd1979b16a15df80afa705f19e34a5ea8184e380708b3b822b9de0b286` | Engineering verification and artifact analysis utility |
 | 79 | `code` | `code/tools/export_deck_ledger.py` | 39.59 KB | `a20260946a57c8857add3b5e3d5b70ef580cc7271223e5b67577c4329cc99378` | Engineering verification and artifact analysis utility |
-| 80 | `code` | `code/tools/s1_multicabinet_sim.py` | 12.12 KB | `ea9c9c403c849dd14cecfb3ea9435c29120477dff24cd7ff12c50c9a67584b01` | Engineering verification and artifact analysis utility |
-| 81 | `code` | `code/tools/stage_submission.py` | 5.21 KB | `43d403b013af388893cfb884e74e3b72363d4f62c9dac016a00603bb6dd6560b` | Engineering verification and artifact analysis utility |
-| 82 | `code` | `code/verify_all.py` | 6.76 KB | `f8d05f4dd439d48773ad4aafdd434650a45d4435bf6136fc9f549285a01368c4` | Deterministic CLI verifier executing 29 validation checks across 45 CSVs in < 0.5s |
-| 83 | `docs` | `docs/HACKATHON.md` | 3.72 KB | `be16e96cf571ffabb8f728d489dc26d55ef9e668bc9dca41c8b2b0b971b74fdb` | Challenge alignment, competition boundaries, and judging rules reference |
-| 84 | `docs` | `docs/One_Page_SLA_Specification.md` | 22.20 KB | `65fe05c7e3269eea74359e9f966929b515a6be84c3952960b9148d5ac5f3f693` | Comprehensive outcome-based CaaS SLA specification and 2029 customer story |
-| 85 | `docs` | `docs/PROJECT.md` | 17.15 KB | `1804e340c355504f911c24279dc490bceca22cc65617baaee3d39d988c81de14` | Single source of engineering truth and system technical blueprint |
-| 86 | `docs` | `docs/PROJECT_AUDIT_REPORT.md` | 7.17 KB | `9ee879203249404d8ac5b1c49ea2bee0ad0fb9a2bb428c7c92e4219de829fddf` | Forensic audit report verifying all 5 competition evaluation dimensions |
-| 87 | `docs` | `docs/ZERO_HUMAN_DESIGN.md` | 18.70 KB | `4a1df3da519f8b69c763474128e7fccb0bae965ed1d5244bca0efcc9e7ecfc03` | Comprehensive zero-human autonomous architecture design specification |
-| 88 | `docs` | `docs/assumptions_and_additions.md` | 11.67 KB | `b51226c0eabfe14f722e204828169e3558e1a40b4ba13d6e06afa4d46c79f2bf` | Transparent dictionary of 20 engineering assumptions and introduced artifacts |
-| 89 | `docs` | `docs/attribution_matrix.md` | 13.94 KB | `c589f83d68fa7cfcada147a9c1c7e4f8373d318bd45d1b1ac20c926308096e76` | 16-cell causal attribution matrix for S1, S2, and S5 scenarios |
-| 90 | `docs` | `docs/demo_day/00_pocket_cheat_sheet.md` | 8.88 KB | `8c1e41f37a71acf3d5591d7c2eaed0d7317803b670bfe04af8069a3ae2fe5842` | On-stage quick-reference card, timeline checkpoints, and golden quotes |
-| 91 | `docs` | `docs/demo_day/01_stage_schedule_and_setup.md` | 47.69 KB | `94bd789edce7e64106fb7bb345c0c8998badab46596fe86a71d41b68fe388921` | Minute-by-minute presentation timeline and dual-laptop hardware setup |
-| 92 | `docs` | `docs/demo_day/02_team_roles_and_coordination.md` | 32.92 KB | `35a0133c5902c568cfdc30d30848179cceda5941d2893ddbc35d69408e105a22` | 4-person role matrix, verbatim speaker handoff cues, and console SOP |
-| 93 | `docs` | `docs/demo_day/03_judge_personas_and_question_bank.md` | 31.10 KB | `fbe274474571ad072923fd77e3f4a09f7aaf00346c6cc2676b9ed83988f2747e` | 3 juror profiles and 14 representative hardcore questions |
-| 94 | `docs` | `docs/demo_day/04_structured_defense_and_crisis_manual.md` | 48.96 KB | `bfde4d27f643c05125d413f31e3906192b155520a32f5ed68c65403856f8f02a` | 3-part structured defense responses and emergency crisis procedures |
-| 95 | `docs` | `docs/demo_day/05_live_demo_operational_sop.md` | 12.56 KB | `d80535b094e780b7ba1b0c5dfe0cf04129f645454910d2c57b8e0079a1712809` | Live console operator step-by-step Standard Operating Procedure |
-| 96 | `docs` | `docs/demo_day/06_code_proof_and_authenticity_guide.md` | 12.18 KB | `1aafcb5d859dae4de823a21f10d3a0cfdb3a0b0850c8cb3518553b4406169aed` | Code-level proof walkthrough and data authenticity verification guide |
-| 97 | `docs` | `docs/demo_day/README.md` | 16.53 KB | `14e87f49a9ca2ea5871ea0a355b6758117120c670b1fe56b1c8cc3f36b2d26ae` | Demo Day operational handbook master index |
-| 98 | `docs` | `docs/energy_impact.md` | 20.66 KB | `deffb9be6a910a30dc7f277e1bca728dcd253bb1a15aa43f18e2ce45407842c5` | Station-by-station energy ledger and 95-site network-wide grid impact proof |
-| 99 | `docs` | `docs/hackathon/BRIEF.md` | 6.18 KB | `571c27eb8738cb0b1a6d1ce3775c6ad1b413acb34473c4e1d7603bfadbf47f27` | Official Kempower challenge brief transcription |
-| 100 | `docs` | `docs/hackathon/BUILD_PLAN.md` | 2.31 KB | `11af160f1836588db876ec8d590c705f032476be909dd7dd0afbc4298006ad02` | Engineering build and delivery milestone schedule |
-| 101 | `docs` | `docs/hackathon/DECISIONS.md` | 3.41 KB | `db08a4e7f78a9724bc30a86188fabc432d4bc919ac443858227a198c29d6f967` | Architectural decisions and rationale log |
-| 102 | `docs` | `docs/hackathon/DEMO_SCRIPT.md` | 5.61 KB | `4b3979ec02a20e050d04812cc9ab0f6ece8b85fac0e1348e88ebbfcf12658022` | 120-second live demonstration script |
-| 103 | `docs` | `docs/hackathon/JUDGING.md` | 5.51 KB | `c6b827e9d0665a249fc563c9e00e0c2a3153374fea6244b8d4d8c2ecc75c2d98` | Official evaluation criteria, weights, and scoring rubrics |
-| 104 | `docs` | `docs/hackathon/RULES.md` | 3.51 KB | `76170f3d29259f6c0232486e31fbc944ee97f95a3f556b4e21c4dbe4847ee9d0` | Competition rules, design perspective, and integrity boundaries |
-| 105 | `docs` | `docs/hackathon/SUBMISSION.md` | 5.32 KB | `13f6abe5fee18c06ecbc981db851a47a3a766dfc479895ea66e0ef1ec58ad456` | Deliverable manifest checklist and submission requirements |
-| 106 | `docs` | `docs/one_page_agreement.html` | 11.08 KB | `a92cb6b5c7427ea02d216cd5d97ea4cfd157cc43f0c8af9cfd05ada0a999b60d` | Rendered one-page SLA agreement strictly formatted to 1 A4 page |
-| 107 | `docs` | `docs/one_page_agreement.md` | 6.58 KB | `254e3961995d99d9d151b2db2f824a852659df918809bb6ab7506a4a5ee23af7` | Markdown source of the one-page SLA agreement |
-| 108 | `presentation` | `presentation/PITCH_DECK_OUTLINE.md` | 44.41 KB | `5f7987a8719de3c1533052b9db6394c440358ea0118f08d3a4e9881e0329b3c9` | Original pitch deck structure reference outline |
-| 109 | `presentation` | `presentation/PITCH_DECK_OUTLINE_v2.md` | 44.95 KB | `204e2a9c5640f609e12c9908903296354b73091010728986aa57d005de614917` | Detailed pitch deck structure and jury defense talking points |
-| 110 | `presentation` | `presentation/Project_Sentinel_12pages_final.pptx` | 16.31 MB | `3cbc088ad7887f89238e0fae7a5e1e80fceac5174e7ac3ecd6f0017eabaf83a9` | 12-slide modern presentation pitch deck for championship defense |
-| 111 | `presentation` | `presentation/SPEECH_OVERHEAT_SCENE.md` | 9.17 KB | `d42e7d94fc6c27176052d87b432aa895e7d1f7c528387695c6d1068bbd8b46a8` | Deep-dive verbal script for S1 sub-zero thermal trip scenario |
-| 112 | `presentation` | `presentation/SPEECH_SIX_SCENES.md` | 12.60 KB | `6beabed6486dd43476d4c3bcad97c0003eac9c1d887c07c5ddc7adc7776055fc` | Verbal presentation speech script covering all 6 failure scenarios |
-| 113 | `presentation` | `presentation/presentation 1.mp4` | 61.05 MB | `2dd2206be17fe2dbca005a490a1bf424cc74c59b2f0b84d28cf5e0fdd8ea143d` | Stage presentation rehearsal demonstration video part 1 |
-| 114 | `presentation` | `presentation/presentation 2.mp4` | 53.47 MB | `f7e1a5e90888dc1e37ae53b4baa6641d1d03c8f4735d75385e83e66e0a979ef3` | Stage presentation rehearsal demonstration video part 2 |
-| 115 | `presentation` | `presentation/presentation_demo.mp4` | 5.78 MB | `e3881b1d21b1c15e26b8809a5a9e4a1c642ae516103dc5694c4aec5375d8763e` | Master 1080p presentation demo video (75s runtime) |
-| 116 | `root` | `README.md` | 23.78 KB | `3f3e17acc7fbd1c04a0dc880551b8ee8422dfbe4b90894ce8aee28707c16fb1e` | Master project documentation, system architecture, 6-scenario benchmark, and quickstart guide |
-| 117 | `videos` | `videos/1.Night replay.mp4` | 149.79 MB | `fed7cac36fe3051b22b700dafaf573f1bf20b47179d428d5fdfa471a0162aaf9` | Scenario 1: S1 overnight bus depot sub-zero charging & thermal trip replay (1080p) |
-| 118 | `videos` | `videos/2.Outage replay.mp4` | 374.07 MB | `3f9a6c1d0dc221cf0b8a07fd546dead842fbe21c4318a7feec75ca61d3dffd6d` | Scenario 2: S3 highway public hub 2-hour cellular outage & edge islanding replay (1080p) |
-| 119 | `videos` | `videos/3.Price spike replay.mp4` | 205.84 MB | `a6e57eaf9207cff17a502640951dd36982bc838a2e66fdd1a19b61260c1edafd` | Scenario 3: S4 urban hub 799.30 EUR/MWh price spike peak shaving replay (1080p) |
-| 120 | `videos` | `videos/4.Curtailment replay.mp4` | 104.31 MB | `ad4c607f9e7f946efa7508f18f05e3d6bfb8a0a0a0f5b5fd8253404f378cb93e` | Scenario 4: S2 logistics depot 400 kW DSO curtailment preemption replay (1080p) |
-| 121 | `videos` | `videos/5.Cable fault replay.mp4` | 77.86 MB | `a8ec106a3b47e4d07b7c94f1e78649e2de7604cb3227c887e331825b54052f9d` | Scenario 5: S1 dispenser cable fault & BBM rerouting replay (1080p) |
-| 122 | `videos` | `videos/6.Commissioning replay.mp4` | 133.89 MB | `bf81e08b2998daeadcd5831bcea249769a196e9deb14dca57120e9e0e7625e89` | Scenario 6: S5 commissioning configuration reconciliation replay (1080p) |
+| 80 | `code` | `code/tools/package_and_manifest.py` | 16.02 KB | `a6cec90de108599081b01740731098ba16201e36e62eff27c257e67c06554e80` | Engineering verification and artifact analysis utility |
+| 81 | `code` | `code/tools/s1_multicabinet_sim.py` | 12.12 KB | `ea9c9c403c849dd14cecfb3ea9435c29120477dff24cd7ff12c50c9a67584b01` | Engineering verification and artifact analysis utility |
+| 82 | `code` | `code/tools/stage_submission.py` | 5.66 KB | `cd42cff88c4e16cc80224888d0a6606fe3c0938a59fd80ebc69627131d17adbd` | Engineering verification and artifact analysis utility |
+| 83 | `code` | `code/tools/verify_submission_cjk.py` | 2.13 KB | `89bca34e67d5d935d199a5427609ef411270c118e16844a9995045f53c1bbe59` | Engineering verification and artifact analysis utility |
+| 84 | `code` | `code/verify_all.py` | 6.76 KB | `f8d05f4dd439d48773ad4aafdd434650a45d4435bf6136fc9f549285a01368c4` | Deterministic CLI verifier executing 29 validation checks across 45 CSVs in < 0.5s |
+| 85 | `docs` | `docs/HACKATHON.md` | 3.72 KB | `be16e96cf571ffabb8f728d489dc26d55ef9e668bc9dca41c8b2b0b971b74fdb` | Challenge alignment, competition boundaries, and judging rules reference |
+| 86 | `docs` | `docs/One_Page_SLA_Specification.md` | 22.20 KB | `65fe05c7e3269eea74359e9f966929b515a6be84c3952960b9148d5ac5f3f693` | Comprehensive outcome-based CaaS SLA specification and 2029 customer story |
+| 87 | `docs` | `docs/PROJECT.md` | 17.15 KB | `1804e340c355504f911c24279dc490bceca22cc65617baaee3d39d988c81de14` | Single source of engineering truth and system technical blueprint |
+| 88 | `docs` | `docs/PROJECT_AUDIT_REPORT.md` | 7.17 KB | `9ee879203249404d8ac5b1c49ea2bee0ad0fb9a2bb428c7c92e4219de829fddf` | Forensic audit report verifying all 5 competition evaluation dimensions |
+| 89 | `docs` | `docs/Team3-One_Page-Autonomous_Charging_Services_Agreement.docx` | 92.76 KB | `0158958048cac203dd591ce589bf042f48d7160b21e8e00c5859f10f6e6f987e` | Commercial one-page Autonomous Charging Services Agreement (Microsoft Word format) |
+| 90 | `docs` | `docs/ZERO_HUMAN_DESIGN.md` | 18.70 KB | `4a1df3da519f8b69c763474128e7fccb0bae965ed1d5244bca0efcc9e7ecfc03` | Comprehensive zero-human autonomous architecture design specification |
+| 91 | `docs` | `docs/assumptions_and_additions.md` | 11.67 KB | `b51226c0eabfe14f722e204828169e3558e1a40b4ba13d6e06afa4d46c79f2bf` | Transparent dictionary of 20 engineering assumptions and introduced artifacts |
+| 92 | `docs` | `docs/attribution_matrix.md` | 13.94 KB | `c589f83d68fa7cfcada147a9c1c7e4f8373d318bd45d1b1ac20c926308096e76` | 16-cell causal attribution matrix for S1, S2, and S5 scenarios |
+| 93 | `docs` | `docs/demo_day/00_pocket_cheat_sheet.md` | 8.88 KB | `8c1e41f37a71acf3d5591d7c2eaed0d7317803b670bfe04af8069a3ae2fe5842` | On-stage quick-reference card, timeline checkpoints, and golden quotes |
+| 94 | `docs` | `docs/demo_day/01_stage_schedule_and_setup.md` | 47.69 KB | `94bd789edce7e64106fb7bb345c0c8998badab46596fe86a71d41b68fe388921` | Minute-by-minute presentation timeline and dual-laptop hardware setup |
+| 95 | `docs` | `docs/demo_day/02_team_roles_and_coordination.md` | 32.92 KB | `35a0133c5902c568cfdc30d30848179cceda5941d2893ddbc35d69408e105a22` | 4-person role matrix, verbatim speaker handoff cues, and console SOP |
+| 96 | `docs` | `docs/demo_day/03_judge_personas_and_question_bank.md` | 31.10 KB | `fbe274474571ad072923fd77e3f4a09f7aaf00346c6cc2676b9ed83988f2747e` | 3 juror profiles and 14 representative hardcore questions |
+| 97 | `docs` | `docs/demo_day/04_structured_defense_and_crisis_manual.md` | 48.96 KB | `bfde4d27f643c05125d413f31e3906192b155520a32f5ed68c65403856f8f02a` | 3-part structured defense responses and emergency crisis procedures |
+| 98 | `docs` | `docs/demo_day/05_live_demo_operational_sop.md` | 12.56 KB | `d80535b094e780b7ba1b0c5dfe0cf04129f645454910d2c57b8e0079a1712809` | Live console operator step-by-step Standard Operating Procedure |
+| 99 | `docs` | `docs/demo_day/06_code_proof_and_authenticity_guide.md` | 12.18 KB | `1aafcb5d859dae4de823a21f10d3a0cfdb3a0b0850c8cb3518553b4406169aed` | Code-level proof walkthrough and data authenticity verification guide |
+| 100 | `docs` | `docs/demo_day/README.md` | 16.53 KB | `14e87f49a9ca2ea5871ea0a355b6758117120c670b1fe56b1c8cc3f36b2d26ae` | Demo Day operational handbook master index |
+| 101 | `docs` | `docs/energy_impact.md` | 20.66 KB | `deffb9be6a910a30dc7f277e1bca728dcd253bb1a15aa43f18e2ce45407842c5` | Station-by-station energy ledger and 95-site network-wide grid impact proof |
+| 102 | `docs` | `docs/hackathon/BRIEF.md` | 6.18 KB | `571c27eb8738cb0b1a6d1ce3775c6ad1b413acb34473c4e1d7603bfadbf47f27` | Official Kempower challenge brief transcription |
+| 103 | `docs` | `docs/hackathon/BUILD_PLAN.md` | 2.31 KB | `11af160f1836588db876ec8d590c705f032476be909dd7dd0afbc4298006ad02` | Engineering build and delivery milestone schedule |
+| 104 | `docs` | `docs/hackathon/DECISIONS.md` | 3.41 KB | `db08a4e7f78a9724bc30a86188fabc432d4bc919ac443858227a198c29d6f967` | Architectural decisions and rationale log |
+| 105 | `docs` | `docs/hackathon/DEMO_SCRIPT.md` | 5.61 KB | `4b3979ec02a20e050d04812cc9ab0f6ece8b85fac0e1348e88ebbfcf12658022` | 120-second live demonstration script |
+| 106 | `docs` | `docs/hackathon/JUDGING.md` | 5.51 KB | `c6b827e9d0665a249fc563c9e00e0c2a3153374fea6244b8d4d8c2ecc75c2d98` | Official evaluation criteria, weights, and scoring rubrics |
+| 107 | `docs` | `docs/hackathon/RULES.md` | 3.51 KB | `76170f3d29259f6c0232486e31fbc944ee97f95a3f556b4e21c4dbe4847ee9d0` | Competition rules, design perspective, and integrity boundaries |
+| 108 | `docs` | `docs/hackathon/SUBMISSION.md` | 5.32 KB | `13f6abe5fee18c06ecbc981db851a47a3a766dfc479895ea66e0ef1ec58ad456` | Deliverable manifest checklist and submission requirements |
+| 109 | `docs` | `docs/one_page_agreement.html` | 11.08 KB | `a92cb6b5c7427ea02d216cd5d97ea4cfd157cc43f0c8af9cfd05ada0a999b60d` | Rendered one-page SLA agreement strictly formatted to 1 A4 page |
+| 110 | `docs` | `docs/one_page_agreement.md` | 6.58 KB | `254e3961995d99d9d151b2db2f824a852659df918809bb6ab7506a4a5ee23af7` | Markdown source of the one-page SLA agreement |
+| 111 | `presentation` | `presentation/PITCH_DECK_OUTLINE.md` | 44.41 KB | `5f7987a8719de3c1533052b9db6394c440358ea0118f08d3a4e9881e0329b3c9` | Original pitch deck structure reference outline |
+| 112 | `presentation` | `presentation/PITCH_DECK_OUTLINE_v2.md` | 44.95 KB | `204e2a9c5640f609e12c9908903296354b73091010728986aa57d005de614917` | Detailed pitch deck structure and jury defense talking points |
+| 113 | `presentation` | `presentation/PPT_SPEECH_PLAN.md` | 33.13 KB | `a6ce68c132c0a78c6f99a236924df6ec03fc1c0b81ff3750eca3d1556de2bbda` | Structured PPT speech plan, slide timings, speaker notes, and stage SOP |
+| 114 | `presentation` | `presentation/Project_Sentinel_12pages_final.pptx` | 16.31 MB | `3cbc088ad7887f89238e0fae7a5e1e80fceac5174e7ac3ecd6f0017eabaf83a9` | 12-slide modern presentation pitch deck with embedded speaker notes |
+| 115 | `presentation` | `presentation/Project_Sentinel_12pages_v3.pptx` | 16.06 MB | `9582147dc0ea0de3d668521334c68c49b763877ca6c0c3fc0c232973d852b2ec` | 12-slide modern presentation pitch deck (official release with real GitHub QR code) |
+| 116 | `presentation` | `presentation/Project_Sentinel_Pitch_Script_12pages.md` | 14.79 KB | `7a684095e1e6e66e6576a33090932b26743cd887ab94013553f7ae91146292e3` | Verbatim 10-minute speech script mapped slide-by-slide to the 12-page pitch deck |
+| 117 | `presentation` | `presentation/SPEECH_10MIN_ENGLISH_OFFICIAL.md` | 24.88 KB | `164dacc7c1fa60cb006b04a51b1c1d6b2f4cf719fb0be90ad24d14a05a83d932` | Official 10-minute keynote speech script with blizzard opening and jury defense |
+| 118 | `presentation` | `presentation/SPEECH_OVERHEAT_SCENE.md` | 9.17 KB | `d42e7d94fc6c27176052d87b432aa895e7d1f7c528387695c6d1068bbd8b46a8` | Deep-dive verbal script for S1 sub-zero thermal trip scenario |
+| 119 | `presentation` | `presentation/SPEECH_SIX_SCENES.md` | 12.60 KB | `6beabed6486dd43476d4c3bcad97c0003eac9c1d887c07c5ddc7adc7776055fc` | Verbal presentation speech script covering all 6 failure scenarios |
+| 120 | `presentation` | `presentation/presentation 1.mp4` | 61.05 MB | `2dd2206be17fe2dbca005a490a1bf424cc74c59b2f0b84d28cf5e0fdd8ea143d` | Stage presentation rehearsal demonstration video part 1 |
+| 121 | `presentation` | `presentation/presentation 2.mp4` | 53.47 MB | `f7e1a5e90888dc1e37ae53b4baa6641d1d03c8f4735d75385e83e66e0a979ef3` | Stage presentation rehearsal demonstration video part 2 |
+| 122 | `presentation` | `presentation/presentation_demo.mp4` | 5.78 MB | `e3881b1d21b1c15e26b8809a5a9e4a1c642ae516103dc5694c4aec5375d8763e` | Master 1080p presentation demo video (75s runtime) |
+| 123 | `root` | `README.md` | 106.87 KB | `38de0e28678731be1dfad58983cf333550f743ade45f6b50cdc3068468800cef` | Master project documentation, system architecture, 6-scenario benchmark, and quickstart guide |
+| 124 | `videos` | `videos/1.Night replay.mp4` | 149.79 MB | `fed7cac36fe3051b22b700dafaf573f1bf20b47179d428d5fdfa471a0162aaf9` | Scenario 1: S1 overnight bus depot sub-zero charging & thermal trip replay (1080p) |
+| 125 | `videos` | `videos/2.Outage replay.mp4` | 374.07 MB | `3f9a6c1d0dc221cf0b8a07fd546dead842fbe21c4318a7feec75ca61d3dffd6d` | Scenario 2: S3 highway public hub 2-hour cellular outage & edge islanding replay (1080p) |
+| 126 | `videos` | `videos/3.Price spike replay.mp4` | 205.84 MB | `a6e57eaf9207cff17a502640951dd36982bc838a2e66fdd1a19b61260c1edafd` | Scenario 3: S4 urban hub 799.30 EUR/MWh price spike peak shaving replay (1080p) |
+| 127 | `videos` | `videos/4.Curtailment replay.mp4` | 104.31 MB | `ad4c607f9e7f946efa7508f18f05e3d6bfb8a0a0a0f5b5fd8253404f378cb93e` | Scenario 4: S2 logistics depot 400 kW DSO curtailment preemption replay (1080p) |
+| 128 | `videos` | `videos/5.Cable fault replay.mp4` | 77.86 MB | `a8ec106a3b47e4d07b7c94f1e78649e2de7604cb3227c887e331825b54052f9d` | Scenario 5: S1 dispenser cable fault & BBM rerouting replay (1080p) |
+| 129 | `videos` | `videos/6.Commissioning replay.mp4` | 133.89 MB | `bf81e08b2998daeadcd5831bcea249769a196e9deb14dca57120e9e0e7625e89` | Scenario 6: S5 commissioning configuration reconciliation replay (1080p) |
 
 ---
 

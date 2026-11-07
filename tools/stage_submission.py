@@ -54,6 +54,7 @@ def main():
     # Core specification & audit reports
     doc_files = [
         ("One_Page_SLA_Specification.md", "One_Page_SLA_Specification.md"),
+        ("Team3-One_Page-Autonomous_Charging_Services_Agreement.docx", "Team3-One_Page-Autonomous_Charging_Services_Agreement.docx"),
         ("docs/one_page_agreement.html", "one_page_agreement.html"),
         ("docs/one_page_agreement.md", "one_page_agreement.md"),
         ("docs/PROJECT_AUDIT_REPORT.md", "PROJECT_AUDIT_REPORT.md"),
@@ -96,7 +97,11 @@ def main():
     pres_dir = os.path.join(SUBMISSION_DIR, "presentation")
     os.makedirs(pres_dir, exist_ok=True)
     pres_files = [
+        ("Project_Sentinel_12pages_v3.pptx", "Project_Sentinel_12pages_v3.pptx"),
         ("Project_Sentinel_12pages_final.pptx", "Project_Sentinel_12pages_final.pptx"),
+        ("Project_Sentinel_Pitch_Script_12pages.md", "Project_Sentinel_Pitch_Script_12pages.md"),
+        ("docs/SPEECH_10MIN_ENGLISH_OFFICIAL.md", "SPEECH_10MIN_ENGLISH_OFFICIAL.md"),
+        ("docs/PPT_SPEECH_PLAN.md", "PPT_SPEECH_PLAN.md"),
         ("PITCH_DECK_OUTLINE_v2.md", "PITCH_DECK_OUTLINE_v2.md"),
         ("PITCH_DECK_OUTLINE.md", "PITCH_DECK_OUTLINE.md"),
         ("demo_scenarios/SPEECH_SIX_SCENES.md", "SPEECH_SIX_SCENES.md"),

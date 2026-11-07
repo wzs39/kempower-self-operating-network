@@ -53,6 +53,7 @@ FILE_DESCRIPTIONS = {
     
     # Docs
     "docs/One_Page_SLA_Specification.md": "Comprehensive outcome-based CaaS SLA specification and 2029 customer story",
+    "docs/Team3-One_Page-Autonomous_Charging_Services_Agreement.docx": "Commercial one-page Autonomous Charging Services Agreement (Microsoft Word format)",
     "docs/one_page_agreement.html": "Rendered one-page SLA agreement strictly formatted to 1 A4 page",
     "docs/one_page_agreement.md": "Markdown source of the one-page SLA agreement",
     "docs/PROJECT_AUDIT_REPORT.md": "Forensic audit report verifying all 5 competition evaluation dimensions",
@@ -83,7 +84,11 @@ FILE_DESCRIPTIONS = {
     "docs/hackathon/SUBMISSION.md": "Deliverable manifest checklist and submission requirements",
     
     # Presentation
-    "presentation/Project_Sentinel_12pages_final.pptx": "12-slide modern presentation pitch deck for championship defense",
+    "presentation/Project_Sentinel_12pages_v3.pptx": "12-slide modern presentation pitch deck (official release with real GitHub QR code)",
+    "presentation/Project_Sentinel_12pages_final.pptx": "12-slide modern presentation pitch deck with embedded speaker notes",
+    "presentation/Project_Sentinel_Pitch_Script_12pages.md": "Verbatim 10-minute speech script mapped slide-by-slide to the 12-page pitch deck",
+    "presentation/SPEECH_10MIN_ENGLISH_OFFICIAL.md": "Official 10-minute keynote speech script with blizzard opening and jury defense",
+    "presentation/PPT_SPEECH_PLAN.md": "Structured PPT speech plan, slide timings, speaker notes, and stage SOP",
     "presentation/PITCH_DECK_OUTLINE_v2.md": "Detailed pitch deck structure and jury defense talking points",
     "presentation/PITCH_DECK_OUTLINE.md": "Original pitch deck structure reference outline",
     "presentation/SPEECH_SIX_SCENES.md": "Verbal presentation speech script covering all 6 failure scenarios",
