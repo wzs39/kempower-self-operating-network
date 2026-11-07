@@ -72,6 +72,8 @@ test/
 # Large submission archives (>100MB exceeds GitHub push limit)
 submission.zip
 submission/
+final_submission/
+Team3_Project_Sentinel_Submission/
 *.zip
 !Team3_Project_Sentinel_Submission.zip
 

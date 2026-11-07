@@ -268,6 +268,10 @@ streamlit run app.py
 
 ## 4.2 12-Slide Modern Pitch Deck Outline & Slide-by-Slide Defense
 
+> 📕 **Official Bilingual Demo Day Jury Defense Playbook & Hardcore Q&A Manual (PDF) Released**:  
+> Comprehensive 32-page publication covering 3 Juror Archetypes, 14 Hardcore Q&As (verbatim questions, psychological traps, opening stances, quantitative citations, L1-L3 mechanisms, preemptive counter-strikes), 4-Member Tactical Division, and 6 Stage Crisis Protocols.  
+> 👉 **[Download / View the 32-Page Bilingual PDF Manual](./PROJECT_SENTINEL_JURY_DEFENSE_BILINGUAL_MANUAL.pdf)** &nbsp;|&nbsp; **[Interactive HTML Version](./docs/demo_day/PROJECT_SENTINEL_JURY_DEFENSE_BILINGUAL_MANUAL.html)**
+
 ```
 Slide 01: Title & Vision — Project Sentinel: The Self-Operating Charging Network
 Slide 02: Problem — The Invisible Army: 20.76 FTE Operational Baseline (€1.82M/yr)
