@@ -3,8 +3,8 @@
 **Project Sentinel · Kempower Challenge, LahtiES Energy Tech Hackathon 2026**
 Service Provider = equipment supplier & service provider (`contracts.csv`, holds 18/29 service-scope contracts) · Client = fleet operator / site owner · Scenario reference day **2026-11-13** · All figures computed from the **synthetic** official dataset; the 2029 customer is fictional.
 
-> Printable single-page version: [`one_page_agreement.html`](./one_page_agreement.html) (verified: renders to **exactly 1 A4 page**).
-> This file is the markdown twin of the same text. The 24-article long-form contract is `Team3-…Agreement.docx` and is explicitly **not** the one-pager.
+> Printable single-page version: [`one_page_agreement.pdf`](./one_page_agreement.pdf) — verified to render as **exactly 1 A4 page** (re-rendered from [`one_page_agreement.html`](./one_page_agreement.html)).
+> This file is the markdown twin of the same text; it is the one-page agreement deliverable. Full derivations and tier tables: `SLA_Specification_Annex_Full.pdf`.
 
 ---
 
