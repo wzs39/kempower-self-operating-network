@@ -1,22 +1,25 @@
 """
-充电场站夜间功率分配与挪车次数核算。
+Overnight charging station power allocation and yard move accounting.
 
-一个可复现的离散时间仿真：给定车辆时间窗、补能需求、连接点数量与整流容量，
-算出能否按时充满、需要多少次物理换位、故障发生时谁会被牺牲。
+A reproducible discrete-time simulation: given vehicle time windows, energy demands,
+connection points, and rectification capacity, calculates on-time completion,
+required physical replugs, and failure impact under hardware faults.
 
-三个必须建模对的物理事实，缺了数字就不真实：
-  1. 恒压段衰减（CV taper）—— SoC 超过 80% 后车端受电功率骤降，
-     这是充电后段"越充越慢"的根本原因。
-  2. 机柜故障是"掉枪"而不是"全体降速"—— C1-3 停机等于挂在它上面的
-     4 个连接点直接失电，上面的车当场断充。
-  3. 换位要时间 —— 一次 move_and_replug 是 8 分钟，这期间枪位空转。
+Three critical physical behaviors modeled:
+  1. Constant Voltage (CV) taper — vehicle charge acceptance drops significantly above 80% SoC,
+     causing charging speed to decrease in the late stage.
+  2. Cabinet failure causes dropped dispensers rather than uniform throttling — C1-3 shutdown
+     directly cuts power to its 4 connected points, interrupting active charging.
+  3. Physical replug latency — each manual move_and_replug requires 8 minutes, during which
+     the dispenser remains idle.
 
-两种调度策略：
-  fcfs    —— 现状。先到先充，枪满了排队，枪一空就要人挪车。
-  urgency —— 零人化。所有车到场即插，按「剩余电量 / 剩余时间」分功率，
-             等价于 EDF（最早截止期优先）的连续功率版本。
+Two dispatch strategies:
+  fcfs    — Baseline status quo. First-come first-served; queueing when full; manual moves when empty.
+  urgency — Zero-human autonomy. All vehicles plugged in on arrival; dynamic power distribution
+             proportional to urgency (remaining energy needed / remaining dwell time),
+             equivalent to a continuous-power Earliest Deadline First (EDF) scheduler.
 
-所有输入来自 data/*.csv，不硬编码任何结果。
+All inputs originate from data/*.csv without hardcoded results.
 """
 
 from __future__ import annotations
@@ -36,7 +39,7 @@ TAPER_DEPTH = 0.9
 
 @dataclass
 class Job:
-    """一辆车的夜间充电任务。"""
+    """Overnight vehicle charging job."""
 
     vehicle_id: str
     arrive: datetime
@@ -61,7 +64,7 @@ class Job:
 
 @dataclass
 class Point:
-    """一个连接点（枪）。"""
+    """A connection point (charging gun / dispenser)."""
 
     idx: int
     job: Job | None = None
@@ -81,7 +84,7 @@ class Result:
 
 
 def taper_limit(job: Job, soc: float) -> float:
-    """恒压段功率衰减：SoC 超过 80% 后，车端能接受的功率按曲线下降。"""
+    """CV taper power derating: above 80% SoC, maximum acceptable power drops non-linearly."""
     if soc <= SOC_TAPER_START:
         return job.max_kw
     x = min((soc - SOC_TAPER_START) / (1.0 - SOC_TAPER_START), 1.0)
@@ -89,7 +92,7 @@ def taper_limit(job: Job, soc: float) -> float:
 
 
 def cap_profile(events: list[tuple[datetime, float]]):
-    """把「某时刻容量变成多少」的事件表，变成一个 t -> cap_kw 的函数。"""
+    """Converts a step-wise capacity event timeline into a continuous t -> cap_kw function."""
     ordered = sorted(events)
 
     def f(t: datetime) -> float:
@@ -103,7 +106,7 @@ def cap_profile(events: list[tuple[datetime, float]]):
 
 
 def load_jobs(site_id: str = "S1", day: str = "2026-11-12", night_only: bool = True) -> list[Job]:
-    """从赛题数据读出场站的充电任务。"""
+    """Loads station charging jobs directly from dataset CSV files."""
     vehicles = {}
     with open(DATA_DIR / "vehicles.csv", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -143,12 +146,12 @@ def simulate(
     fault: tuple[datetime, int] | None = None,
     move_delay_min: float = 0.0,
 ) -> Result:
-    """跑一遍夜间充电。
+    """Simulates an overnight charging schedule.
 
-    strategy      : "fcfs" 先到先充 + 排队挪车；"urgency" 全部插上按紧迫度分功率
-    cap_fn        : t -> 可用容量 kW
-    fault         : (时刻, 掉枪数)，模拟机柜停机导致若干连接点失电
-    move_delay_min: 一次换位要多久才能重新送电（取自 operations_log 的 8 分钟）
+    strategy      : "fcfs" (first-come first-served + queue replugs) or "urgency" (all connected, urgency-weighted)
+    cap_fn        : t -> available capacity in kW
+    fault         : (timestamp, dropped_guns), models power cabinet outage causing dispenser deactivation
+    move_delay_min: delay before newly replugged vehicle can draw power (8 minutes per operations_log)
     """
     if not jobs:
         return Result()
@@ -174,7 +177,7 @@ def simulate(
         return soc[j.vehicle_id] >= j.soc_req - 1e-9
 
     while t <= end:
-        # ---- 1) 故障注入：掉枪，挂在上面的车当场断充 ----
+        # ---- 1) Fault Injection: Dropped guns cut off active charging vehicles ----
         if fault and not fault_fired and t >= fault[0]:
             fault_fired = True
             for p in points[-fault[1]:]:
@@ -188,7 +191,7 @@ def simulate(
         live = [p for p in points if p.alive]
         cap_now = cap_fn(t)
 
-        # ---- 2) 到场：有活着的空点就插上 ----
+        # ---- 2) Arrival: Connect to available live points ----
         for j in jobs:
             if j.vehicle_id in seen or j.arrive > t:
                 continue
@@ -200,12 +203,12 @@ def simulate(
             else:
                 waiting.append(j)
 
-        # ---- 3) 释放充饱或到点的车 ----
+        # ---- 3) Release fully charged or departed vehicles ----
         for p in live:
             if p.job is not None and (finished(p.job) or t >= p.job.depart):
                 p.job = None
 
-        # ---- 4) 空位补给排队最久的车 ----
+        # ---- 4) Fill vacant points from waiting queue ----
         for p in live:
             if p.job is None and waiting:
                 waiting.sort(key=lambda x: x.arrive)
@@ -214,11 +217,11 @@ def simulate(
                     p.job = nxt
                     if strategy == "fcfs":
                         p.ready_at = t + timedelta(minutes=move_delay_min)
-                        moves += 1          # 人工开车过去 + 插枪
+                        moves += 1          # Manual vehicle repositioning + plug-in
                     else:
-                        p.ready_at = t      # 矩阵直接改道，无需人
+                        p.ready_at = t      # Autonomous matrix routing, zero manual delay
 
-        # ---- 5) 充电 ----
+        # ---- 5) Power Allocation & Charging ----
         active = [
             p.job for p in live
             if p.job is not None and not finished(p.job)
@@ -244,8 +247,8 @@ def simulate(
                 remain_h = max((j.depart - t).total_seconds() / 3600.0, 0.05)
                 weight[j.vehicle_id] = (j.need_kwh - delivered[j.vehicle_id]) / remain_h
 
-            # 注水式分配：被恒压段或车端上限卡住的车拿走它能吃的部分，
-            # 剩余功率再按权重分给没被卡住的车，直到分完或全部封顶。
+            # Water-filling distribution: vehicles constrained by taper or vehicle max take their share,
+            # remaining capacity is proportionally allocated to unconstrained vehicles until fully allocated.
             alloc_kw = {j.vehicle_id: 0.0 for j in active}
             pool = cap_now
             pending = list(active)

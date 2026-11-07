@@ -1,4 +1,4 @@
-# Project: Kempower Self-Operating Charging Network (Kempower 自运行充电网络)
+# Project Sentinel · Kempower Autonomous Self-Operating Charging Network
 
 ## Overview & Hackathon Winning Positioning
 - **Event**: LahtiES Energy Tech Hackathon (LUT Lahti / CrazyTown)

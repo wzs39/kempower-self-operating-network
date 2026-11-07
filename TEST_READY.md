@@ -1,103 +1,84 @@
-# TEST_READY: Independent Opaque-Box E2E Test Suite Sign-Off
-*Project: The Self-Operating Charging Network (Kempower Flagship Challenge 2026)*  
-*Track: Independent Opaque-Box E2E Testing Track (`e2e_tests/`)*  
-*Sign-Off Date: 2026-11-05 · Status: PASSED & VERIFIED (100% Pass Rate)*
+# TEST_READY: Demo Day Simulation Independent E2E Test Suite
+
+**Status**: READY  
+**Author**: `test_writer_e2e_1`  
+**Timestamp**: 2026-11-06T23:18:30Z  
+**Target Milestone**: Demo Day Simulation (R1–R4, Master Integration & Mirroring)
 
 ---
 
-## 1. Executive Test Sign-Off
+## 1. Test Suite Deliverables Summary
 
-The Independent End-to-End (E2E) Test Suite has been fully constructed in `e2e_tests/`, verified against all 45 official CSV files, and cross-validated with both `pytest` and the master test runner `python e2e_tests/test_runner.py`.
-
-### 1.1 Test Suite Metrics
-- **Independent E2E Suite (`e2e_tests/`)**: **106 test cases** across 4 tiers.
-  - **Tier 1 (Feature Coverage)**: 45 tests (100% pass, 0.030s)
-  - **Tier 2 (Boundary & Corner)**: 40 tests (100% pass, 0.001s)
-  - **Tier 3 (Cross-Feature Interactions)**: 12 tests (100% pass, 0.018s)
-  - **Tier 4 (Real-World Scenarios)**: 9 tests (100% pass, 0.363s)
-  - **Total E2E Suite Execution Time**: **0.7-0.9 s** via `test_runner.py`.
-- **Full Pytest Suite (`tests/`)**: **434 test cases** (100% pass via `pytest tests/ -q`).
-- **Deterministic Verifier (`verify_all.py`)**: **100% pass**, timed section **under 0.5 s of timed work** warm / **0.49 s** cold (**1.5-1.8 s** wall clock) — all well under the < 5.0 s quality-gate budget.
-- **Combined Network Verification Count**: **`434 pytest + 106 E2E (540 total)` + deterministic verifier** with **zero regressions**.
+| Artifact | Location | Purpose |
+|---|---|---|
+| **Test Infrastructure Spec** | `TEST_INFRA.md` | Authoritative test methodology, invariant derivation, R1–R4 validation rules, and feature coverage matrix. |
+| **Pytest Verification Suite** | `tests/test_demo_day_simulation.py` | 28 automated, independent, requirement-driven test cases validating structure, semantics, and numerical precision. |
+| **Test Readiness Declaration** | `TEST_READY.md` | Verification status report and execution guide for orchestrator and audit agents. |
 
 ---
 
-## 2. 4-Tier Test Architecture Summary (`e2e_tests/`)
-
-```
-e2e_tests/
-├── __init__.py                   # Package initialization
-├── common.py                     # Black-box production adapters & path constants
-├── test_runner.py                # Master E2E runner (CLI arguments, tier selection, summary table)
-├── tier1_feature_coverage.py     # Tier 1: Feature Contract Coverage (>=5 tests per core feature)
-├── tier2_boundary_corner.py      # Tier 2: Boundary & Corner Cases (Stress, Edge, Saturation)
-├── tier3_cross_feature.py        # Tier 3: Pairwise & Multi-Variable Interactions
-└── tier4_real_world_scenario.py  # Tier 4: Real-World Scenario Day 2026-11-13 Workloads
-```
-
-### 2.1 Tier 1: Feature Contract Coverage (45 Tests)
-- **F01 (25 kW DPR Contactor Matrix)**: Discrete 25 kW module quantization, power pooling across guns, break-before-make zero-arc sequence, contactor delay <500ms, AC grid clamp.
-- **F02 (15-min Macro MPC/MILP)**: $10^{-3}$ objective scaling, CV inequality relaxation <25 kW, 150 kW vehicle CV curve, BESS price arbitrage (>20x ratio), SoC bounds normalization.
-- **F03 (Edge Micro FSM)**: Deterministic state machine loop, fan RPM degradation detection (>20%), 75.0°C hardware breaker trip, OFFLINE_ISLANDING full local DLM power, auto-calibration state.
-- **F04 (Dual-Gun Satellite Multiplexing)**: 24-bus physical connection, Phase A fast charge, Phase B 02:00 switchover, balanced top-off before morning departure, zero replug guarantee.
-- **F05 (95.5% Inverter Loss Constraint)**: $1.04712 \times P_{DC}$ AC expansion, S3 1,432.5 kW DC limit, 57-module quantization (1,425 kW DC / 1,492.15 kW AC $\le$ 1,500 kW AC), overload trip prevention, >7 kW headroom margin.
-- **F06 (Predictive Thermal PdM)**: Telemetry fan RPM lookup from official data, 5-min lookahead temperature projection, early load migration before 65°C, N-1 capacity headroom (720 kW at S1), hardware safe envelope.
-- **F07 (S5 Three-Way Config Reconciler Auto-Calibration)**: D5-7 50 kW config anomaly detection, D5-8 inactive eSIM detection, 150 kW config reconciler override, eSIM healing, commissioning step audit.
-- **F08 (799.30 €/MWh Price Peak BESS Interface)**: Extreme price spike verification from `prices.csv` at 18:00:00, lowest price window (27.35 €/MWh), BESS 10% SoC reserve clamp *(interface defined, not field-validated)*.
-- **F11 (One-Page SLA Engine & Anti-Fraud)**: Exact MRDT formula verification, physical gate fraudulent claim rejection, fleet penalty itemized calculation, piecewise availability deductions, 150% monthly liability cap.
-
-### 2.2 Tier 2: Boundary & Corner Cases (40 Tests)
-- **F01 Boundaries**: 0.0 kW request, negative request (-50 kW), cabinet saturation clamp (500 kW $\rightarrow$ 360 kW), zero module rerouting rejection, fractional module ceil (25.001 kW $\rightarrow$ 50 kW).
-- **F02 Boundaries**: 0.0 €/MWh spot price, negative spot price (-15 €/MWh), exact 80.0% CC/CV boundary, 100% SoC 10% floor taper, 0.0 duration $dt$.
-- **F03 Boundaries**: Exact 75.0°C trip boundary, exact 65.0°C warning boundary, exact 20.0% RPM drop trigger, 19.9% RPM drop margin, WAN recovery transition to NORMAL.
-- **F04 Boundaries**: Empty fleet group A, exact 02:00 switchover hour, exact 05:30 top-off hour, midnight wrap-around (0.0h), all 24 buses connected.
-- **F05 Boundaries**: 0.0 kW AC grid limit, minimal 25 kW AC limit (cannot fit 25 kW module), exact single module limit (26.2 kW AC), massive unconstrained saturation, numerical roundtrip precision.
-- **F06 Boundaries**: Zero fan RPM, negative corrupted fan RPM, extreme temperature (110°C), sub-zero Nordic temperature (-14°C), missing/NaN telemetry handling.
-- **F07 Boundaries**: Already-correct config, already-active SIM, over-rated config clamp, zero-rated config default, boolean string parsing robustness.
-- **F08 Boundaries**: Peak price 799.30 €/MWh trigger, near-peak 672.63 €/MWh trigger, BESS 100% full clamp, BESS 5% zero reserve clamp, penalty vs energy cost priority order.
-
-### 2.3 Tier 3: Cross-Feature Interactions (12 Tests)
-- **C01**: Dual-Gun multiplexing with 95.5% AC inverter loss envelope.
-- **C02**: WAN outage islanding occurring concurrently with fan degradation.
-- **C03**: 799.30 €/MWh price spike colliding with urgent departure deadline.
-- **C04**: Plug & Queue reservation receiving released modules from CV tapering vehicle.
-- **C05**: S5 three-way config reconciler auto-calibration followed by DPR continuous intra-cabinet pooling.
-- **C06**: S2 DSO curtailment (400 kW) solved by T05–T08 afternoon preemption.
-- **C07**: S1 thermal N-1 load shedding (180 kW) and zero-arc contactor rerouting.
-- **C08**: BESS arbitrage interface discharging without violating MRDT customer dwell requirements.
-- **C09**: Contactor switching delay (<500ms) fitting within 1000ms micro-FSM tick interval.
-- **C10**: Multi-site concurrent crisis (S1 thermal, S2 curtailment, S3 WAN drop, S4 price peak, S5 misconfig).
-- **C11**: Sub-zero ambient temperature (-15°C) with full matrix load rebalancing.
-- **C12**: Rapid fleet timetable reschedule and rolling horizon MPC feasibility.
-
-### 2.4 Tier 4: Real-World Scenarios (9 Tests)
-- **S1 (Bus Depot)**: 4 baseline missed departures (`398.5 kWh` simulated deficit) reduced to **3 missed (`48.8 kWh` deficit, `-87.8%`, `B20` saved)** under `0 €` software urgency and **0 missed (`0.0 kWh` deficit)** under `324,000 €` 24-plug dual-gun expansion; D1-9 thermal peak detected 199 minutes in advance (22:31 @ 59.3°C).
-- **S2 (Logistics Depot)**: 4 baseline starved trucks (283.50 kWh deficit) preempted from T05–T08 pool (1,857.06 kWh), resulting in 0 missed departures.
-- **S3 (Public Highway Hub)**: 256 drivers, WAN drop, baseline 29.69% day / 44.83% in-window abandonment (`public_arrivals.csv` row level; the 15-min aggregate gives 46.88%); the shipped result is capacity held at 1,425 kW DC / 1,492.15 kW AC local DLM vs the 500 kW naive fallback.
-- **S4 (Urban Hub)**: MILP continuous SoC slack shaves 799.30 €/MWh peak, F017 cable fault isolated with 0 stranded vehicles.
-- **S5 (Fast Depot)**: 5 baseline missed departures eliminated (0 missed) by reconciling grid limit 600 $\rightarrow$ 900 kW (+750 kWh) and correcting D5-7/8.
-- **Commercial AEaaS**: 20.76 FTE continuous operations eliminated (1.82M €/yr at 45 €/h), 9.95 replug FTE (873k €/yr), Tier 2 (0 € CAPEX) vs Tier 3 (324k € CAPEX, 13.31y payback).
-- **One-Page SLA**: Verified itemized audit invoice generator with non-negative net payable and 150% monthly liability cap.
-- **Grid Safety Invariant**: 0 official `grid_kw` limit violations across 134,400 intervals in `network_site_power.csv`.
-- **Closed-Loop Reconciliation**: 13 baseline missed departures drop to **3 (`0 €` software urgency, `10` saved)** and **0 (`324,000 €` S1 dual-gun expansion)** on Scenario Day 2026-11-13.
-
----
-
-## 3. Verification & Execution Instructions
+## 2. Test Execution Commands
 
 ```powershell
-# 1. Master E2E Runner (Tiers 1-4, formatted report)
-python e2e_tests/test_runner.py
+# Execute the entire Demo Day Simulation test suite
+pytest tests/test_demo_day_simulation.py -v --tb=short
 
-# 2. Run via pytest
-python -m pytest e2e_tests/ -v
-
-# 3. Run full pytest suite (`434 pytest + 106 E2E (540 total)`)
-python -m pytest tests/ -q
-
-# 4. Run deterministic verifier (timed section < 0.5 s; wall clock 1.5-1.8 s)
-python verify_all.py
+# Execute specific requirement test classes
+pytest tests/test_demo_day_simulation.py -k "TestR1" -v
+pytest tests/test_demo_day_simulation.py -k "TestR2" -v
+pytest tests/test_demo_day_simulation.py -k "TestR3" -v
+pytest tests/test_demo_day_simulation.py -k "TestR4" -v
+pytest tests/test_demo_day_simulation.py -k "TestMaster" -v
 ```
 
 ---
-*Certified and signed off by: Independent E2E Testing Track (`e2e_test_writer`)*
+
+## 3. Test Coverage & Invariants Verified
+
+### 3.1 Requirement 1 (R1): Stage Schedule & Setup
+- `test_r1_file_exists_and_substantial`: Checks `demo_day_simulation/01_stage_schedule_and_setup.md` exists and $\ge 1500$ chars.
+- `test_r1_pitch_total_duration_600s`: Enforces exact 10-minute (600s) pitch duration.
+- `test_r1_qa_schedule_3_to_5_min`: Enforces 3–5 min Q&A schedule (10:00–14:00/15:00).
+- `test_r1_live_demo_slot_120s`: Enforces 120s (2 min) live demo window between 5:00 and 7:00.
+- `test_r1_stage_layout_and_positioning`: Enforces physical stage layout and 4-member positioning.
+- `test_r1_failsafe_triad_components`: Enforces Failsafe Triad (Streamlit `app.py`, deterministic CLI `verify_all.py`, backup video `.mp4`) and emergency cutover triggers.
+
+### 3.2 Requirement 2 (R2): 4-Person Roles & Synergy
+- `test_r2_file_exists_and_substantial`: Checks `demo_day_simulation/02_team_roles_and_coordination.md` exists and $\ge 1500$ chars.
+- `test_r2_four_member_role_definitions`: Validates distinct profiles for Speaker A, Speaker B, Member C, and Member D.
+- `test_r2_role_responsibilities_separation`: Verifies commercial/story for A, architecture/DPR for B, live console for C, and math/SLA for D.
+- `test_r2_verbatim_speaker_transitions`: Verifies verbatim dual-speaker relay transition scripts.
+- `test_r2_member_c_console_sop_and_triggers`: Verifies console operator SOP, hotkeys, and cutover triggers.
+
+### 3.3 Requirement 3 (R3): Judge Personas & Questions
+- `test_r3_file_exists_and_substantial`: Checks `demo_day_simulation/03_judge_personas_and_question_bank.md` exists and $\ge 2000$ chars.
+- `test_r3_judge_personas_count_and_types`: Verifies $\ge 3$ distinct personas (Technical Architect, Commercial/VC, Kempower Challenge Provider).
+- `test_r3_hardcore_questions_count_at_least_12`: Verifies at least 12 distinct hardcore questions (identifying Q01..Q14).
+- `test_r3_question_structure_metadata`: Verifies each question has ID, category, and target judge persona.
+
+### 3.4 Requirement 4 (R4): Structured Defense & Crisis Response
+- `test_r4_file_exists_and_substantial`: Checks `demo_day_simulation/04_structured_defense_and_crisis_manual.md` exists and $\ge 2500$ chars.
+- `test_r4_three_part_structured_answers`: Verifies structured 3-part response architecture across answers.
+- `test_r4_quantitative_facts_*`: Validates citations of exact numerical proofs:
+  - `21 FTE` manual labor keynote baseline (€1,365,000 / €1.365M / yr @ €65k/yr)
+  - `1.365M €` labor cost savings
+  - `13->3 vs 13->0` missed departures ($0 €$ software triage vs hardware expansion)
+  - `799.30 €/MWh` spot price spike defense via continuous slack variable
+  - `260ms BBM` 6-step Break-Before-Make contactor relay timing
+  - `1,425 kW DC` S3 edge islanding capacity ($P_{\text{AC}} = 1,492.15\text{ kW} \le 1,500\text{ kW}$)
+  - `MRDT anti-fraud` gate in One-Page SLA Specification §5.1
+- `test_r4_crisis_response_procedures`: Verifies emergency procedures for stage hardware crashes, aggressive judges, timer alerts, and out-of-scope questions.
+
+### 3.5 Master Integration & Mirroring
+- `test_master_readme_exists_and_indexes`: Validates `demo_day_simulation/README.md` and navigation index.
+- `test_pocket_cheat_sheet_exists_and_concise`: Validates `demo_day_simulation/00_pocket_cheat_sheet.md`.
+- `test_docs_mirror_complete_and_identical`: Validates 100% mirrored existence and file parity in `docs/demo_day/`.
+
+---
+
+## 4. Initial Test Execution Status
+
+- **Total Test Cases**: 28
+- **R1 Results (`TestR1StageScheduleAndSetup`)**: **6 PASSED / 6 TOTAL (100%)** on `01_stage_schedule_and_setup.md`.
+- **R2–R4 & Master Results**: Failing as expected prior to implementation artifact delivery (Zero facade / True requirement-driven barrier).
+- **Runtime Performance**: < 0.25 seconds execution time for full test discovery and execution.

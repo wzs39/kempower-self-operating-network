@@ -1,31 +1,26 @@
 """
-充电场站夜间功率分配与挪车次数核算。
+Charging station overnight power allocation and yard move accounting.
 
-一个离散时间仿真：给定车辆时间窗、补能需求、机柜配置，算出能否按时充满、
-需要多少次物理换位、故障发生时谁会被牺牲。
+A discrete-time simulation: given vehicle arrival windows, energy demands, and cabinet configurations,
+calculates on-time completion, required physical yard replugs, and failure impact under hardware faults.
 
-建模的物理事实（每条都有数据来源）：
+Physical behaviors modeled:
+1. CV taper (Constant Voltage):
+   Vehicle charge acceptance drops significantly above 80% SoC, decreasing charging speed in the late stage.
+2. Cabinet failure causes dropped cabinets rather than uniform throttling:
+   S1 has 3 power cabinets (360 kW each, 4 satellites per cabinet). C1-3 shutdown directly de-energizes
+   its 4 connected points.
+3. Cross-cabinet busbar redundancy (cross_tie):
+   By default, each cabinet only powers its assigned dispensers. Adding a cross-cabinet busbar tie
+   allows any surviving cabinet to power any dispenser.
+4. Physical replug latency:
+   Each manual move_and_replug takes 8 minutes (staff_minutes in operations_log.csv).
 
-1. 恒压段衰减（CV taper）
-   SoC 超过 80% 后车端受电功率骤降，这是充电后段"越充越慢"的根本原因。
+Two dispatch strategies:
+  fcfs    — Status quo baseline. First-come first-served; queueing when full; manual moves when empty.
+  urgency — Zero-human autonomy. All vehicles connected; dynamic power allocation proportional to urgency.
 
-2. 机柜故障是"掉柜"，不是"全体降速"
-   S1 有 3 个整流柜，每柜 360 kW，各带 4 台卫星。C1-3 停机 = 挂在它上面的
-   那批连接点直接失电，而不是 12 把枪一起变慢。
-
-3. 没有柜间互济，功率就出不了自己的柜
-   默认情况下每个柜只能喂自己那批点。加了互济母排（cross_tie）之后，
-   任意柜的功率才能供给任意点。这是 B/C 两个方案的唯一差别。
-
-4. 换位要时间
-   一次 move_and_replug 是 8 分钟（operations_log.csv 的 staff_minutes），
-   这期间枪位空转。
-
-两种调度策略：
-  fcfs    —— 现状。先到先充，枪满了排队，枪一空就要人挪车。
-  urgency —— 零人化。所有车到场即插，按「剩余电量 / 剩余时间」分功率。
-
-所有输入来自 data/*.csv，不硬编码任何结果。
+All inputs originate from data/*.csv without hardcoded results.
 """
 
 from __future__ import annotations
@@ -33,22 +28,21 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from pathlib import Path
-
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.utils.paths import get_data_dir
+
 DATA_DIR = get_data_dir()
 
 SOC_TAPER_START = 0.80
 TAPER_EXP = 1.2
 TAPER_DEPTH = 0.9
 
-
 @dataclass
 class Job:
-    """一辆车的夜间充电任务。"""
+    """Overnight vehicle charging job."""
 
     vehicle_id: str
     arrive: datetime
@@ -70,26 +64,23 @@ class Job:
     def avg_kw_needed(self) -> float:
         return self.need_kwh / self.window_h if self.window_h > 0 else float("inf")
 
-
 @dataclass
 class Cabinet:
-    """一个整流柜。"""
+    """A power rectifier cabinet."""
 
     idx: int
-    kw: float
+    cap_kw: float
     alive: bool = True
-
 
 @dataclass
 class Point:
-    """一个连接点（枪），物理上属于某个柜。"""
+    """A connection point (gun) assigned physically to a cabinet."""
 
     idx: int
-    cabinet: int
+    cabinet_idx: int
     job: Job | None = None
     alive: bool = True
     ready_at: datetime | None = None
-
 
 @dataclass
 class Result:
@@ -98,27 +89,24 @@ class Result:
     undercharged: list[tuple[str, float]] = field(default_factory=list)
     peak_kw: float = 0.0
     total_kwh: float = 0.0
-    never_charged: list[str] = field(default_factory=list)
+    stranded: list[str] = field(default_factory=list)
     last_finish: datetime | None = None
-    points_lost: int = 0
 
     def summary(self) -> str:
         return (
-            f"挪车 {self.moves} 次 | 欠电 {len(self.undercharged)} 辆 | "
-            f"峰值 {self.peak_kw:.0f} kW | 充入 {self.total_kwh:.0f} kWh"
+            f"Moves: {self.moves} | Undercharged: {len(self.undercharged)} | "
+            f"Peak: {self.peak_kw:.0f} kW | Delivered: {self.total_kwh:.0f} kWh"
         )
 
-
 def taper_limit(job: Job, soc: float) -> float:
-    """恒压段功率衰减：SoC 超过 80% 后，车端能接受的功率按曲线下降。"""
+    """CV taper derating: above 80% SoC, maximum acceptable power drops non-linearly."""
     if soc <= SOC_TAPER_START:
         return job.max_kw
     x = min((soc - SOC_TAPER_START) / (1.0 - SOC_TAPER_START), 1.0)
     return job.max_kw * max(1.0 - TAPER_DEPTH, 1.0 - TAPER_DEPTH * x ** TAPER_EXP)
 
-
 def load_jobs(site_id: str = "S1", day: str = "2026-11-12", night_only: bool = True) -> list[Job]:
-    """从赛题数据读出场站的充电任务。"""
+    """Loads station charging jobs directly from dataset CSV files."""
     vehicles = {}
     with open(DATA_DIR / "vehicles.csv", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -147,32 +135,42 @@ def load_jobs(site_id: str = "S1", day: str = "2026-11-12", night_only: bool = T
     jobs.sort(key=lambda j: j.arrive)
     return jobs
 
+def _waterfill(jobs: list[Job], cap: float, soc: dict[str, float], delivered: dict[str, float],
+               t: datetime, gun_kw: float) -> dict[str, float]:
+    """Water-filling power allocation respecting CV taper and maximum charging power."""
+    if not jobs or cap <= 1e-9:
+        return {j.vehicle_id: 0.0 for j in jobs}
 
-def _waterfill(items, cap_kw, weight_fn, limit_fn) -> dict[str, float]:
-    """注水式分配：被恒压段或车端上限卡住的车拿走它能吃的部分，
-    剩余功率再按权重分给没被卡住的车，直到分完或全部封顶。"""
-    alloc = {j.vehicle_id: 0.0 for j in items}
-    pool = cap_kw
-    pending = list(items)
+    weight = {}
+    for j in jobs:
+        remain_h = max((j.depart - t).total_seconds() / 3600.0, 0.05)
+        weight[j.vehicle_id] = (j.need_kwh - delivered[j.vehicle_id]) / remain_h
+
+    alloc_kw = {j.vehicle_id: 0.0 for j in jobs}
+    pool = cap
+    pending = list(jobs)
     while pending and pool > 1e-9:
-        total_w = sum(weight_fn(j) for j in pending)
+        total_w = sum(weight[j.vehicle_id] for j in pending)
         if total_w <= 1e-9:
             break
         scale = pool / total_w
         capped = []
         for j in pending:
-            if weight_fn(j) * scale >= limit_fn(j) - 1e-9:
-                capped.append((j, limit_fn(j)))
+            want = weight[j.vehicle_id] * scale
+            limit = min(taper_limit(j, soc[j.vehicle_id]), j.max_kw, gun_kw)
+            if want >= limit - 1e-9:
+                capped.append((j, limit))
         if not capped:
             for j in pending:
-                alloc[j.vehicle_id] = weight_fn(j) * scale
-            return alloc
+                alloc_kw[j.vehicle_id] = weight[j.vehicle_id] * scale
+            pool = 0.0
+            break
         for j, lim in capped:
-            alloc[j.vehicle_id] = lim
+            alloc_kw[j.vehicle_id] = lim
             pool -= lim
             pending.remove(j)
-    return alloc
 
+    return alloc_kw
 
 def simulate(
     jobs: list[Job],
@@ -185,34 +183,36 @@ def simulate(
     move_delay_min: float = 0.0,
     gun_kw: float = 150.0,
 ) -> Result:
-    """跑一遍夜间充电。
+    """Simulates multi-cabinet overnight charging.
 
-    cabinet_kw       : 每个整流柜的容量，如 S1 为 [360, 360, 360]
-    points_per_cabinet: 每个柜带多少个连接点。现状 4（单枪卫星），改造后 8（双枪）
-    strategy         : "fcfs" 先到先充 + 排队挪车；"urgency" 全插上按紧迫度分功率
-    fault            : (时刻, [柜号...])，该时刻这些柜停机
-    cross_tie        : True 表示有柜间互济母排，柜死了点位仍可由其他柜供电
-    move_delay_min   : 一次换位要多久才能重新送电（取自 operations_log 的 8 分钟）
-    gun_kw           : 单把枪的硬件功率上限（chargers.csv 中 S1 每枪 150 kW）
+    cabinet_kw        : capacity of each rectifier cabinet (e.g. [360, 360, 360])
+    points_per_cabinet: number of dispensers connected per cabinet (4 for 1-gun, 8 for dual-gun)
+    strategy          : "fcfs" or "urgency"
+    fault             : (timestamp, [cabinet_indices])
+    cross_tie         : if True, surviving cabinets share power across all connection points
+    move_delay_min    : yard move delay (8 minutes per operations_log)
+    gun_kw            : physical hardware power limit per dispenser (150 kW)
     """
     if not jobs:
         return Result()
 
-    cabinets = [Cabinet(i, kw) for i, kw in enumerate(cabinet_kw)]
+    n_cabs = len(cabinet_kw)
+    cabinets = [Cabinet(idx=i, cap_kw=kw) for i, kw in enumerate(cabinet_kw)]
     points: list[Point] = []
+    pidx = 0
     for c in cabinets:
         for _ in range(points_per_cabinet):
-            points.append(Point(idx=len(points), cabinet=c.idx))
+            points.append(Point(idx=pidx, cabinet_idx=c.idx))
+            pidx += 1
 
     delivered = {j.vehicle_id: 0.0 for j in jobs}
     soc = {j.vehicle_id: j.soc_in for j in jobs}
     waiting: list[Job] = []
     seen: set[str] = set()
-    stranded: set[str] = set()
     moves = 0
     peak = 0.0
     fault_fired = False
-    points_lost = 0
+    stranded: set[str] = set()
     finish_at: dict[str, datetime] = {}
 
     t = min(j.arrive for j in jobs)
@@ -222,53 +222,48 @@ def simulate(
     def finished(j: Job) -> bool:
         return soc[j.vehicle_id] >= j.soc_req - 1e-9
 
-    def alive_cap() -> float:
-        return sum(c.kw for c in cabinets if c.alive)
-
     while t <= end:
-        # ---- 1) 故障注入：整柜停机 ----
+        # ---- 1) Fault Injection ----
         if fault and not fault_fired and t >= fault[0]:
             fault_fired = True
-            dead = set(fault[1])
+            down_cabs = set(fault[1])
             for c in cabinets:
-                if c.idx in dead:
+                if c.idx in down_cabs:
                     c.alive = False
             for p in points:
-                if p.cabinet in dead:
+                if p.cabinet_idx in down_cabs:
                     if not cross_tie:
                         p.alive = False
-                        points_lost += 1
                     if p.job is not None:
                         if not finished(p.job):
                             if cross_tie:
-                                waiting.append(p.job)   # 点位还在，重新排队等功率
+                                waiting.append(p.job)
                             else:
-                                stranded.add(p.job.vehicle_id)  # 电缆在那个柜上，插不回来
+                                stranded.add(p.job.vehicle_id)
                         p.job = None
             waiting.sort(key=lambda x: x.arrive)
 
-        live = [p for p in points if p.alive]
-        cap_now = alive_cap()
+        live_pts = [p for p in points if p.alive]
 
-        # ---- 2) 到场：有活着的空点就插上 ----
+        # ---- 2) Arrival ----
         for j in jobs:
             if j.vehicle_id in seen or j.arrive > t:
                 continue
             seen.add(j.vehicle_id)
-            free = next((p for p in live if p.job is None), None)
+            free = next((p for p in live_pts if p.job is None), None)
             if free is not None:
                 free.job = j
                 free.ready_at = t
             else:
                 waiting.append(j)
 
-        # ---- 3) 释放充饱或到点的车 ----
-        for p in live:
+        # ---- 3) Release completed vehicles ----
+        for p in live_pts:
             if p.job is not None and (finished(p.job) or t >= p.job.depart):
                 p.job = None
 
-        # ---- 4) 空位补给排队最久的车 ----
-        for p in live:
+        # ---- 4) Queue replenishment ----
+        for p in live_pts:
             if p.job is None and waiting:
                 waiting.sort(key=lambda x: x.arrive)
                 nxt = waiting.pop(0)
@@ -276,70 +271,57 @@ def simulate(
                     p.job = nxt
                     if strategy == "fcfs":
                         p.ready_at = t + timedelta(minutes=move_delay_min)
-                        moves += 1          # 人工开车过去 + 插枪
+                        moves += 1
                     else:
-                        p.ready_at = t      # 矩阵直接改道，无需人
+                        p.ready_at = t
 
-        # ---- 5) 充电 ----
-        active = [
-            (p, p.job) for p in live
+        # ---- 5) Power Allocation ----
+        active_pts = [
+            p for p in live_pts
             if p.job is not None and not finished(p.job)
             and (p.ready_at is None or t >= p.ready_at)
         ]
 
+        alloc_kw: dict[str, float] = {}
         if strategy == "fcfs":
-            # 先算功率再更新 SoC，否则峰值会用到更新后的 SoC，略微低估
-            draw = 0.0
-            plan = []
-            for p, j in active:
-                cab = cabinets[p.cabinet]
-                if not cab.alive:
-                    continue
-                per_point = cab.kw / points_per_cabinet
-                limit = min(per_point, taper_limit(j, soc[j.vehicle_id]), gun_kw)
-                draw += limit
-                plan.append((j, limit))
-            peak = max(peak, draw)
-
-            for j, limit in plan:
-                room = j.need_kwh - delivered[j.vehicle_id]
-                add = max(0.0, min(limit * step_min / 60.0, room))
-                delivered[j.vehicle_id] += add
-                soc[j.vehicle_id] = min(
-                    j.soc_req, j.soc_in + delivered[j.vehicle_id] / j.battery_kwh
-                )
-                if finished(j) and j.vehicle_id not in finish_at:
-                    finish_at[j.vehicle_id] = t
-        elif active:
-            def w_fn(j: Job) -> float:
-                remain_h = max((j.depart - t).total_seconds() / 3600.0, 0.05)
-                return (j.need_kwh - delivered[j.vehicle_id]) / remain_h
-
-            def l_fn(j: Job) -> float:
-                return min(taper_limit(j, soc[j.vehicle_id]), j.max_kw, gun_kw)
-
             if cross_tie:
-                groups = {None: [j for _, j in active]}
-            else:
-                groups = {}
-                for p, j in active:
-                    groups.setdefault(p.cabinet, []).append(j)
-
-            total_alloc = 0.0
-            for cab_idx, group in groups.items():
-                cap = cap_now if cab_idx is None else cabinets[cab_idx].kw
-                alloc = _waterfill(group, cap, w_fn, l_fn)
-                total_alloc += sum(alloc.values())
-                for j in group:
-                    room = j.need_kwh - delivered[j.vehicle_id]
-                    add = max(0.0, min(alloc[j.vehicle_id] * step_min / 60.0, room))
-                    delivered[j.vehicle_id] += add
-                    soc[j.vehicle_id] = min(
-                        j.soc_req, j.soc_in + delivered[j.vehicle_id] / j.battery_kwh
+                total_cap = sum(c.cap_kw for c in cabinets if c.alive)
+                per_pt = total_cap / max(len(live_pts), 1)
+                for p in active_pts:
+                    alloc_kw[p.job.vehicle_id] = min(
+                        per_pt, taper_limit(p.job, soc[p.job.vehicle_id]), p.job.max_kw, gun_kw
                     )
-                    if finished(j) and j.vehicle_id not in finish_at:
-                        finish_at[j.vehicle_id] = t
-            peak = max(peak, total_alloc)
+            else:
+                for c in cabinets:
+                    c_live = [p for p in live_pts if p.cabinet_idx == c.idx]
+                    c_act = [p for p in active_pts if p.cabinet_idx == c.idx]
+                    if not c.alive or not c_act:
+                        continue
+                    per_pt = c.cap_kw / max(len(c_live), 1)
+                    for p in c_act:
+                        alloc_kw[p.job.vehicle_id] = min(
+                            per_pt, taper_limit(p.job, soc[p.job.vehicle_id]), p.job.max_kw, gun_kw
+                        )
+        else:
+            if cross_tie:
+                total_cap = sum(c.cap_kw for c in cabinets if c.alive)
+                alloc_kw = _waterfill([p.job for p in active_pts], total_cap, soc, delivered, t, gun_kw)
+            else:
+                for c in cabinets:
+                    if not c.alive:
+                        continue
+                    c_act_jobs = [p.job for p in active_pts if p.cabinet_idx == c.idx]
+                    alloc_kw.update(_waterfill(c_act_jobs, c.cap_kw, soc, delivered, t, gun_kw))
+
+        peak = max(peak, sum(alloc_kw.values()))
+        for j_id, kw in alloc_kw.items():
+            job = next(j for j in jobs if j.vehicle_id == j_id)
+            room = job.need_kwh - delivered[j_id]
+            add = max(0.0, min(kw * step_min / 60.0, room))
+            delivered[j_id] += add
+            soc[j_id] = min(job.soc_req, job.soc_in + delivered[j_id] / job.battery_kwh)
+            if finished(job) and j_id not in finish_at:
+                finish_at[j_id] = t
 
         t += dt
 
@@ -348,14 +330,12 @@ def simulate(
         for j in jobs
         if delivered[j.vehicle_id] < j.need_kwh - 1.0
     ]
-    never = [j.vehicle_id for j in jobs if delivered[j.vehicle_id] < 1.0]
     return Result(
         delivered=delivered,
         moves=moves,
         undercharged=under,
         peak_kw=round(peak, 1),
         total_kwh=round(sum(delivered.values()), 1),
-        never_charged=never,
+        stranded=sorted(stranded),
         last_finish=max(finish_at.values()) if finish_at else None,
-        points_lost=points_lost,
     )

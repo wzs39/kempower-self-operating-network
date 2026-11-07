@@ -1,192 +1,160 @@
-# Test Infrastructure Specification: The Self-Operating Charging Network
-*Kempower Flagship Challenge 2026 · Autonomous Charging Infrastructure*  
-*Document Version: 2.0.0 · Track: Independent Opaque-Box E2E Testing Architecture*
+# TEST_INFRA: Demo Day Simulation Independent E2E Test Infrastructure
 
----
+## 1. Overview & Test Architecture
 
-## 1. Test Philosophy & Design Principles
-
-The testing framework for the Self-Operating Charging Network adheres to three non-negotiable architectural tenets:
-
-### 1.1 Opaque-Box & Requirement-Driven Testing
-- **Black-Box Invariant Enforcement**: Tests treat system modules (`src/core`, `src/sim`, `src/commercial`) strictly as black boxes defined by the interface contracts in `PROJECT.md § Interface Contracts`. Tests verify observable state transitions, mathematical correctness, physical law adherence, and domain invariants rather than private internal implementation details.
-- **Authoritative Expected Output Derivation**: Every test case references ground-truth specifications:
-  1. The 45 official Kempower challenge CSV datasets (240,635 rows).
-  2. Physical and mathematical laws (AC/DC 95.5% inverter efficiency, $10^{-3}$ MILP objective scaling, IEC 61851-23 safety trip thresholds).
-  3. The One-Page SLA Specification (MRDT formula, 5-layer anti-fraud gate, piecewise availability fee deduction).
-
-### 1.2 Progressive Testability & Track Independence
-- **Zero Inter-Milestone Blocker**: As an independent testing track (`e2e_tests/`), the test harness is completely self-contained. It incorporates robust contract reference adapters (`common.py`) and data loaders, enabling standalone test suite execution before, during, and after M1-M4 implementations.
-- **Fail-Fast & Zero-Facade Policy**: No test shall pass trivially or assert dummy conditions (`assert True`). Every test asserts strictly computed mathematical values, non-zero differentials, and concrete operational outputs.
-
-### 1.3 Adversarial Verification & Stress Hardening
-- **Encoding & Edge Boundaries**: Comprehensive testing of degenerate cases: 0 kW power requests, negative requests, zero dwell time, negative spot prices, 799.30 €/MWh price peaks, 75.0°C thermal runaway trips, 72h+ WAN outages, and fraudulent driver claims.
-
----
-
-## 2. Feature Inventory Mapping (F01–F21)
-
-| Feature ID | Feature Name | Tier Mapping | Target Test Module / Method | Verification Method |
-|:---|:---|:---:|:---|:---|
-| **F01** | 25 kW DPR Contactor Matrix | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f01_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f01_b*` | Discrete module allocation, break-before-make (<500ms) |
-| **F02** | 15-min Macro MPC/MILP | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f02_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f02_b*` | $10^{-3}$ scaling, CV inequality relaxation, BESS bounds |
-| **F03** | Edge Micro FSM | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f03_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f03_b*` | State transitions: NORMAL, THERMAL, OFFLINE, CALIBRATED |
-| **F04** | Dual-Gun Topology & Multiplexing | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f04_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f04_b*` | 12 satellites = 24 plugs, A/B night sequencing, 0 replug |
-| **F05** | 95.5% Inverter Loss Constraint | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f05_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f05_b*` | $P_{AC} = P_{DC} / 0.955 \le P_{transformer\_max}$ clamp |
-| **F06** | Predictive Thermal Calibration / PdM | Tier 1, 2, 3 | `e2e_tests/tier1_feature_coverage.py::test_f06_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f06_b*` | 1-min telemetry fan RPM drop >20%, 5-min lookahead shift |
-| **F07** | S5 Three-Way Config Reconciler | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f07_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f07_b*` | D5-7 50kW override to 150kW, D5-8 eSIM activation |
-| **F08** | 799.30 €/MWh Price Peak BESS Interface | Tier 1, 2, 3, 4 | `e2e_tests/tier1_feature_coverage.py::test_f08_*`<br>`e2e_tests/tier2_boundary_corner.py::test_f08_b*` | BESS peak shaving interface at 18:00 *(interface defined, not field-validated)* |
-| **F09** | 2026-11-13 Baseline Replay | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_s1_*` to `test_s5_*` | 13 missed departures across S1 (4), S2 (4), S5 (5) |
-| **F10** | 2026-11-13 Sentinel Runner | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_closed_loop_*` | 3 missed (0 € software) / 0 missed (324k € S1 expansion + unpriced busbar), offline capacity 1,425 kW DC held vs 500 kW fallback, 0 grid breaches |
-| **F11** | One-Page SLA Engine & Anti-Fraud | Tier 1, 2, 4 | `e2e_tests/tier1_feature_coverage.py::test_f11_*`<br>`e2e_tests/tier4_real_world_scenario.py::test_one_page_*` | MRDT gate, 5-layer fraud rejection, piecewise fee deduction |
-| **F12** | Commercial AEaaS ROI Model | Tier 4 | `e2e_tests/tier4_real_world_scenario.py::test_commercial_*` | 20.76 FTE continuous elimination (1.82M €/yr), Tier 2 (0 €) vs Tier 3 (324k €) |
-| **F13–F18** | High-Value Innovation Protocols | Tier 3, 4 | `e2e_tests/tier3_cross_feature.py`<br>`e2e_tests/tier4_real_world_scenario.py` | Pairwise and full Scenario Day stress validation |
-| **F19** | Zero-Regression Deterministic Verifier | Master / Root | `verify_all.py` | Sub-0.5-second execution budget validation (<5.0s) |
-| **F20** | Independent Opaque-Box E2E Suite | Track Scope | `e2e_tests/test_runner.py` (Tiers 1–4) | 100% pass across 106 tests in `e2e_tests/` in 0.7-0.9 s |
-| **F21** | Final Integration & Adversarial Verification | All Tiers | `e2e_tests/` + `tests/` | 100% pass across `434 pytest + 106 E2E (540 total)` |
-
----
-
-## 3. Directory Layout & 4-Tier Test Architecture
+This test infrastructure document formalizes the validation architecture, test methodology, and quality verification gates for the **Project Sentinel Demo Day Simulation Deliverables** at the *LahtiES Energy Tech Hackathon 2026 (Kempower Challenge)*.
 
 ```
-e2e_tests/
-├── __init__.py                   # Package marker
-├── common.py                     # Black-box production adapters & path constants
-├── test_runner.py                # Master E2E test runner with CLI & summary table
-├── tier1_feature_coverage.py     # Tier 1: Feature Contract Coverage (>=5 tests per core feature)
-├── tier2_boundary_corner.py      # Tier 2: Boundary & Corner cases (Edge, Stress, Saturation)
-├── tier3_cross_feature.py        # Tier 3: Pairwise & Multi-variable interactions
-└── tier4_real_world_scenario.py  # Tier 4: Real-world Scenario Day 2026-11-13 workloads
+                           ┌────────────────────────────────────────┐
+                           │          ORIGINAL_REQUEST.md           │
+                           │  & orchestrator_r1/PROJECT.md Specs    │
+                           └──────────────────┬─────────────────────┘
+                                              │
+                         ┌────────────────────▼───────────────────┐
+                         │      TEST_INFRA.md Specification       │
+                         │ (Methodology, Invariants, Assertions)  │
+                         └────────────────────┬───────────────────┘
+                                              │
+                        ┌─────────────────────▼─────────────────────┐
+                        │   tests/test_demo_day_simulation.py       │
+                        │    Independent Pytest Verification        │
+                        └─────────────────────┬─────────────────────┘
+                                              │
+            ┌─────────────────────────────────┼─────────────────────────────────┐
+            ▼                                 ▼                                 ▼
+┌───────────────────────┐         ┌───────────────────────┐         ┌───────────────────────┐
+│ R1: Stage Master      │         │ R2: 4-Person Roles &  │         │ R3: Judge Personas &  │
+│ Schedule & Failsafe   │         │ Relay Synergy SOP     │         │ Hardcore Questions    │
+│ (01_stage_schedule)   │         │ (02_team_roles)       │         │ (03_judge_personas)   │
+└───────────────────────┘         └───────────────────────┘         └───────────────────────┘
+            │                                 │                                 │
+            └─────────────────────────────────┼─────────────────────────────────┘
+                                              │
+            ┌─────────────────────────────────┴─────────────────────────────────┐
+            ▼                                                                   ▼
+┌───────────────────────┐                                           ┌───────────────────────┐
+│ R4: Structured        │                                           │ Master Integration &  │
+│ Defense & Crisis      │                                           │ Mirrored Docs Tree    │
+│ (04_structured_defense│                                           │ (README, 00_pocket,   │
+│  & crisis manual)     │                                           │  docs/demo_day/*)     │
+└───────────────────────┘                                           └───────────────────────┘
 ```
 
-```
-                                [ TIER 4: REAL-WORLD SCENARIOS ]
-                        - S1 Depot 24-Bus Night Shift (3 Missed @ 0€ software; 0 Missed only with an unpriced cross-cabinet busbar tie - plugs alone = 8)
-                        - S2 Logistics 4-Truck DSO Curtailment (G1 400 kW)
-                        - S3 Highway 256-Driver Offline Islanding (1,425 kW DC held vs 500 kW fallback)
-                        - S4 Urban Hub 799.30 €/MWh Peak & D4-2 Cable Trip
-                        - S5 Commissioning Three-Way Config Reconciler (D5-7/8)
-                        - Commercial 20.76 FTE Elimination & One-Page SLA Settlement
-                                                ▲
-                                                │
-                                [ TIER 3: CROSS-FEATURE INTERACTIONS ]
-                        - Dual-Gun Multiplexing + 95.5% Inverter Clamp
-                        - Offline Islanding + Predictive Thermal Shifting
-                        - 799.30 €/MWh Peak + BESS Interface + Hard Schedules
-                        - Plug & Queue Reservation + CC/CV Dynamic Tapering
-                        - S5 Three-Way Config Reconciler + 25 kW Matrix Pooling
-                        - S2 DSO Curtailment + Lookahead Precharging & Preemption
-                        - Low Ambient Temperature (-15°C) + Matrix Contactor Cycling
-                                                ▲
-                                                │
-                                [ TIER 2: BOUNDARY & CORNER CASES ]
-                        - 0 kW / Negative Power Requests / Max Site Grid Limits
-                        - Battery SoC Boundaries (0.0%, 80.0% CC/CV, 100.0%)
-                        - Extreme Spot Price Spikes (799.30 €/MWh vs 27.35 €/MWh)
-                        - Thermal Runaway & Hard Trip Clamp (65°C / 75°C / 110°C)
-                        - Dwell Time Shorter Than Physical MRDT Feasibility
-                        - Corrupted / Subzero / Missing Telemetry Fallback
-                                                ▲
-                                                │
-                                [ TIER 1: FEATURE CONTRACT COVERAGE ]
-                        - F01: 25 kW Discrete Allocation & Zero-Arc Safety (<500ms)
-                        - F02: 15-min Macro MPC ($10^-3$ Scale, Inequality Relaxation)
-                        - F03: Edge FSM Deterministic State Machine Transition Loop
-                        - F04: Dual-Gun A/B Satellite Dynamic Scheduling
-                        - F05: AC Inverter 95.5% Loss ($1.0471 \times P_{DC}$) Calculation
-                        - F06: Predictive Thermal Maintenance (Fan RPM Gradient)
-                        - F07: Three-Way Config Reconciler Parameter Reconciliation
-                        - F08: BESS Battery Degradation & Capacity Safeguard
-                        - F11: One-Page SLA Formula & MRDT 5-Layer Anti-Fraud Gate
-```
-
-### Tier 1: Feature Contract Coverage (`tier1_feature_coverage.py`)
-- $\ge 5$ discrete unit/contract test cases per feature across F01–F08 and F11.
-- Validates the functional input-output contracts, state transitions, and fundamental algorithmic behaviors.
-- **Actual Delivered**: 45 test cases (100% pass in 0.030s).
-
-### Tier 2: Boundary & Corner Cases (`tier2_boundary_corner.py`)
-- $\ge 5$ boundary/stress test cases per core feature.
-- Evaluates degenerate inputs: zero values, negative values, maximal saturation values, boundary thresholds (80% CC/CV threshold, 65°C alarm, 75°C hardware trip, 110°C extreme trip, 99.50% availability boundary).
-- **Actual Delivered**: 40 test cases (100% pass in 0.001s).
-
-### Tier 3: Cross-Feature Combinations (`tier3_cross_feature.py`)
-- Tests multi-feature interactions where conflicting objectives collide:
-  - High spot price vs rigid departure urgency.
-  - Reduced grid capacity vs multi-vehicle simultaneous demand.
-  - WAN outage vs dynamic load re-balancing.
-  - Hardware thermal degradation during peak throughput.
-  - -15°C cold ambient acceptance vs full matrix cycling.
-- **Actual Delivered**: 12 test cases (100% pass in 0.018s).
-
-### Tier 4: Real-World Scenarios (`tier4_real_world_scenario.py`)
-- Replays actual operational traces from the 2026-11-13 scenario day across all five focus sites (S1–S5).
-- Directly tests against the 45 official CSV files to prove:
-  - 13 missed departures in baseline $\rightarrow$ **3 missed (`0 €` software urgency, `10` saved; S1 deficit `398.5 -> 48.8 kWh`, `-87.8%`)**. The remaining 3 are not bought by the `324,000 €` of extra plugs (that variant measures **8 missed**, i.e. worse); `0 missed` appears only with `cross_tie=True`, a busbar tie that `equipment_costs.csv` does not price - a documented capability boundary, not a product tier.
-  - S3 recorded abandonment `29.69%` (76/256, row level in `public_arrivals.csv`) is reported as the **capacity we hold offline** (`1,425 kW DC` vs the `500 kW` fallback); no post-fix abandonment percentage is published, because no simulation produces one.
-  - 20.76 FTE manual workload $\rightarrow$ 0 continuous FTE daily operations.
-  - Economic arbitrage and One-Page SLA financial settlements.
-  - Network-wide grid safety: 0 official `grid_kw` over-limit intervals across 134,400 data points.
-- **Actual Delivered**: 9 test cases (100% pass in 0.363s).
+The test suite (`tests/test_demo_day_simulation.py`) operates as a completely independent, requirement-driven audit barrier. It verifies structural completeness, semantic validity, quantitative fidelity, and cross-document coherence without circular assumptions or facade shortcuts.
 
 ---
 
-## 4. Coverage Thresholds & Quality Gates
+## 2. Test Methodology & Authoritative Invariant Derivation
 
-| Metric | Target Requirement | Actual Delivered | Strict Enforcement Rule |
-|:---|:---:|:---:|:---|
-| **Tier 1 Feature Tests** | $\ge 40$ test cases | **45 test cases** | Minimum 5 test cases for each of F01–F08, F11 |
-| **Tier 2 Boundary Tests** | $\ge 40$ test cases | **40 test cases** | Minimum 5 edge cases for each of F01–F08 |
-| **Tier 3 Interaction Tests**| $\ge 10$ test cases | **12 test cases** | Pairwise and multi-variable integration suites |
-| **Tier 4 Real-World Tests** | $\ge 5$ scenario tests | **9 test cases** | Explicit verification across S1–S5 & commercial datasets |
-| **Total Test Count** | **$\ge 100$ test cases** | **106 test cases** | All executed via `python e2e_tests/test_runner.py` |
-| **Execution Duration** | $\le 5.0$ seconds | **0.414 seconds** | Extreme performance budget for fast CI feedback |
-| **Pass Rate** | 100% | **100% (106 / 106)** | Zero failures, zero regressions, zero skipped |
-| **Deterministic Seed** | 100% reproducible | 100% reproducible | Zero flaky tests, zero unseeded random states |
+### 2.1 Authoritative Specification Sources
+Every test assertion is directly derived from primary hackathon contracts:
+1. `Kempower-challenge-brief.pdf`: Strict 10-minute presentation mandate, 2029 customer story, one-page agreement, 5-dimensional evaluation rubric.
+2. `Kempower_LahtiES_hackathon_kickoff_2026-11-05.pptx` (Mats Mattsson keynote): 21 FTE baseline (€1,365,000/yr @ €65,000/yr), 10-minute pitch stage cutoff.
+3. `ORIGINAL_REQUEST.md`: R1 stage timeline, R2 4-person roles (Speaker A, Speaker B, Member C, Member D), R3 >= 3 judge personas & >= 12 hardcore questions, R4 structured 3-part answers and crisis response procedures.
+4. `PROJECT.md` (orchestrator_r1): 11 Features (F1–F11), 5 Milestones (M1–M5), Interface contracts (Slide timestamps, role routing, physical constraints).
+5. Repository Ground Truth: `One_Page_SLA_Specification.md` (MRDT §5.1 gate), `docs/assumptions_and_additions.md` (Inverter loss $\eta=0.955$, 1,425 kW DC = 1,492.15 kW AC $\le$ 1,500 kW transformer), `src/core/self_healing.py` (260ms BBM 6-step timing).
+
+### 2.2 Anti-Facade & Adversarial Rules
+1. **Physical Existence & Non-Trivial Volume**: Every required deliverable file must exist, be readable, and contain substantive content (minimum byte size and structured markdown headings).
+2. **Exact Numerical Invariants**: Tests programmatically enforce exact regex matching on critical numbers (e.g. `21 FTE`, `1.365M €` / `1,365,000`, `13->3` / `13 → 3`, `799.30`, `260ms` / `260 ms`, `1,425 kW` / `1425 kW`, `MRDT`).
+3. **Failsafe Triad Validation**: Tests confirm all three offline backup tiers are documented with operational cutover rules:
+   - Tier 1: Streamlit interactive cockpit (`app.py`)
+   - Tier 2: Deterministic CLI verification runner (`verify_all.py`)
+   - Tier 3: Pre-rendered backup video (`presentation_demo.mp4`)
+4. **Mirror Parity Check**: Tests confirm exact byte-level or line-level parity between `demo_day_simulation/` and `docs/demo_day/`.
 
 ---
 
-## 5. Test Execution & Verification Commands
+## 3. Feature Inventory & Test Coverage Matrix
 
-### 1. Master E2E Runner (Recommended)
+| Feature ID | Feature Name | Target Deliverable | Test Class / Functions in Pytest |
+|---|---|---|---|
+| **F1** | Stage Master Schedule & Timeline | `01_stage_schedule_and_setup.md` | `TestR1StageScheduleAndSetup::test_pitch_total_duration_600s`<br>`TestR1StageScheduleAndSetup::test_qa_duration_3_to_5_min`<br>`TestR1StageScheduleAndSetup::test_live_demo_slot_120s` |
+| **F2** | Stage Setup & Failsafe Triad Protocol | `01_stage_schedule_and_setup.md` | `TestR1StageScheduleAndSetup::test_stage_setup_and_diagram`<br>`TestR1StageScheduleAndSetup::test_failsafe_triad_components` |
+| **F3** | 4-Person Role Division & Positioning | `02_team_roles_and_coordination.md` | `TestR2TeamRolesAndCoordination::test_four_member_role_definitions`<br>`TestR2TeamRolesAndCoordination::test_physical_positioning_and_presence` |
+| **F4** | Dual-Speaker Relay Script & Transitions | `02_team_roles_and_coordination.md` | `TestR2TeamRolesAndCoordination::test_verbatim_speaker_transitions` |
+| **F5** | Member C & D Console SOP & Triggers | `02_team_roles_and_coordination.md` | `TestR2TeamRolesAndCoordination::test_member_c_console_sop_and_hotkeys`<br>`TestR2TeamRolesAndCoordination::test_emergency_cutover_triggers` |
+| **F6** | Tripartite Judge Persona Profiles | `03_judge_personas_and_question_bank.md` | `TestR3JudgePersonasAndQuestions::test_judge_personas_presence`<br>`TestR3JudgePersonasAndQuestions::test_judge_perspectives_and_scoring_focus` |
+| **F7** | Hardcore Question Bank (>= 12 Questions) | `03_judge_personas_and_question_bank.md` | `TestR3JudgePersonasAndQuestions::test_question_bank_count_and_structure`<br>`TestR3JudgePersonasAndQuestions::test_question_persona_and_category_mapping` |
+| **F8** | Structured Defense Answers & Proofs | `04_structured_defense_and_crisis_manual.md` | `TestR4StructuredDefenseAndCrisis::test_three_part_structured_answers`<br>`TestR4StructuredDefenseAndCrisis::test_quantitative_facts_citations` |
+| **F9** | Team Synergy & Defense Handoff Rules | `04_structured_defense_and_crisis_manual.md` | `TestR4StructuredDefenseAndCrisis::test_team_defense_handoff_rules` |
+| **F10** | Live Crisis Emergency Response Manual | `04_structured_defense_and_crisis_manual.md` | `TestR4StructuredDefenseAndCrisis::test_crisis_response_protocols` |
+| **F11** | Master Integration, Pocket Cards & Mirror | `README.md`, `00_pocket_cheat_sheet.md`, `docs/demo_day/*` | `TestMasterIntegrationAndMirroring::test_master_readme_exists_and_indexes`<br>`TestMasterIntegrationAndMirroring::test_pocket_cheat_sheet_exists`<br>`TestMasterIntegrationAndMirroring::test_docs_mirror_complete_and_identical` |
+
+---
+
+## 4. Requirement Verification Rules
+
+### 4.1 Requirement 1 (R1): Stage Schedule & Setup
+- **Rule R1.1**: Total spoken pitch duration must explicitly equal 10 minutes (600 seconds), respecting the hard cutoff of LahtiES / Kempower challenge brief.
+- **Rule R1.2**: Q&A schedule must explicitly define a 3–5 minute defense window (180–300 seconds), bringing total stage presence to 13–15 minutes.
+- **Rule R1.3**: The Live Demo segment must be allotted a dedicated 120-second (2:00) slot positioned within the 5:00 to 7:00 window (Slides P7–P8).
+- **Rule R1.4**: Stage setup must include an ASCII stage diagram positioning 4 members (Speakers A & B at front lectern/stage center; Member C at the tech console laptop; Member D on standing standby).
+- **Rule R1.5**: The Failsafe Triad must be explicitly documented with:
+  1. Primary: Streamlit interactive dashboard (`app.py`)
+  2. Fallback 1: Deterministic CLI runner (`verify_all.py`)
+  3. Fallback 2: 1080p pre-rendered video (`presentation_demo.mp4` / `Kempower_video*.mp4`)
+  4. Hard trigger: Cutover decision rule if latency exceeds 2.5s or app freezes.
+
+### 4.2 Requirement 2 (R2): 4-Person Roles & Synergy
+- **Rule R2.1**: Exactly 4 distinct roles must be defined with unambiguous boundaries:
+  - **Speaker A**: Business pain points, commercial viability, AEaaS model, 2029 customer story (Pekka Virtanen), closing call to action.
+  - **Speaker B**: Technical architecture, 3-tier decoupling (L1/L2/L3), Kempower DPR fidelity, 25 kW modular matrix, physical grid invariants.
+  - **Member C**: Live Console pilot, Streamlit scenario steering, failure injection execution, A/V failsafe switching.
+  - **Member D**: Deep technical defense, mathematical formulations, continuous slack variables, edge islanding proof, One-Page SLA legal/contract terms.
+- **Rule R2.2**: Verbatim dual-speaker handoff scripts must be provided:
+  - Speaker A $\to$ Speaker B handoff (Business to Technical Architecture).
+  - Speaker B $\to$ Member C handoff (Technical Architecture to Live Console Demo).
+  - Speaker B $\to$ Speaker A handoff (Live Demo back to Commercial AEaaS & 2029 Story).
+- **Rule R2.3**: Member C Console SOP must provide step-by-step hotkeys, scenario injection sequence (S1 $\to$ S2 $\to$ S3 $\to$ S4 $\to$ S5), and emergency video cutover protocol.
+
+### 4.3 Requirement 3 (R3): Judge Personas & Question Bank
+- **Rule R3.1**: At least 3 distinct judge personas must be profiled:
+  1. *Technical Architect / Power Electronics Expert* (Mats Mattsson / Panu Vartiainen persona: focused on DPR, 25kW modules, BBM 260ms, inverter losses, offline edge resilience).
+  2. *Commercial / Venture Capital Investor* (LahtiES / VC persona: focused on 21 FTE savings, €1.365M/yr, 2-month payback, CaaS pricing, defensibility).
+  3. *Kempower Flagship Challenge Judge* (Lead Evaluator persona: focused on rule compliance, 0 edited CSVs, equipment_costs.csv fidelity, honest technician retention).
+- **Rule R3.2**: The question bank must contain at least 12 distinct hardcore questions (target 14), each with:
+  - Distinct Question Identifier (`Q01`, `Q02`, etc.)
+  - Target Persona / Question Category
+  - Underlying Judge Concern & Evaluation Dimension
+
+### 4.4 Requirement 4 (R4): Structured Defense & Crisis Response
+- **Rule R4.1**: Every question in the bank must have a structured 3-part defense answer:
+  1. *Direct Bottom-Line Assertion* (15-second executive answer).
+  2. *Empirical & Mathematical Proof* (exact citation of data, equations, benchmarks).
+  3. *Commercial or Operational Takeaway* (SLA term, contract guarantee, edge resilience).
+- **Rule R4.2**: Quantitative facts must be accurately cited across the defense answers:
+  - `21 FTE` manual labor keynote baseline (€1,365,000 / €1.365M / yr @ €65k/yr) vs 20.76 FTE statutory baseline (€1.82M/yr @ €45/h).
+  - `1.365M €` (or `€1,365,000`) annual operational labor expenditure.
+  - `13->3 vs 13->0` (Sentinel 0 € CAPEX software triage cuts missed departures from 13 to 3; reaching 0 requires either €324,000 dual-gun expansion which alone leaves 8 missed without busbar tie, or Tier 5 hardware expansion).
+  - `799.30 €/MWh` (S4 synthetic spot tariff price spike handled by continuous SoC slack variable $z \in [0, 1]$ in HiGHS MILP).
+  - `260ms BBM` (Break-Before-Make contactor relay 6-step switching protocol < 500 ms).
+  - `1,425 kW DC` (S3 highway hub edge islanding load; $P_{AC} = 1425 / 0.955 = 1492.15\text{ kW} \le 1500\text{ kW}$ transformer limit).
+  - `MRDT anti-fraud` (Minimum Required Dwell Time gate in One_Page_SLA_Specification.md §5.1 waives liquidated damages if dwell time is shorter than physical energy requirement).
+- **Rule R4.3**: Crisis response procedures must cover at least 5 black-swan stage emergencies:
+  1. Live Demo laptop crash / freeze
+  2. Projector disconnection / resolution distortion
+  3. Hostile / interrupting judge
+  4. Timer signal alert (1 minute left or 30 seconds left)
+  5. Question completely outside hackathon dataset scope
+
+### 4.5 Master Integration & Mirroring
+- **Rule M.1**: `demo_day_simulation/README.md` must exist and provide a master directory index, reading roadmap, and stage checklist.
+- **Rule M.2**: `demo_day_simulation/00_pocket_cheat_sheet.md` must exist as a concise quick-reference card for on-stage recall.
+- **Rule M.3**: Every file in `demo_day_simulation/` must have an identical mirror copy in `docs/demo_day/`.
+
+---
+
+## 5. Test Execution Protocol
+
 ```powershell
-python e2e_tests/test_runner.py
+# Run the complete Demo Day Simulation E2E test suite
+pytest tests/test_demo_day_simulation.py -v --tb=short
+
+# Run with specific requirement focus
+pytest tests/test_demo_day_simulation.py -k "TestR1" -v
+pytest tests/test_demo_day_simulation.py -k "TestR2" -v
+pytest tests/test_demo_day_simulation.py -k "TestR3" -v
+pytest tests/test_demo_day_simulation.py -k "TestR4" -v
+pytest tests/test_demo_day_simulation.py -k "TestMaster" -v
 ```
-
-### 2. Run Specific Tiers
-```powershell
-# Run only Tier 1 Feature Coverage
-python e2e_tests/test_runner.py --tier 1
-
-# Run Tiers 1 and 2
-python e2e_tests/test_runner.py --tier 1 --tier 2
-
-# Run with verbose output
-python e2e_tests/test_runner.py -v
-```
-
-### 3. Run Individual Tier Scripts Standalone
-```powershell
-python e2e_tests/tier1_feature_coverage.py
-python e2e_tests/tier2_boundary_corner.py
-python e2e_tests/tier3_cross_feature.py
-python e2e_tests/tier4_real_world_scenario.py
-```
-
-### 4. Run via Pytest
-```powershell
-# Run all E2E tests
-python -m pytest e2e_tests/ -v
-
-# Run full pytest suite (`434 pytest + 106 E2E (540 total)`)
-python -m pytest tests/ -q
-```
-
-### 5. Run Deterministic Verifier Gate (timed section &lt; 0.5 s; command wall clock 1.5-1.8 s)
-```powershell
-python verify_all.py
-```
-
----
-*Signed by: Independent E2E Testing Track (`e2e_test_writer`)*

@@ -187,5 +187,6 @@ def verify_presentation(pptx_path: str):
     print("=" * 80)
 
 if __name__ == "__main__":
-    pptx_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Project_Sentinel_Pitch_Deck.pptx")
+    default_target = "Project_Sentinel_12pages_final.pptx" if os.path.exists("Project_Sentinel_12pages_final.pptx") else "Project_Sentinel_Pitch_Deck.pptx"
+    pptx_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), default_target)
     verify_presentation(pptx_path)

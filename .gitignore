@@ -34,13 +34,9 @@ scratch/
 update_report.py
 csv_details.json
 
-# Internal review notes (working documents, deliberately not part of the submission)
-漏洞审查*.md
-
 # Third-party material that must not be redistributed from a public repo
 # (organiser kickoff deck, workshop recordings, the organiser's mentoring
-#  spreadsheet, the challenge zip, and unsourced screenshots). Files stay on
-# the local disk; they are simply not tracked.
+# spreadsheet, the challenge zip, and unsourced screenshots).
 Kempower_LahtiES_hackathon_kickoff_*.pptx
 Kempower_video*.mp4
 kempower-challenge.zip
@@ -54,7 +50,7 @@ Desktop.ini
 .vscode/
 .idea/
 
-# --- deck build caches and temp files ---
+# Deck build caches and temp files
 deck_build/
 deck_src/
 test_*.pptx
@@ -65,7 +61,7 @@ test.zip
 test/
 ~$*
 
-# Large video recordings (>50MB, not tracked by git, kept locally)
+# Large video recordings (>50MB, kept locally or in demo_scenarios)
 *.mp4
 !demo/presentation_demo.mp4
 
@@ -73,20 +69,18 @@ test/
 *.png
 !demo/*.png
 
-# Internal working notes
-_archive_outdated/
-赛前就绪度审计*.md
-侧重*.md
-修复清单*.md
-评委视角*.md
-漏洞审查*.md
-反思*.md
-黑客松初步理解*.docx
+# Large submission archives (>100MB exceeds GitHub push limit)
+submission.zip
+submission/
+*.zip
 
-# --- demo scratch frames ---
+# Internal working notes and archives
+_archive_outdated/
+zcode-pojia/
+
+# Demo scratch frames
 demo/audit_frames/
 demo/ref_v1_*.png
 demo/ref_v2_*.png
 demo/skill_test_poster.png
 demo/verify_snapshots/
-

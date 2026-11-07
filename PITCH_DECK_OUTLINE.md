@@ -135,7 +135,7 @@
 **Official Judging Focus: Degree of Autonomy (25%)**
 
 ### Slide Content & Visual Layout
-- **Header**: **Autonomy in Action: Scenario Day 2026-11-13 (`13` Baseline $\to$ `3` [`0 €`] $\to$ `0` [`324,000 €` + 无报价母联])**
+- **Header**: **Autonomy in Action: Scenario Day 2026-11-13 (`13` Baseline $\to$ `3` [`0 €`] $\to$ `0` [`324,000 €` + unpriced busbar])**
 - **Scenario Day Resolution Matrix**:
   | Station | Scenario Incident | Baseline Human Outcome | Sentinel Autonomous Action | Sentinel Outcome (`0` Human Moves) |
   |---|---|---|---|---|

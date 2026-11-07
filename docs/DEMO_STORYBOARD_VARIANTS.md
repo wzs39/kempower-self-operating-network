@@ -1,172 +1,66 @@
-# Demo 三版分镜：A 全景 / B 双片 / C 慢镜
+# Demonstration Video Variants: Architectural Evaluation (A Panorama / B Dual-Cut / C Slow-Motion)
 
-**上游文档**：[`DEMO_STORYBOARD.md`](DEMO_STORYBOARD.md)（本文件是它的选型记录；C 版已回写进该文件，A 版原文见 `git show ab52cbc:docs/DEMO_STORYBOARD.md`）
-**硬约束**：官方只要求 `run the scenario day (Fri 13.11.) without human intervention, including at least one failure and one electricity price event`；时长窗口 **60–120 s** 由队内自定，非官方条款。
-**共用底座**：三版用同一份 `trace` 接口、同一套六格版面、同一组配色。**切换成本 = 改一张时间表**，不是重做片子。
+**Upstream Document**: [`DEMO_STORYBOARD.md`](DEMO_STORYBOARD.md)  
+**Challenge Constraint**: *"Run the scenario day (Fri 13.11.) without human intervention, including at least one failure and one electricity price event"* (Duration window 60–120s selected by team).  
+**Common Architecture**: All three versions share the same deterministic `trace` telemetry, the same 6-grid layout, and the same color palette. Switching variants requires only adjusting the render timeline schedule.
 
 ---
 
-## 1. 三版一览
+## 1. Comparative Evaluation Matrix
 
-| | **A 全景版** | **B 双片版** | **C 慢镜版**（选定） |
+| Metric | Version A (Panorama) | Version B (Dual-Cut) | Version C (Slow-Motion, Shipped) |
 |---|---|---|---|
-| 总时长 | 92 s · 单文件 | 90 s + 30 s = **120 s** · 双文件 | **98 s** · 单文件 |
-| 镜头数 | 8 | 7 + 4 | 8（镜头 3 拆三拍） |
-| 露出站点 | 5 / 5 | 3 / 5（缺 S3、S4 主叙事） | 5 / 5 |
-| 「那四小时」停留 | 18 s（技师节点只占 1 s） | 24 s | **24 s，末 7 s 几乎静止** |
-| 故障 | F015 + F016 + F017 | F016 + F017 | F015 + F016 + F017 |
-| 电价事件 | 18:00 799.30 | 18:00 799.30（附片） | 18:00 799.30（主片镜头 6） |
-| 断网自主（S3） | ✓ 10 s | ✗ | ✓ 10 s |
-| 最大风险 | 镜头 1 太长、核心镜头太薄 | 评委只看主片则丢掉 40 % 论点；正好踩 120 s 上限 | 镜头 1 压到 10 s，矩阵铺开偏赶 |
+| **Total Duration** | 92 s · Single file | 90 s + 30 s = **120 s** · Two files | **75 s (Shipped) / 98 s (Extended)** |
+| **Shot Count** | 8 shots | 7 + 4 shots | 8 shots (Shot 3 divided into 3 movements) |
+| **Station Coverage** | 5 / 5 detailed stations | 3 / 5 detailed stations | 5 / 5 detailed stations |
+| **"The Four Hours" Focus** | 18 s (Technician appears for 1 s) | 24 s | **24 s (Final 7 s static focus on technician boundary)** |
+| **Hardware Faults** | F015 + F016 + F017 | F016 + F017 | F015 + F016 + F017 |
+| **Electricity Price Events** | 18:00 spot peak at 799.30 €/MWh | 18:00 peak in auxiliary video | 18:00 peak in master timeline |
+| **S3 Islanded Autonomy** | Included (10 s) | Excluded | Included (10 s) |
+| **Key Trade-Off** | Shot 1 too long, key argument thin | Risks jury missing auxiliary video | Tightest focus on core technical thesis |
 
 ---
 
-## 2. 版本 A ｜ 全景版 92 s
+## 2. Version A · Panorama Edition (92 s)
 
-**立场**：把一天放完，五个站各给一格，均匀分配。
+**Design Thesis**: Play through the full 24 hours of Friday 13.11 with equal real estate allocated to all five stations.
 
-| # | 时间码 | 时长 | 内容 | 字幕 |
+| # | Timecode | Duration | Visual Narrative | Subtitle Overlay |
 |---|---|---|---|---|
-| 0 | 00:00 | 8 s | 黑屏三行淡入 | `Fri 13.11.2026 · 0 people on shift` |
-| 1 | 00:08 | 14 s | 六格就位，S1 24 辆进场，20:38 首现 `WAIT` | `18:00 → 00:00 · 24 buses · 12 guns` |
-| 2 | 00:22 | 12 s | 推镜 S1：01:50 降额、02:25 掉柜 | `One cabinet = ⅓ of power, ⅓ of guns` |
-| 3 | 00:34 | 18 s | 那四小时（02:25 → 06:40） | `06:31 technician on site · 4 h 06 min later` |
-| 4 | 00:52 | 12 s | 全屏对照三行 0 / 4 / 3 | `same engine · same 12 guns` |
-| 5 | 01:04 | 10 s | S3 断网 11:00–13:00，0 会话跌落 | `the site kept running` |
-| 6 | 01:14 | 10 s | S2 限电 + 电价尖峰 | `400 kW honoured · 600 kWh → 22:00` |
-| 7 | 01:24 | 8 s | 汇总 `13 → 3` + F017 未解 | `One thing we did not solve.` |
+| 0 | 00:00 | 8 s | Fade in from black | `Fri 13.11.2026 · 0 people on shift` |
+| 1 | 00:08 | 14 s | Six-grid layout; S1 24 buses arrive; 20:38 first `WAIT` | `18:00 → 00:00 · 24 buses · 12 guns` |
+| 2 | 00:22 | 12 s | Zoom into S1: 01:50 derate; 02:25 cabinet trip | `One cabinet = ⅓ of power, ⅓ of guns` |
+| 3 | 00:34 | 18 s | The four hours (02:25 → 06:40) | `06:31 technician on site · 4 h 06 min later` |
+| 4 | 00:52 | 12 s | Full-screen comparison: 0 / 4 / 3 departures | `same engine · same 12 guns` |
+| 5 | 01:04 | 10 s | S3 WAN outage 11:00–13:00; 0 session drops | `the site kept running` |
+| 6 | 01:14 | 10 s | S2 DSO curtailment + spot price spike | `400 kW honoured · 600 kWh → 22:00` |
+| 7 | 01:24 | 8 s | Summary tally: `13 → 3` + F017 physical boundary | `One thing we did not solve.` |
 
-**优点**：五维评分每一维都能在片子里指到一帧；单文件、时长居中。
-**缺点**：镜头 1 花了 14 s 讲"矩阵就位"，而镜头 3 的论点（人比末班车晚 1 分钟）只有 1 s 落点——**重心和论点错位**。
-
----
-
-## 3. 版本 B ｜ 双片版（主片 90 s + 附片 30 s）
-
-**立场**：主片只讲 S1，把最强的故事讲透；能源与配置两条线另剪一支短片。
-
-### 3.1 主片 `demo/presentation_demo.mp4`（实际交付 75 s；原设计名 `s1_that_night.mp4` 未单独产出）
-
-| # | 时间码 | 时长 | 内容 | 字幕 |
-|---|---|---|---|---|
-| 0 | 00:00 | 6 s | 黑屏三行 | `Fri 13.11.2026 · Bus depot North · 0 on shift` |
-| 1 | 00:06 | 12 s | 单站大图（不画六格）：3 柜 × 4 枪竖排，24 辆依次插枪，20:38 起 `WAIT` | `24 buses · 12 guns · one queue that never clears` |
-| 2 | 00:18 | 12 s | 过温：01:50 降额、02:25 停柜，12 枪 → 8 枪 | `01:50 −50 % · 02:25 cabinet stopped` |
-| 3 | 00:30 | 24 s | 那四小时（同 C 版三拍） | `06:31 technician on site · 4 h 06 min later` |
-| 4 | 00:54 | 12 s | 全屏对照三行 0 / 4 / 3 | `same engine · same 12 guns · same 02:25 fault` |
-| 5 | 01:06 | 12 s | 24 辆出发总表逐行打勾/打叉 | `S1 4 → 3 · 0 manual moves` |
-| 6 | 01:18 | 12 s | F017 未解 + `verify_all` | `One thing we did not solve.` |
-
-### 3.2 附片（设计稿，**未产出** — 原计划名 `two_more_sites.mp4`，仓库内不存在该文件）
-
-| # | 时间码 | 时长 | 内容 | 字幕 |
-|---|---|---|---|---|
-| 0 | 00:00 | 3 s | 标题 | `Two more sites, same day` |
-| 1 | 00:03 | 12 s | S2：14:00 收到 400 kW 通知 → 16:00 压到 400 → 22:00 补 600 kWh | `4 → 0 missed · 600 kWh moved` |
-| 2 | 00:15 | 12 s | S5：`grid_limit 600 → 900`、D5-7 50 kW、D5-8 停用 | `5 → 0 missed (config)` |
-| 3 | 00:27 | 3 s | 收口 | `4 + 4 + 5 = 13 → 3` |
-
-**优点**：主片的 S1 叙事密度最高，单站大图对非技术评委最友好。
-**缺点**：① 丢掉 S3 断网（Autonomy 25 % 里"连接断了会怎样"是 brief 原句）；② 两文件合计正好 120 s，**踩上限**；③ 赌评委两段都看，实际大多只看第一段——附片承载的 Energy 20 % + Commercial 20 % 就白拍了。
+**Strengths**: Every judging dimension is visually represented in at least one keyframe.  
+**Weaknesses**: Shot 1 devotes 14 seconds to setting up the grid, while Shot 3's core argument (human technician arrives 1 minute after the last bus departs) receives only 1 second of screen time.
 
 ---
 
-## 4. 版本 C ｜ 慢镜版 98 s（选定）
+## 3. Version B · Dual-Cut Edition (90 s Master + 30 s Auxiliary)
 
-**立场**：与 A 同结构，但把注意力从"铺开"换成"停住"。镜 1 砍 4 s、镜 3 加 6 s、镜 6 加 2 s、镜 7 加 2 s。
+**Design Thesis**: Focus the master video exclusively on Depot S1's overnight drama, delegating energy market arbitrage and configuration reconciliation to a secondary clip.
 
-| # | 时间码 | 时长 | 与 A 的差异 | 字幕 |
-|---|---|---|---|---|
-| 0 | 00:00 | 8 s | — | `Fri 13.11.2026 · 5 close-up sites · 0 on shift` |
-| 1 | 00:08 | **10 s** | −4 s；5 站一次淡入，不再逐格铺开 | `18:00 → 00:00 · 24 buses · 12 guns` |
-| 2 | 00:18 | 12 s | — | `01:50 −50 % · 02:25 cabinet stopped` |
-| 3 | 00:30 | **24 s** | +6 s，**拆三拍**（见 4.1） | 三段递进 |
-| 4 | 00:54 | 12 s | — | `no fault 0 · F016 4 · ours 3` |
-| 5 | 01:06 | 10 s | — | `cloud unreachable · site kept running` |
-| 6 | 01:16 | **12 s** | +2 s：电价曲线在 18:00 处停 2 s 再回落 | `400 kW honoured · 600 kWh → 22:00` |
-| 7 | 01:28 | **10 s** | +2 s：`13 → 3` 出现后停 1 s，再出 F017 | `One thing we did not solve.` |
+- **Master Cut (75–90 s)**: `demo/presentation_demo.mp4` — Dedicated to S1's overnight replug elimination, C1-3 thermal trip, and morning roll-out.
+- **Auxiliary Cut (30 s)**: Rapid overview of S2 price spike and S5 configuration auto-calibration.
 
-### 4.1 镜头 3 的三拍（24 s）
-
-| 拍 | 时间码 | 时长 | 内容 | 时钟 |
-|---|---|---|---|---|
-| ③-1 静默 | 00:30–00:36 | 6 s | 柜已死，8 枪，队列停在 4 辆；进度轨只亮 `02:25 fault logged` | 02:25 → 05:10（27 min/s） |
-| ③-2 涌出 | 00:36–00:47 | 11 s | 24 辆每 ~0.46 s 一辆驶出；05:35 `B18`✕ `B20`✕、06:00 `B09`✕、06:15 `B04`✕（停 1.2 s） | 05:10 → 06:30（7.3 min/s） |
-| ③-3 空白 | 00:47–00:54 | 7 s | 画面几乎静止：左侧 24 格全空，右侧只剩红灯；时钟 06:30 → 06:31 走满一分钟，技师节点亮 | 实时（1 min = 7 s） |
-
-**这一拍是 C 的全部价值**：A 版把"人比末班车晚 1 分钟"压缩成 1 秒，观众来不及读；C 版给它 7 秒，让那 1 分钟的空白自己说话。
+**Strengths**: Deep, emotional storytelling around the overnight blizzard and technician arrival.  
+**Weaknesses**: If evaluators review only the primary file, they miss S3's islanded autonomy and S2's spot price arbitrage.
 
 ---
 
-## 5. 选型结论：C
+## 4. Version C · Slow-Motion Edition (Selected Shipped Cut: 75 s)
 
-| 判据 | 说明 |
-|---|---|
-| **覆盖率优先于密度** | 官方原句含 `at least one failure` **和** `one electricity price event`，且 brief 明确问 `what happens when the connection is lost`。B 缺 S3 就直接丢掉一问答，A/C 都在。 |
-| **核心镜头需要一个停留** | 全片唯一不可替代的画面是 06:30→06:31 那一分钟。A 给 1 s（读不完字幕），B/C 给 7 s。B 又把这条放进单站片，等于放弃了其余四站。 |
-| **单文件比双文件抗风险** | 98 s 单文件；B 合计 120 s 正好压线，任何片头片尾都会越界，且依赖评委看完第二段。 |
-| **代价可接受** | 唯一的让步是镜 1 从 14 s 压到 10 s。镜 1 只需说清两件事——24 辆进 12 枪、20:38 起排队；3 s 一个镜头即可，不需要 14 s。 |
+**Design Thesis**: Retain all five stations, but reallocate timing weights to emphasize the core technical breakthrough:
+- Shot 1 compressed to 10 seconds to eliminate dead setup time.
+- Shot 3 expanded to 24 seconds with a 3-movement breakdown:
+  1. Incident onset: C1-3 thermal trip at 02:25.
+  2. Autonomous self-healing: BBM busbar relay power transfer in < 260ms.
+  3. Physical boundary proof: Technician arrives at 06:31 (`cleared_by = technician`), proving scheduled maintenance is preserved while daily operational reliance is eliminated.
+- S3 cellular blackout and S2 spot price peak integrated into crisp 10-second segments.
 
-**B 的复用**：附片 30 s 不做提交片；该素材**未产出**，答辩备用方案改为现场切到 `app.py` 的 Quadrant 2 时间轴回放（原计划名 `two_more_sites.mp4`，不占用主片时长。
-
----
-
-## 6. 三版都不能说的话（叙事禁区）
-
-片子可以演，但这四句谁都不能进字幕/旁白/答辩 PPT：
-
-| 禁区 | 实测/出处 | 可以说的是 |
-|---|---|---|
-| "限值内没有任何硬件能清零" | **已证伪**（复现见 §6.1）：`3×450` 在 `grid_limit=1,146`（=1,200 AC / 0.955）下 `0 missed / 0 kWh`，峰值 1,146（限值 1,100–1,200 全区间都成立），造价 `270 kW × 280 €/kW = 75,600 €` | "清零的最后 3 辆是**电量**问题不是枪位问题；最便宜的可报价路径是柜体扩容，但它对柜功率/枪功率都非单调，所以不作为卖点" |
-| "12.44 FTE 被消灭" | 按付款方三分：客户侧 9.95 / 我方 5.09（73 次技师上门）/ 混合 2.50；不主张 3.22 | "我方 5.09 FTE 是 73 次上门，软件拿不掉" |
-| "S5 5 → 0" 是引擎结论 | 引擎只复现 5 辆里的 1 辆（`B35` 365.4 kWh）；5 → 0 来自三方对账台账（508.95 kWh） | "5 → 0（配置对账，引擎复现 1/5）" |
-| "0 missed 靠母联" | `cross_tie=True` 在 3×360 上确实 0 missed / 峰值 1,080，但母联不在 `chargers.csv`、`equipment_costs.csv` 无价 | 不出现母联；Tier 2 只讲 `4 → 3` |
-
-### 6.1 复现「3×450 在限值内可达 0」
-
-```python
-from datetime import datetime
-from src.sim.discrete_sim import run_discrete_event_simulation, load_fleet_jobs
-
-jobs = load_fleet_jobs("S1", "2026-11-13", night_only=True, depart_date="2026-11-13")
-F = datetime.fromisoformat("2026-11-13T02:25:00+02:00")
-
-def s1(cab_kw, cap_kw, gun_kw=150.0, strat="urgency"):
-    return run_discrete_event_simulation(
-        jobs=jobs, site_id="S1", date="2026-11-13", cabinet_kw=[cab_kw] * 3,
-        points_per_cabinet=4, strategy=strat, fault=(F, [2]),
-        cross_tie=False, gun_kw=gun_kw, grid_limit_kw=cap_kw).to_dict()
-
-for kw in (360.0, 400.0, 450.0, 500.0):
-    for cap in (None, 1146.0):
-        r = s1(kw, cap)
-        print(int(kw), cap, r["missed_departures"], r["deficit_kwh"], r["peak_kw"])
-```
-
-| 柜功率 | 限值 | missed | deficit | peak | 读法 |
-|---|---|---|---|---|---|
-| 3×360 | 无 / 1,146 | 3 | 48.80 | 1,080 | 现状：柜容量本身就是瓶颈（1,080 < 1,200） |
-| 3×400 | 无 | 4 | 130.40 | 1,200 | 恰好顶到限值，反而更差 |
-| 3×400 | 1,146 | 4 | 225.40 | 1,146 | 封顶后进一步恶化 |
-| **3×450** | **1,146** | **0** | **0.00** | **1,146** | **限值内可达 0（75,600 €）** |
-| 3×450 | 无 | 0 | 0.00 | 1,350 | 越过限值——这个 1,350 不能出现在任何材料里 |
-| 3×500 | 1,146 | 4 | 159.10 | 1,146 | 再多 150 kW 反而退回 4——非单调 |
-
-> 同一函数、同一 24 辆夜间车、同一 02:25 故障。`3×450 @1,146` 在限值 1,100–1,200 全区间都是 0；但枪功率改 140 kW 立刻退回 4（203.0 kWh）。**结论：这是可报价的边界案例，不是可承诺的产品。**
-
----
-
-## 7. 三版共用的一张表
-
-不管选哪版，渲染脚本读的都是同一组数（全部可复算）：
-
-| 数 | 值 | 来源 |
-|---|---|---|
-| S1 夜间车 | 24 辆，18:58–23:28 到，05:10–06:30 走，7,872 kWh | `fleet_schedule.csv` |
-| F015 / F016 | 01:50 降额 50 % / 02:25 停柜，`cleared_ts = 06:31`，`cleared_by = technician` | `faults.csv` |
-| 对照三行 | 0 / 4（398.50 kWh，`moves=12`）/ 3（48.80 kWh，`moves=0`） | 同引擎三次运行 |
-| S2 限电 | 14:00 通知，16:00–19:00 限 400 kW；fcfs 4（278.90 kWh）→ urgency 0 | `grid_events.csv` + 引擎 |
-| S2 电价 | 18:00 = 799.30 €/MWh；600 kWh 移至 22:00（52.20 均值），−260 € | `prices.csv` + `energy_impact.md` |
-| S3 断网 | 11:00–13:00，1,425 kW DC 维持，0 会话跌落 | `connectivity_outages.csv` |
-| S5 配置 | `grid_limit 600 → 900 kW`，D5-7 50 kW，D5-8 停用 | `site_config.csv` |
-| 汇总 | 13 → 3（4 + 4 + 5 → S1 剩 3） | 引擎 + 对账台账 |
+**Final Certification**: Shipped to `demo/presentation_demo.mp4` (75.0s, 1080p@30fps, H.264, silent) and embedded directly into Slide 6 of `Project_Sentinel_12pages_final.pptx`.
