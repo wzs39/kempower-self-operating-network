@@ -92,6 +92,11 @@ demo/verify_snapshots/
 # Temporary probe & scratch files
 *.bat
 *.cmd
+!1_RUN_COCKPIT.bat
+!2_RUN_VERIFY_ALL.bat
+!3_RUN_DEMO_DAY_TESTS.bat
+!4_BUILD_DEFENSE_PDF.bat
+!5_VERIFY_PITCH_DECK.bat
 probe_*
 run_*
 mock_*
