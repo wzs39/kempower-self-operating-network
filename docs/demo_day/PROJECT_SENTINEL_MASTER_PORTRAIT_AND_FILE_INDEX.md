@@ -1,3 +1,16 @@
+<div align="center">
+
+# ⚡ Project Sentinel · The Self-Operating Charging Network
+### 哨兵计划 · Kempower 自主运行充电网络全景大典与系统白皮书
+
+[![Language: 🇨🇳 中文](https://img.shields.io/badge/Language-%F0%9F%87%A8%F0%9F%87%B3%20%E4%B8%AD%E6%96%87-blue?style=for-the-badge)](./README.md)
+[![Language: 🇬🇧 English](https://img.shields.io/badge/Language-%F0%9F%87%AC%F0%9F%87%A7%20English-lightgrey?style=for-the-badge)](./README_EN.md)
+
+**[ 🇨🇳 简体中文版 (当前浏览) ](./README.md)** &nbsp;&nbsp;|&nbsp;&nbsp; **[ 🇬🇧 English Version (Full Blueprint) ](./README_EN.md)**
+
+---
+</div>
+
 # Project Sentinel · 全景自画像与全量文件深度索引大典
 ## (Master Comprehensive Self-Portrait & Exhaustive File-by-File Repository Index)
 

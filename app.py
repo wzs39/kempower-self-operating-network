@@ -507,6 +507,12 @@ def render_streamlit_app() -> None:
         "Autonomous Energy Certainty-as-a-Service (CaaS) | 0-Human Continuous Operations"
     )
 
+    # Sidebar: System Status & Compliance
+    with st.sidebar:
+        st.markdown("### 🌐 System Mode")
+        st.caption("Standard pure English production mode active (100% Zero-CJK certified).")
+        st.divider()
+
     # Cache heavy payload build
     @st.cache_data(show_spinner="Loading Sentinel Network Ground Truth...")
     def _get_payload() -> Dict[str, Any]:

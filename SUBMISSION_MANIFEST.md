@@ -5,7 +5,7 @@
 ---
 - **Package Archive**: `submission.zip`
 - **Total Deliverable Files**: 129
-- **Total Uncompressed Volume**: 1200.15 MB (1,258,451,912 bytes)
+- **Total Uncompressed Volume**: 1202.11 MB (1,260,502,682 bytes)
 - **Zero-CJK Rule Compliance**: 100% Pure Professional English Verified (`[\u4e00-\u9fff]` match count = 0)
 - **Deterministic Verification**: `python code/verify_all.py` (29 checks passing in < 0.5s)
 - **Automated Test Coverage**: 462 Pytest + 106 E2E = 568 total automated tests (100% pass rate)
@@ -13,10 +13,10 @@
 
 ## Deliverable Summary by Category
 
-- **`root/`**: 1 files (106.87 KB)
-- **`code/`**: 84 files (997.66 KB)
+- **`root/`**: 1 files (107.50 KB)
+- **`code/`**: 84 files (998.58 KB)
 - **`docs/`**: 26 files (468.32 KB)
-- **`presentation/`**: 12 files (152.85 MB)
+- **`presentation/`**: 12 files (154.80 MB)
 - **`videos/`**: 6 files (1045.77 MB)
 
 ---
@@ -25,7 +25,7 @@
 
 | # | Category | Relative File Path | Size | SHA-256 Checksum | Functional Description |
 |:---:|:---:|:---|:---:|:---|:---|
-| 1 | `code` | `code/app.py` | 32.14 KB | `a1d9010f7d722b6c45cd1a50c102f5e211ed483a7338c69540ab49adbe136bd8` | Interactive 4-View Streamlit Command Center and Executive Cockpit |
+| 1 | `code` | `code/app.py` | 33.06 KB | `4bd243fcb98ae57afd031e14e7e53bb33e3a4f54d65146fb0b9cfe0418ef44d2` | Interactive 4-View Streamlit Command Center and Executive Cockpit |
 | 2 | `code` | `code/e2e_tests/__init__.py` | 90 B | `de00142fb1e50bcd4418d8b2c7263ae5e82720dd1ab086172c34814e49aa5979` | End-to-End opaque-box testing test suite component |
 | 3 | `code` | `code/e2e_tests/common.py` | 4.82 KB | `828699c80d91ea344d6ba0ad9b8c53b2a0a18a20d24cac28e8e8e1404dc09730` | End-to-End opaque-box testing test suite component |
 | 4 | `code` | `code/e2e_tests/test_runner.py` | 5.79 KB | `1dcf1cb66c6df0fb0eaa57333b1dae9181175aae632b822893991dc98303edee` | End-to-End opaque-box testing test suite component |
@@ -139,7 +139,7 @@
 | 112 | `presentation` | `presentation/PITCH_DECK_OUTLINE_v2.md` | 44.95 KB | `204e2a9c5640f609e12c9908903296354b73091010728986aa57d005de614917` | Detailed pitch deck structure and jury defense talking points |
 | 113 | `presentation` | `presentation/PPT_SPEECH_PLAN.md` | 33.13 KB | `a6ce68c132c0a78c6f99a236924df6ec03fc1c0b81ff3750eca3d1556de2bbda` | Structured PPT speech plan, slide timings, speaker notes, and stage SOP |
 | 114 | `presentation` | `presentation/Project_Sentinel_12pages_final.pptx` | 16.31 MB | `3cbc088ad7887f89238e0fae7a5e1e80fceac5174e7ac3ecd6f0017eabaf83a9` | 12-slide modern presentation pitch deck with embedded speaker notes |
-| 115 | `presentation` | `presentation/Project_Sentinel_12pages_v3.pptx` | 16.06 MB | `9582147dc0ea0de3d668521334c68c49b763877ca6c0c3fc0c232973d852b2ec` | 12-slide modern presentation pitch deck (official release with real GitHub QR code) |
+| 115 | `presentation` | `presentation/Project_Sentinel_12pages_v3.pptx` | 18.01 MB | `b14f628ac5e92a939c2d5ec1b979c7c4a3b145b992852a7565c087cf306a040d` | 12-slide modern presentation pitch deck (official release with real GitHub QR code) |
 | 116 | `presentation` | `presentation/Project_Sentinel_Pitch_Script_12pages.md` | 14.79 KB | `7a684095e1e6e66e6576a33090932b26743cd887ab94013553f7ae91146292e3` | Verbatim 10-minute speech script mapped slide-by-slide to the 12-page pitch deck |
 | 117 | `presentation` | `presentation/SPEECH_10MIN_ENGLISH_OFFICIAL.md` | 24.88 KB | `164dacc7c1fa60cb006b04a51b1c1d6b2f4cf719fb0be90ad24d14a05a83d932` | Official 10-minute keynote speech script with blizzard opening and jury defense |
 | 118 | `presentation` | `presentation/SPEECH_OVERHEAT_SCENE.md` | 9.17 KB | `d42e7d94fc6c27176052d87b432aa895e7d1f7c528387695c6d1068bbd8b46a8` | Deep-dive verbal script for S1 sub-zero thermal trip scenario |
@@ -147,7 +147,7 @@
 | 120 | `presentation` | `presentation/presentation 1.mp4` | 61.05 MB | `2dd2206be17fe2dbca005a490a1bf424cc74c59b2f0b84d28cf5e0fdd8ea143d` | Stage presentation rehearsal demonstration video part 1 |
 | 121 | `presentation` | `presentation/presentation 2.mp4` | 53.47 MB | `f7e1a5e90888dc1e37ae53b4baa6641d1d03c8f4735d75385e83e66e0a979ef3` | Stage presentation rehearsal demonstration video part 2 |
 | 122 | `presentation` | `presentation/presentation_demo.mp4` | 5.78 MB | `e3881b1d21b1c15e26b8809a5a9e4a1c642ae516103dc5694c4aec5375d8763e` | Master 1080p presentation demo video (75s runtime) |
-| 123 | `root` | `README.md` | 106.87 KB | `38de0e28678731be1dfad58983cf333550f743ade45f6b50cdc3068468800cef` | Master project documentation, system architecture, 6-scenario benchmark, and quickstart guide |
+| 123 | `root` | `README.md` | 107.50 KB | `6d1525a4edf0468267fe309762d72097fc387f1f62be3883958d49e62cf765a6` | Master project documentation, system architecture, 6-scenario benchmark, and quickstart guide |
 | 124 | `videos` | `videos/1.Night replay.mp4` | 149.79 MB | `fed7cac36fe3051b22b700dafaf573f1bf20b47179d428d5fdfa471a0162aaf9` | Scenario 1: S1 overnight bus depot sub-zero charging & thermal trip replay (1080p) |
 | 125 | `videos` | `videos/2.Outage replay.mp4` | 374.07 MB | `3f9a6c1d0dc221cf0b8a07fd546dead842fbe21c4318a7feec75ca61d3dffd6d` | Scenario 2: S3 highway public hub 2-hour cellular outage & edge islanding replay (1080p) |
 | 126 | `videos` | `videos/3.Price spike replay.mp4` | 205.84 MB | `a6e57eaf9207cff17a502640951dd36982bc838a2e66fdd1a19b61260c1edafd` | Scenario 3: S4 urban hub 799.30 EUR/MWh price spike peak shaving replay (1080p) |

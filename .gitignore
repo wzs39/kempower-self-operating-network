@@ -79,6 +79,7 @@ _archive_outdated/
 zcode-pojia/
 
 # Demo scratch frames
+demo/sentinel_demo_video/
 demo/audit_frames/
 demo/ref_v1_*.png
 demo/ref_v2_*.png
