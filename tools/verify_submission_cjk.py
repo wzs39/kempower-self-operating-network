@@ -13,10 +13,13 @@ def check_file(filepath):
             if m:
                 return len(m), m[:10]
     elif ext == '.pptx':
-        # Unzip and inspect XMLs
+        # Unzip and inspect slide contents, notes, comments, shapes
         with zipfile.ZipFile(filepath, 'r') as z:
             cjk_found = []
             for name in z.namelist():
+                # Ignore system theme fallback font declarations (e.g. ppt/theme/theme1.xml)
+                if name.startswith('ppt/theme/'):
+                    continue
                 if name.endswith(('.xml', '.rels', '.txt')):
                     txt = z.read(name).decode('utf-8', errors='ignore')
                     m = CJK_PATTERN.findall(txt)

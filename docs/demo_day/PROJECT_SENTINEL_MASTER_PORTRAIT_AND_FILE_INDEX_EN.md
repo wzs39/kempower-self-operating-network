@@ -3,10 +3,7 @@
 # ⚡ Project Sentinel · The Self-Operating Charging Network
 ### Master Architectural Portrait & Exhaustive Technical Blueprint
 
-[![Language: 🇨🇳 中文](https://img.shields.io/badge/Language-%F0%9F%87%A8%F0%9F%87%B3%20%E4%B8%AD%E6%96%87-lightgrey?style=for-the-badge)](./README.md)
-[![Language: 🇬🇧 English](https://img.shields.io/badge/Language-%F0%9F%87%AC%F0%9F%87%A7%20English-blue?style=for-the-badge)](./README_EN.md)
-
-**[ 🇨🇳 简体中文版 (点击切换) ](./README.md)** &nbsp;&nbsp;|&nbsp;&nbsp; **[ 🇬🇧 English Version (Currently Viewing) ](./README_EN.md)**
+[![Documentation](https://img.shields.io/badge/Documentation-Technical%20Master%20Blueprint-blue?style=for-the-badge)](./README.md)
 
 ---
 

@@ -73,6 +73,7 @@ test/
 submission.zip
 submission/
 *.zip
+!Team3_Project_Sentinel_Submission.zip
 
 # Internal working notes and archives
 _archive_outdated/
@@ -85,3 +86,34 @@ demo/ref_v1_*.png
 demo/ref_v2_*.png
 demo/skill_test_poster.png
 demo/verify_snapshots/
+
+# Temporary probe & scratch files
+*.cmd
+probe_*
+run_*
+mock_*
+dump_*
+scan_*
+check_*
+eval_consts.cjs
+asar_probe.py
+appserver_probe.py
+analyze_zcode.py
+add_probe.py
+clean_finalize.py
+patch_zcode_core.py
+rebuild_with_probe.py
+rollback_temp.py
+set_default_model.py
+syntax_gate.py
+trigger_probe.py
+make_*.py
+launch_mock.py
+final_capture.py
+zcode_core.py
+zcode_help.cmd
+zcode-backup/
+capture/
+REPORT-zcode*.md
+final_verify.py
+_cleanup.py

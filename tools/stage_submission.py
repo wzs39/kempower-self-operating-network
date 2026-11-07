@@ -7,18 +7,25 @@ SUBMISSION_DIR = os.path.join(ROOT, "submission")
 
 CJK_PATTERN = re.compile(r'[\u4e00-\u9fff]')
 
-def copy_tree_clean(src, dst):
+def copy_tree_clean(src, dst, exclude_exts=None, exclude_names=None):
     if os.path.exists(dst):
         shutil.rmtree(dst)
     os.makedirs(dst, exist_ok=True)
+    exclude_exts = exclude_exts or []
+    exclude_names = exclude_names or []
+    
     for root, dirs, files in os.walk(src):
-        # ignore __pycache__ and cache dirs
-        dirs[:] = [d for d in dirs if d not in ['__pycache__', '.pytest_cache', '.git']]
+        # Ignore cache and hidden dirs
+        dirs[:] = [d for d in dirs if d not in ['__pycache__', '.pytest_cache', '.git', '.idea', '.vscode']]
         rel_dir = os.path.relpath(root, src)
         target_dir = os.path.join(dst, rel_dir) if rel_dir != '.' else dst
         os.makedirs(target_dir, exist_ok=True)
         for f in files:
             if f.endswith(('.pyc', '.pyo')):
+                continue
+            if any(f.endswith(ext) for ext in exclude_exts):
+                continue
+            if f in exclude_names:
                 continue
             src_file = os.path.join(root, f)
             dst_file = os.path.join(target_dir, f)
@@ -33,7 +40,7 @@ def main():
         shutil.rmtree(SUBMISSION_DIR)
     os.makedirs(SUBMISSION_DIR, exist_ok=True)
 
-    print("Staging submission directory...")
+    print("Staging submission directory strictly per official guidelines (No videos, No rejected web demos)...")
 
     # 1. code/
     code_dir = os.path.join(SUBMISSION_DIR, "code")
@@ -42,6 +49,11 @@ def main():
     copy_tree_clean(os.path.join(ROOT, "tests"), os.path.join(code_dir, "tests"))
     copy_tree_clean(os.path.join(ROOT, "tools"), os.path.join(code_dir, "tools"))
     
+    # demo_scenarios code (strictly excluding all mp4 video files)
+    demo_scenarios_src = os.path.join(ROOT, "demo_scenarios")
+    demo_scenarios_dst = os.path.join(code_dir, "demo_scenarios")
+    copy_tree_clean(demo_scenarios_src, demo_scenarios_dst, exclude_exts=['.mp4', '.avi', '.mov', '.webm'])
+
     for f in ["verify_all.py", "run_s1.py", "app.py", "requirements.txt", "pytest.ini"]:
         src_path = os.path.join(ROOT, f)
         if os.path.exists(src_path):
@@ -70,7 +82,7 @@ def main():
         if os.path.exists(src_path):
             copy_file_safe(src_path, os.path.join(docs_dir, dst_rel))
             
-    # demo_day/ manual
+    # demo_day/ manual (English only, exclude Chinese master portrait)
     demo_day_src = os.path.join(ROOT, "docs", "demo_day")
     demo_day_dst = os.path.join(docs_dir, "demo_day")
     os.makedirs(demo_day_dst, exist_ok=True)
@@ -83,6 +95,7 @@ def main():
         "04_structured_defense_and_crisis_manual.md",
         "05_live_demo_operational_sop.md",
         "06_code_proof_and_authenticity_guide.md",
+        "PROJECT_SENTINEL_MASTER_PORTRAIT_AND_FILE_INDEX_EN.md",
     ]:
         p = os.path.join(demo_day_src, f)
         if os.path.exists(p):
@@ -96,9 +109,11 @@ def main():
     # 3. presentation/
     pres_dir = os.path.join(SUBMISSION_DIR, "presentation")
     os.makedirs(pres_dir, exist_ok=True)
+    
+    # Strictly user-provided PPT (Project_Sentinel_12pages_v3.pptx) and pitch scripts
+    # NO video files, NO web presentations, NO other PPT versions
     pres_files = [
         ("Project_Sentinel_12pages_v3.pptx", "Project_Sentinel_12pages_v3.pptx"),
-        ("Project_Sentinel_12pages_final.pptx", "Project_Sentinel_12pages_final.pptx"),
         ("Project_Sentinel_Pitch_Script_12pages.md", "Project_Sentinel_Pitch_Script_12pages.md"),
         ("docs/SPEECH_10MIN_ENGLISH_OFFICIAL.md", "SPEECH_10MIN_ENGLISH_OFFICIAL.md"),
         ("docs/PPT_SPEECH_PLAN.md", "PPT_SPEECH_PLAN.md"),
@@ -106,33 +121,15 @@ def main():
         ("PITCH_DECK_OUTLINE.md", "PITCH_DECK_OUTLINE.md"),
         ("demo_scenarios/SPEECH_SIX_SCENES.md", "SPEECH_SIX_SCENES.md"),
         ("demo_scenarios/SPEECH_OVERHEAT_SCENE.md", "SPEECH_OVERHEAT_SCENE.md"),
-        ("demo/presentation_demo.mp4", "presentation_demo.mp4"),
-        ("demo_scenarios/presentation 1.mp4", "presentation 1.mp4"),
-        ("demo_scenarios/presentation 2.mp4", "presentation 2.mp4"),
     ]
     for src_rel, dst_rel in pres_files:
         src_path = os.path.join(ROOT, src_rel)
         if os.path.exists(src_path):
             copy_file_safe(src_path, os.path.join(pres_dir, dst_rel))
 
-    # 4. videos/
-    videos_dir = os.path.join(SUBMISSION_DIR, "videos")
-    os.makedirs(videos_dir, exist_ok=True)
-    video_files = [
-        "1.Night replay.mp4",
-        "2.Outage replay.mp4",
-        "3.Price spike replay.mp4",
-        "4.Curtailment replay.mp4",
-        "5.Cable fault replay.mp4",
-        "6.Commissioning replay.mp4",
-    ]
-    for vf in video_files:
-        src_path = os.path.join(ROOT, "demo_scenarios", vf)
-        if os.path.exists(src_path):
-            copy_file_safe(src_path, os.path.join(videos_dir, vf))
-
-    # 5. Top-level README.md
+    # 4. Top-level README.md and master English portrait
     copy_file_safe(os.path.join(ROOT, "README.md"), os.path.join(SUBMISSION_DIR, "README.md"))
+    copy_file_safe(os.path.join(ROOT, "README_EN.md"), os.path.join(SUBMISSION_DIR, "README_EN.md"))
 
     print("Submission directory staged successfully!")
 
