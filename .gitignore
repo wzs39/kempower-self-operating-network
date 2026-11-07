@@ -90,6 +90,7 @@ demo/skill_test_poster.png
 demo/verify_snapshots/
 
 # Temporary probe & scratch files
+*.bat
 *.cmd
 probe_*
 run_*

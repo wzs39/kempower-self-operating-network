@@ -84,7 +84,11 @@ def main():
     copy_tree_clean(os.path.join(ROOT, "src"), os.path.join(p2_dir, "src"))
     copy_tree_clean(os.path.join(ROOT, "tests"), os.path.join(p2_dir, "tests"))
     copy_tree_clean(os.path.join(ROOT, "e2e_tests"), os.path.join(p2_dir, "e2e_tests"))
-    copy_tree_clean(os.path.join(ROOT, "tools"), os.path.join(p2_dir, "tools"))
+    copy_tree_clean(
+        os.path.join(ROOT, "tools"),
+        os.path.join(p2_dir, "tools"),
+        exclude_names=['build_bilingual_qa_manual.py', 'defense_data_bilingual.py', 'qa_items_bilingual.py']
+    )
     
     # demo_scenarios code (strictly excluding all mp4 video files)
     demo_scenarios_src = os.path.join(ROOT, "demo_scenarios")
